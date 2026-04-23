@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            50: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        surface: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-surface-50 text-surface-900 antialiased overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="h-16 border-b border-surface-200 bg-white flex items-center justify-between px-6 z-30 shrink-0">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary-600 rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-surface-900">VotoSeguro</span>
+</div>
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 text-sm">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="Search logs, nodes or transactions..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-surface-500 hover:bg-surface-100 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-surface-500 hover:bg-surface-100 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-surface-200 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-semibold">T. Operador</p>
+<p class="text-[10px] text-surface-500">ID: #4092</p>
+</div>
+<img alt="User Avatar" class="w-8 h-8 rounded-full bg-surface-200" data-alt="User profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARlVHaa5rDOjGwq7nFLQaucY5WG6SNWg8y48rTf33LqI1CzGvZ1NVWkih-xHyE_BUJrU-DwQ8eH3GPeXfcWIBLtv8mT9UC2mFLV0E-XuZLXQxwXb3Hz-vvD1Ebr1_LpBFvxzhAetU7pKYBhPdEyO5TnpefLW9OrV_cyZcnsdooX0kcAxkjQSb9kswzGm9fkyeCqrRDrCDaw7VKKvrAw6VDK3PyB5v0Y80z2kPCHQ6c792KYf7_PAW39G0NZfvjBWengg25v7PSuQ0"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="w-64 border-r border-surface-200 bg-white flex flex-col shrink-0">
+<div class="p-6">
+<h2 class="text-xs font-bold text-surface-400 uppercase tracking-widest">Admin Panel</h2>
+<p class="text-xs text-surface-500 mt-1">Technical Monitoring</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 bg-primary-50 text-primary-700 rounded-lg font-medium" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">lan</span>
+                    Nodes
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">security</span>
+                    Audit
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">warning</span>
+                    Alerts
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">assessment</span>
+                    Reports
+                </a>
+</nav>
+<div class="p-4 border-t border-surface-100">
+<div class="bg-surface-900 rounded-lg p-4 text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 rounded-full bg-green-400 status-pulse"></span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Network Health</span>
+</div>
+<p class="text-2xl font-bold">99.98%</p>
+<p class="text-[10px] text-surface-400 mt-1">Uptime last 24h</p>
+</div>
+</div>
+</aside>
+<!-- Main Content (Canvas) -->
+<main class="flex-1 overflow-y-auto p-8">
+<!-- Header Section -->
+<div class="flex items-end justify-between mb-8">
+<div>
+<h1 class="text-3xl font-bold text-surface-900">Operador Técnico</h1>
+<p class="text-surface-500">Real-time infrastructure monitoring and validation metrics.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-green-500 flex items-center justify-center text-[10px] text-white font-bold">8</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-amber-500 flex items-center justify-center text-[10px] text-white font-bold">3</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-red-500 flex items-center justify-center text-[10px] text-white font-bold">1</div>
+</div>
+<span class="text-xs font-semibold text-surface-400">12 TOTAL NODES</span>
+</div>
+</div>
+<!-- Bento Grid Metrics -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+<!-- Large Status Card -->
+<div class="col-span-2 row-span-2 bg-white rounded-xl border border-surface-200 p-6 flex flex-col justify-between shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-surface-400 uppercase tracking-wider mb-1">Blockchain Height</p>
+<h3 class="text-4xl font-black text-surface-900 tracking-tight">18,492,031</h3>
+</div>
+<span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">+1.2s avg block</span>
+</div>
+<div class="mt-8 flex-1 flex items-end gap-1">
+<!-- Simple visual bar chart placeholder -->
+<div class="w-full h-24 bg-surface-50 rounded-lg relative overflow-hidden flex items-end justify-between px-2 py-2">
+<div class="w-4 bg-primary-200 h-1/2 rounded-t"></div>
+<div class="w-4 bg-primary-300 h-2/3 rounded-t"></div>
+<div class="w-4 bg-primary-400 h-3/4 rounded-t"></div>
+<div class="w-4 bg-primary-500 h-full rounded-t"></div>
+<div class="w-4 bg-primary-400 h-5/6 rounded-t"></div>
+<div class="w-4 bg-primary-300 h-2/3 rounded-t"></div>
+<div class="w-4 bg-primary-400 h-3/4 rounded-t"></div>
+<div class="w-4 bg-primary-500 h-full rounded-t"></div>
+<div class="w-4 bg-primary-600 h-full rounded-t"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent"></div>
+</div>
+</div>
+<div class="mt-4 flex justify-between items-center text-xs text-surface-500 border-t border-surface-100 pt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> Last sync: 0.4s ago</span>
+<span class="font-mono">HASH: 0x4f...a231</span>
+</div>
+</div>
+<!-- Metric Cards -->
+<div class="bg-white rounded-xl border border-surface-200 p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-surface-400">timer</span>
+<span class="text-green-500 text-xs font-bold flex items-center">-12ms</span>
+</div>
+<p class="text-xs font-bold text-surface-400 uppercase tracking-wider">Avg Latency</p>
+<p class="text-2xl font-bold text-surface-900 mt-1">42ms</p>
+</div>
+<div class="bg-white rounded-xl border border-surface-200 p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-surface-400">verified</span>
+<span class="text-primary-500 text-xs font-bold flex items-center">Stable</span>
+</div>
+<p class="text-xs font-bold text-surface-400 uppercase tracking-wider">Validation Rate</p>
+<p class="text-2xl font-bold text-surface-900 mt-1">98.4%</p>
+</div>
+<div class="bg-white rounded-xl border border-surface-200 p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-surface-400">speed</span>
+<span class="text-amber-500 text-xs font-bold flex items-center">+4% load</span>
+</div>
+<p class="text-xs font-bold text-surface-400 uppercase tracking-wider">Response Time</p>
+<p class="text-2xl font-bold text-surface-900 mt-1">115ms</p>
+</div>
+<div class="bg-white rounded-xl border border-surface-200 p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-surface-400">cloud_done</span>
+<span class="text-green-500 text-xs font-bold flex items-center">Target met</span>
+</div>
+<p class="text-xs font-bold text-surface-400 uppercase tracking-wider">Availability</p>
+<p class="text-2xl font-bold text-surface-900 mt-1">99.9%</p>
+</div>
+</div>
+<!-- Content Area: Table and Incident Log -->
+<div class="grid grid-cols-3 gap-6">
+<!-- Node Table -->
+<div class="col-span-2 bg-white rounded-xl border border-surface-200 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-surface-100 flex items-center justify-between">
+<h3 class="font-bold text-surface-900">Active Nodes Explorer</h3>
+<button class="text-xs font-bold text-primary-600 hover:text-primary-700">View Network Map</button>
+</div>
+<table class="w-full text-left">
+<thead class="bg-surface-50 text-[10px] uppercase font-bold text-surface-400">
+<tr>
+<th class="px-6 py-3">Node Name</th>
+<th class="px-6 py-3">Region</th>
+<th class="px-6 py-3 text-center">Status</th>
+<th class="px-6 py-3">Load</th>
+<th class="px-6 py-3 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-surface-100">
+<tr>
+<td class="px-6 py-4 font-medium">Validator-North-01</td>
+<td class="px-6 py-4 text-surface-500">us-east-1</td>
+<td class="px-6 py-4">
+<div class="flex justify-center">
+<span class="flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> ACTIVE
+                                        </span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-surface-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary-500 w-[65%]"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-surface-400 hover:text-surface-900">more_vert</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-medium">Validator-South-02</td>
+<td class="px-6 py-4 text-surface-500">sa-east-1</td>
+<td class="px-6 py-4">
+<div class="flex justify-center">
+<span class="flex items-center gap-1.5 px-2 py-1 bg-amber-50 text-amber-600 text-[10px] font-bold rounded">
+<span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span> WARNING
+                                        </span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-surface-100 rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 w-[88%]"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-surface-400 hover:text-surface-900">more_vert</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-medium">Relay-Global-03</td>
+<td class="px-6 py-4 text-surface-500">eu-central-1</td>
+<td class="px-6 py-4">
+<div class="flex justify-center">
+<span class="flex items-center gap-1.5 px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded">
+<span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span> DOWN
+                                        </span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-surface-100 rounded-full overflow-hidden">
+<div class="h-full bg-surface-300 w-0"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-surface-400 hover:text-surface-900">more_vert</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-medium">Validator-East-04</td>
+<td class="px-6 py-4 text-surface-500">ap-northeast-1</td>
+<td class="px-6 py-4">
+<div class="flex justify-center">
+<span class="flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> ACTIVE
+                                        </span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-surface-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary-500 w-[42%]"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-surface-400 hover:text-surface-900">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Recent Logs/Incidents -->
+<div class="bg-surface-900 rounded-xl shadow-sm text-white overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-surface-800 flex items-center justify-between">
+<h3 class="font-bold">System Incident Log</h3>
+<span class="text-[10px] font-bold bg-primary-600 px-2 py-0.5 rounded">LIVE</span>
+</div>
+<div class="p-6 flex-1 space-y-4 font-mono text-xs overflow-y-auto max-h-[400px]">
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">14:02:11</span>
+<p><span class="text-amber-400">[WARN]</span> Node-02 high CPU usage detected (88%)</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">14:00:45</span>
+<p><span class="text-green-400">[INFO]</span> Block 18,492,031 confirmed by 9/12 nodes</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">13:58:22</span>
+<p><span class="text-red-400">[CRIT]</span> Relay-03 connection timeout. Retrying...</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">13:55:01</span>
+<p><span class="text-surface-400">[DEBUG]</span> Garbage collection completed in 42ms</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">13:52:19</span>
+<p><span class="text-primary-400">[SYS]</span> Snapshot backup initiated to S3 bucket</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">13:50:44</span>
+<p><span class="text-green-400">[INFO]</span> Block 18,492,030 confirmed by 11/12 nodes</p>
+</div>
+<div class="flex gap-3">
+<span class="text-surface-500 shrink-0">13:48:30</span>
+<p><span class="text-amber-400">[WARN]</span> Latency spike detected in SA-East region (312ms)</p>
+</div>
+</div>
+<div class="p-4 border-t border-surface-800 bg-surface-950">
+<button class="w-full py-2 bg-surface-800 hover:bg-surface-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">
+                            Full Log Export
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

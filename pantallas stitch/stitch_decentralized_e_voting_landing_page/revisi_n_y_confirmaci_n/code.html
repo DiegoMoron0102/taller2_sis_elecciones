@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Revisión y Confirmación - Portal de Votación</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 md:px-20 py-4 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">how_to_vote</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Portal de Votación</h2>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
+<span class="material-symbols-outlined text-sm">shield</span>
+<span class="text-xs font-bold uppercase tracking-wider">Sistema Seguro</span>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center py-8 px-4 sm:px-10 lg:px-40">
+<div class="w-full max-w-2xl">
+<!-- Stepper Section -->
+<div class="flex flex-col gap-3 mb-10">
+<div class="flex justify-between items-center">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Paso 2 de 3</p>
+<span class="text-primary text-sm font-bold">66% Completado</span>
+</div>
+<div class="h-2.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 66%;"></div>
+</div>
+<p class="text-slate-500 dark:text-slate-500 text-sm italic">Revisión y Confirmación de Selección</p>
+</div>
+<!-- Main Review Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-8 flex flex-col items-center text-center">
+<h2 class="text-2xl font-extrabold mb-8">Revise su Selección</h2>
+<!-- Candidate Focus -->
+<div class="flex flex-col items-center gap-6 p-6 rounded-xl bg-background-light dark:bg-background-dark border border-slate-100 dark:border-slate-800 w-full max-w-sm">
+<div class="relative">
+<div class="size-32 rounded-full border-4 border-primary/20 p-1 overflow-hidden">
+<img alt="Retrato de Juan Pérez" class="w-full h-full object-cover rounded-full" data-alt="Retrato profesional de un candidato sonriendo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD67bv8Fv4qBwL8lgpL0wyq_cVhrFGaRU730NJtNYnM6K6kxtVkC_LSbKSUc_RrcxF6lRxsNIilh5thYpgKle9aVdLViGT0lOZ6JkpB2QB_qDqQBigfkuBn0ky2std_mkin_HZutWD5p64qhUZ_QViTDWRyQJGh3dpSYIWChShPUVqu7gYg6SbuZmGVyKZatc7wAtK65bUFxMurwIC1KVCk9EKocV-1Ehgg9lvecfmA3IXIbLgzyrAzW-Q1hHIwOBs7IXVWK82Pk1M"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-green-500 text-white rounded-full p-1 border-4 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-lg block">check_circle</span>
+</div>
+</div>
+<div class="flex flex-col items-center">
+<p class="text-2xl font-bold leading-tight">Juan Pérez</p>
+<p class="text-primary font-semibold text-base mt-1">Partido del Futuro</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1 uppercase tracking-widest font-medium">Candidato a la Presidencia</p>
+</div>
+</div>
+<!-- System Validation Message -->
+<div class="mt-8 flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-4 py-2 rounded-full border border-green-200 dark:border-green-800/30">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span class="text-sm font-bold uppercase">Selección validada por el sistema</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-3">
+<button class="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">send</span>
+                                Confirmar y emitir voto
+                            </button>
+<button class="w-full py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                Cambiar selección
+                            </button>
+</div>
+</div>
+<!-- Security Note -->
+<div class="mt-10 p-5 rounded-xl border-l-4 border-primary bg-primary/5 flex gap-4 items-start">
+<div class="text-primary mt-1">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1 uppercase tracking-tight">Nota de Seguridad Institucional</h4>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                Su boleta será cifrada con una clave pública antes de ser registrada en la <strong>blockchain</strong>, garantizando el anonimato y la inmutabilidad de su voto conforme a los estándares internacionales de seguridad electoral.
+                            </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Info -->
+<footer class="py-8 px-6 text-center text-slate-500 dark:text-slate-600 text-xs">
+<div class="flex justify-center gap-6 mb-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">encrypted</span> Cifrado AES-256</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">account_balance</span> Autoridad Electoral</span>
+</div>
+<p>© 2024 Portal de Votación Ciudadana. Todos los derechos reservados.</p>
+</footer>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        error: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        neutral: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .error-grid-pattern {
+            background-image: radial-gradient(circle, #f87171 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900 overflow-hidden">
+<!-- Exclusion Protocol: Hidden NavBars for Error/Linear Flow -->
+<main class="relative min-h-screen flex items-center justify-center p-6">
+<!-- Background Decorative Elements -->
+<div class="absolute inset-0 error-grid-pattern pointer-events-none"></div>
+<div class="absolute top-0 left-0 w-full h-1 bg-error-600"></div>
+<div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+<!-- Visual Narrative Side (Asymmetric) -->
+<div class="lg:col-span-5 space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-error-100 text-error-700 rounded-full border border-error-200">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">report</span>
+<span class="text-xs font-bold tracking-wider font-label">CRITICAL_FAILURE</span>
+</div>
+<h1 class="text-5xl font-headline font-bold leading-tight tracking-tight text-neutral-900">
+                    Error en el sistema de monitoreo
+                </h1>
+<p class="text-lg text-neutral-600 leading-relaxed">
+                    No fue posible establecer comunicación con la red de nodos. <span class="font-semibold text-error-700">Supervisión degradada.</span> Por favor, verifique la conexión del protocolo de seguridad.
+                </p>
+<div class="pt-4 flex flex-col sm:flex-row gap-4">
+<button class="bg-neutral-900 text-white px-8 py-3 rounded-lg font-label font-medium hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">refresh</span>
+                        Reintentar
+                    </button>
+<button class="border border-neutral-300 text-neutral-600 px-8 py-3 rounded-lg font-label font-medium hover:bg-neutral-100 transition-colors flex items-center justify-center gap-2">
+                        Ver Estado de Red
+                    </button>
+</div>
+</div>
+<!-- Data Detail Side (Bento Grid) -->
+<div class="lg:col-span-7 grid grid-cols-2 gap-4">
+<!-- Main Status Card -->
+<div class="col-span-2 bg-white p-6 rounded-xl border border-neutral-200 shadow-sm flex items-start gap-4">
+<div class="w-12 h-12 bg-error-50 rounded-lg flex items-center justify-center text-error-600">
+<span class="material-symbols-outlined text-3xl">lan</span>
+</div>
+<div>
+<h3 class="font-headline font-semibold text-neutral-800">Estado de VotoSeguro</h3>
+<p class="text-sm text-neutral-500">Servicio de auditoría técnica no disponible en este momento.</p>
+</div>
+</div>
+<!-- Technical Details Bento Item -->
+<div class="bg-white p-5 rounded-xl border border-neutral-200 shadow-sm">
+<div class="flex items-center gap-2 mb-3 text-neutral-400">
+<span class="material-symbols-outlined text-sm">code</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-label">Detalle técnico</span>
+</div>
+<code class="text-xs font-mono text-neutral-600 block leading-relaxed">
+                        ERR_CONN_TIMEOUT<br/>
+                        NODE_SYNC_FAILURE<br/>
+                        VOT-SEC-0x404
+                    </code>
+</div>
+<!-- Incident ID Bento Item -->
+<div class="bg-neutral-900 text-white p-5 rounded-xl border border-neutral-800 shadow-lg">
+<div class="flex items-center gap-2 mb-3 text-neutral-400">
+<span class="material-symbols-outlined text-sm">fingerprint</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-label">ID Incidencia</span>
+</div>
+<div class="text-lg font-headline font-bold">#VS-882-90</div>
+<div class="text-[10px] text-neutral-500 mt-1">Registrado automáticamente</div>
+</div>
+<!-- Visual Representation -->
+<div class="col-span-2 relative h-48 rounded-xl overflow-hidden border border-neutral-200 group">
+<img alt="Abstact technical representation of server nodes" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Abstract server rack with red warning lights and digital noise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm5mngg9nw2ivZzAXu2IhEGtUmCy7C_y5RyDMdIiYxSICMshKDJNhRQTiqTLPrjbdk73APp3Gtnd8n_JLwxqawg-vS7_V6jtyZYk8fcUHhlyY0piEAmmR6e0cY6l_atfO7xQDKGy6c0_FozQQpu9rIHqrYNswZu9hAnjqzrBcO_9fhgoXLD0XetNpdtJnuvtixH6TtyevYXgLoZQIjhWzRsvJd40j3ygdp9-qPPcKj8XcJqoK5khiwwi_p6U6v2mGzq9jIrQfZ6RY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-neutral-900/80 to-transparent flex items-end p-4">
+<div class="flex items-center gap-2 text-white/90">
+<span class="material-symbols-outlined text-sm animate-pulse">radar</span>
+<span class="text-xs font-label">Buscando Nodos de Respaldo...</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Logo Reference (Immutable string logic) -->
+<footer class="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined text-neutral-600">security</span>
+<span class="font-headline font-bold text-neutral-800 tracking-tighter">VotoSeguro</span>
+<span class="h-4 w-px bg-neutral-300"></span>
+<span class="text-xs font-label text-neutral-500">Admin Panel</span>
+</footer>
+</main>
+</body></html>

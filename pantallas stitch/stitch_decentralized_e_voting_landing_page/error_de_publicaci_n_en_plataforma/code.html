@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#1a365d",
+              error: "#dc2626",
+              surface: "#f8fafc",
+              border: "#e2e8f0"
+            },
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-slate-900 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-primary tracking-tight">VotoSeguro</span>
+<div class="hidden md:flex items-center bg-slate-100 px-3 py-1.5 rounded-lg border border-border">
+<span class="material-symbols-outlined text-slate-500 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64" placeholder="Buscar procesos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-border">
+<img alt="Admin Profile" data-alt="Official headshot of electoral system administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfWd4i0EmjjQVlbNjo59PrbCszGWRB7cd2fLVPirsEwmUaEPHqg3QZ-WUgCB22a8dj7Q-nDiTsly0g-UTMsokzrJOcr5F2HUZahet-QOegYQDn9VVfv38-PbJ8g81Sq-pdDe1v_74AepWBnKhZYgFvn6Tu5WUL2KJrD5XA_g0B1kxMVpUZVYZxzMzDKVdfGZcZqXzTGE2x0oDx7qRj6h_K0aThIJxv2v7WaND97X8moZGxp-_2QnfvMooktsOMTa27utP2ehG4PvU"/>
+</div>
+</div>
+</nav>
+<!-- Main Content: Exclusion Protocol applied (No SideNav for Focus) -->
+<main class="flex-grow flex items-center justify-center p-6 bg-slate-50/50">
+<div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<!-- Left: Visual/Status -->
+<div class="lg:col-span-5 flex flex-col items-center lg:items-end text-center lg:text-right space-y-6">
+<div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center border-4 border-white shadow-xl">
+<span class="material-symbols-outlined text-error text-5xl" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div>
+<h1 class="text-3xl font-bold text-slate-900 leading-tight">No se pudo publicar el reporte de resultados</h1>
+<p class="mt-4 text-slate-600 font-medium">Fallo al subir a la plataforma central de escrutinio.</p>
+</div>
+</div>
+<!-- Right: Contingency Actions & Info -->
+<div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-sm border border-border space-y-8">
+<!-- ProgressBar Shared Component -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Election Audit Progress</span>
+<span class="text-xs text-slate-400">Verifying encrypted ballots</span>
+</div>
+<span class="text-2xl font-bold text-primary">45%</span>
+</div>
+<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+<div class="bg-primary h-full transition-all duration-500" style="width: 45%;"></div>
+</div>
+</div>
+<div class="p-4 bg-slate-50 border-l-4 border-error rounded-r-lg">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-error text-xl">security</span>
+<div>
+<p class="text-sm font-bold text-slate-800">Manejo técnico de contingencia</p>
+<p class="text-xs text-slate-600 mt-1 leading-relaxed">Se ha detectado una interrupción en el túnel VPN de auditoría. El reporte ha sido cifrado localmente en el nodo seguro para prevenir pérdida de integridad.</p>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="flex-1 bg-primary text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="refresh">refresh</span>
+                        Reintentar publicación
+                    </button>
+<button class="flex-1 bg-white text-slate-700 border border-border font-bold py-4 px-6 rounded-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Volver al panel
+                    </button>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+<div class="flex items-center gap-2 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">code</span>
+<span>Error Code: VS-503-PUB</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 text-xs justify-end">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>Timestamp: 2024-10-27 14:32:01</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-border mt-auto">
+<div class="max-w-7xl mx-auto px-6 py-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-slate-500 text-sm font-medium">
+                    © 2024 VotoSeguro Electoral Systems. All rights reserved.
+                </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Institutional Privacy</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Audit Protocol</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Technical Support</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

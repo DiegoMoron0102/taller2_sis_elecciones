@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>VotoSeguro - Verificación de Elegibilidad</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 md:px-20 lg:px-40 py-4 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary text-white rounded-lg">
+<span class="material-symbols-outlined">how_to_reg</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-black leading-tight tracking-tight">VotoSeguro</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Inicio</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">Verificar</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Resultados</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Ayuda</a>
+</nav>
+<div class="bg-primary/10 rounded-full p-1 border border-primary/20">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" data-alt="User profile placeholder circular icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWyGQJFpMEAiFTbdfEmoezRFT_rpGxweVXB3tP2_hSDfppD-jYe-UVvg95LIDzbEtVTJELm8vn1pRoIp0JmzVezVpUik8JpSupQPE8Z24H89_6ud1FvkEJQ04m4LzlXpnk_VwIdVbFmAambjSCsi7s7CnguW1U2bX80olQ29YpLZHCl8l17BgP-LbRfINo0DyyXzwP31R6Vt4B007OpLt0XznQkNy__c0_OLx_zmaHaqhlFSTSmWTO2XucvIQjRQnEyvFUCmjR_II");'></div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-10 px-4 md:px-0">
+<div class="layout-content-container flex flex-col max-w-[800px] flex-1">
+<div class="flex flex-col gap-4 p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm mb-6 border border-slate-200 dark:border-slate-800">
+<div class="flex gap-6 justify-between items-end">
+<div class="flex flex-col gap-1">
+<span class="text-primary font-bold text-xs uppercase tracking-widest">Paso Actual</span>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-none">1. Verificación de Elegibilidad</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Fase 1 de 4</p>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 25%;"></div>
+</div>
+<div class="flex justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-tighter">Progreso del proceso</p>
+<div class="flex gap-1">
+<span class="size-2 rounded-full bg-primary"></span>
+<span class="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></span>
+<span class="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></span>
+<span class="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 p-6">
+<div class="flex flex-col gap-3">
+<h1 class="text-slate-900 dark:text-slate-100 text-4xl md:text-5xl font-black leading-tight tracking-tight">Verificar elegibilidad del votante</h1>
+<p class="text-primary text-lg font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined">account_balance</span>
+                                Sistema de Votación Electrónica Descentralizada
+                            </p>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                            Para garantizar la integridad del proceso democrático, debemos verificar que usted se encuentra habilitado para votar en este padrón electoral. Este procedimiento es obligatorio para asegurar que cada ciudadano emita un único voto válido según la normativa vigente.
+                        </p>
+<div class="grid gap-4 @container">
+<div class="flex flex-1 flex-col items-start justify-between gap-6 rounded-xl border border-primary/20 bg-primary/5 p-6 @[480px]:flex-row @[480px]:items-center">
+<div class="flex gap-4">
+<div class="text-primary shrink-0">
+<span class="material-symbols-outlined text-4xl">shield_person</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold">Privacidad Garantizada</p>
+<p class="text-slate-600 dark:text-slate-400 text-base leading-snug">
+                                            Su identidad es validada rigurosamente para prevenir fraudes, pero su voto permanece <strong>completamente anónimo y cifrado</strong> mediante tecnología blockchain de última generación.
+                                        </p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4 mt-4">
+<div class="flex flex-col gap-2">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">Requisitos para la validación:</h3>
+<ul class="space-y-2">
+<li class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                                        Documento de identidad nacional vigente.
+                                    </li>
+<li class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                                        Dispositivo con cámara para validación biométrica.
+                                    </li>
+<li class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                                        Conexión a internet estable y segura.
+                                    </li>
+</ul>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 pt-6">
+<button class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group">
+                                Iniciar verificación
+                                <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+<button class="px-8 py-4 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                Consultar padrón
+                            </button>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+<a class="text-sm font-semibold text-primary hover:underline flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-sm">policy</span>
+                                Leer política de privacidad completa
+                            </a>
+<p class="text-slate-400 text-xs text-center md:text-right">
+                                Organismo Electoral Independiente © 2024. <br/>
+                                Infraestructura protegida por cifrado de extremo a extremo.
+                            </p>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full py-6 px-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-center text-slate-500 dark:text-slate-400 text-xs">
+                Este sistema utiliza tecnología de registro distribuido (Blockchain) para asegurar la inmutabilidad de los datos.
+            </footer>
+</div>
+</div>
+</body></html>

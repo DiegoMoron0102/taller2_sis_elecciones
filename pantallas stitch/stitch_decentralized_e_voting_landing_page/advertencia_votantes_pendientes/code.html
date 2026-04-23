@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#1e293b',
+                            foreground: '#ffffff'
+                        },
+                        warning: {
+                            DEFAULT: '#f59e0b',
+                            foreground: '#ffffff'
+                        },
+                        danger: {
+                            DEFAULT: '#dc2626',
+                            foreground: '#ffffff'
+                        },
+                        surface: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0'
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-white border-b border-surface-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="font-headline font-bold text-xl text-primary tracking-tight">VotoSeguro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-surface-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-surface-200 border border-surface-200">
+<img alt="admin profile" class="w-full h-full object-cover" data-alt="admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyk9pEu3Kum9ve35YJl8ipDo6ENM-nPOVI-OmmQ-4ywQletyktl-WZfiZ_XchjA-j-RJbxt3LeJLPYDq4_5QAttOx8es_5q-zbmRvEyT_JxBzq3OgEXa7qa8sbh2OkJNKZGg0yJJzz8xSL1g8kUQOFfQjtE_8fF5_pzxAbqq0_i0cRWIpqAPZp2nSlB_f92gAa5Ue1Uq7b5E4d9tLOD2IZaZebE5QyPTb-A08B5cZVzcFjxzRuboo0uncz9Bjg5cj5LYVXjT_gMkI"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Shared Component - Progress 20%) -->
+<div class="bg-white px-6 py-4 border-b border-surface-200">
+<div class="max-w-4xl mx-auto">
+<div class="flex justify-between items-end mb-2">
+<div>
+<p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Election Closing Process</p>
+<h2 class="text-sm font-medium text-slate-900">Step: Authentication</h2>
+</div>
+<span class="text-sm font-bold text-primary">20%</span>
+</div>
+<div class="w-full bg-surface-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full transition-all duration-500" style="width: 20%"></div>
+</div>
+</div>
+</div>
+<!-- Main Content: Warning Screen -->
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Left Side: Visual Warning (Bento Style) -->
+<div class="md:col-span-5 flex flex-col gap-6">
+<div class="bg-warning/10 border border-warning/20 p-8 rounded-xl flex flex-col items-center justify-center text-center">
+<div class="w-20 h-20 bg-warning/20 rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-warning text-5xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h1 class="text-2xl font-bold text-slate-900 font-headline leading-tight">Existen votantes pendientes</h1>
+</div>
+<div class="bg-white border border-surface-200 p-6 rounded-xl">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-slate-400">info</span>
+<span class="text-sm font-semibold text-slate-500 uppercase">Contexto del Sistema</span>
+</div>
+<p class="text-slate-600 text-sm leading-relaxed">
+                        Aún se detectan sesiones activas o actividad pendiente de cierre en algunos nodos. Forzar el cierre puede resultar en la pérdida de datos de sincronización local.
+                    </p>
+</div>
+</div>
+<!-- Right Side: Node Details and Actions -->
+<div class="md:col-span-7 flex flex-col gap-6">
+<div class="bg-white border border-surface-200 rounded-xl overflow-hidden flex flex-col h-full">
+<div class="p-6 border-b border-surface-100 flex justify-between items-center bg-slate-50/50">
+<h3 class="font-semibold text-slate-900">Nodos con actividad detectada</h3>
+<span class="px-2 py-1 bg-warning/10 text-warning text-xs font-bold rounded">3 NODOS</span>
+</div>
+<div class="p-4 space-y-3 flex-grow">
+<!-- Node Item -->
+<div class="flex items-center justify-between p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-warning rounded-full"></div>
+<div>
+<p class="text-sm font-bold text-slate-800">Nodo Central - Sector 04</p>
+<p class="text-xs text-slate-500">12 sesiones en espera de cierre</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300">hub</span>
+</div>
+<!-- Node Item -->
+<div class="flex items-center justify-between p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-warning rounded-full animate-pulse"></div>
+<div>
+<p class="text-sm font-bold text-slate-800">Nodo Remoto - Región Norte</p>
+<p class="text-xs text-slate-500">Sincronización en curso (88%)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300">cloud_sync</span>
+</div>
+<!-- Node Item -->
+<div class="flex items-center justify-between p-4 bg-surface-50 rounded-lg border border-surface-100 opacity-60">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-slate-400 rounded-full"></div>
+<div>
+<p class="text-sm font-bold text-slate-800">Punto de Acceso 12B</p>
+<p class="text-xs text-slate-500">Sesión de administrador activa</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300">person</span>
+</div>
+</div>
+<!-- ButtonGroup (Shared Component) -->
+<div class="p-6 bg-slate-50 border-t border-surface-100 flex justify-end gap-3">
+<button class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm">
+                            Esperar / Cancelar
+                        </button>
+<button class="px-6 py-3 bg-danger text-white font-semibold rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm shadow-lg shadow-danger/20">
+<span class="material-symbols-outlined text-lg">gavel</span>
+                            Cerrar de todos modos
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-white border-t border-surface-200 py-8 px-6">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-slate-500 text-sm">
+                © 2024 VotoSeguro Institutional. All rights reserved.
+            </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Institutional Portal</a>
+<a class="text-sm text-slate-600 hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

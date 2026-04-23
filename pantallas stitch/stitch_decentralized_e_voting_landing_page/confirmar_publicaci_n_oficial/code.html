@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: "#1a1a1a",
+                            secondary: "#4a4a4a",
+                            accent: "#ef4444", // Red/Orange strong for authorization
+                            surface: "#ffffff",
+                            muted: "#f3f4f6"
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-900 min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-black flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-white text-sm" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<span class="font-headline font-bold text-xl tracking-tight">VotoSeguro</span>
+</div>
+<div class="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2 w-64">
+<span class="material-symbols-outlined text-gray-400 text-lg mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full p-0" placeholder="on_left" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-gray-200">
+<img alt="Admin Profile" data-alt="Close up of a professional administrator portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD95CVuqLbBkFKDvVeCZcw0SeyzRZsDgVIgtG1bclwWHQqP82YGyZV20H3stzN_ujQYGCEkyRj-KVTLyBwEIagU-Hfdq4G5IAWRlSWxHLSPlN3YDXEedJNo53Ugh1jT_494Tjxi1vj95kZj1Uhq2P2BbTlgKJ0gYA-Z467COWRIj5IZI201XGr-oehzimy1W0IK_n6Zfe2xyie3QUS8NMTbn8-17MyYY9ltD4hf4b8O5aF99PIKjXUx_75vrZNFUhg3_84VCNQT4UM"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Shared Component) -->
+<div class="bg-white border-b border-gray-100 px-6 py-3">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium text-gray-600">Election Audit Progress</span>
+<span class="text-sm font-bold text-black">45%</span>
+</div>
+<div class="w-full bg-gray-100 rounded-full h-2">
+<div class="bg-black h-2 rounded-full transition-all duration-500" style="width: 45%;"></div>
+</div>
+<p class="text-xs text-gray-400 mt-2 italic">Verifying encrypted ballots</p>
+</div>
+</div>
+<!-- Main Content: Linear Confirmation Flow (Exclusion Protocol applied: Focus on Task) -->
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="max-w-4xl w-full">
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+<div class="p-8 md:p-12">
+<!-- Header -->
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-red-50 rounded-xl">
+<span class="material-symbols-outlined text-red-600 text-4xl" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h1 class="text-2xl md:text-3xl font-headline font-bold text-slate-900 leading-tight">Confirmar publicación de resultados y evidencias</h1>
+<p class="text-red-600 font-medium mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="error">error</span>
+                                Advertencia: Acción oficial e irreversible
+                            </p>
+</div>
+</div>
+<!-- Bento Grid Implications -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+<div class="group p-6 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-300 transition-colors">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-gray-700" data-icon="public">public</span>
+<h3 class="font-bold text-slate-900">Visibilidad pública</h3>
+</div>
+<p class="text-sm text-gray-600 leading-relaxed">Los resultados serán accesibles para todos los ciudadanos y observadores internacionales de forma inmediata.</p>
+</div>
+<div class="group p-6 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-300 transition-colors">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-gray-700" data-icon="description">description</span>
+<h3 class="font-bold text-slate-900">Generación de evidencias</h3>
+</div>
+<p class="text-sm text-gray-600 leading-relaxed">Se compilarán informes técnicos y actas digitalizadas con firma electrónica para respaldo legal.</p>
+</div>
+<div class="group p-6 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-300 transition-colors">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-gray-700" data-icon="link">link</span>
+<h3 class="font-bold text-slate-900">Anclaje blockchain</h3>
+</div>
+<p class="text-sm text-gray-600 leading-relaxed">El hash de los resultados se registrará en la cadena de bloques, garantizando su inmutabilidad perpetua.</p>
+</div>
+<div class="group p-6 rounded-xl border border-gray-100 bg-gray-50 hover:border-gray-300 transition-colors">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-gray-700" data-icon="history_edu">history_edu</span>
+<h3 class="font-bold text-slate-900">Registro auditoría</h3>
+</div>
+<p class="text-sm text-gray-600 leading-relaxed">Esta acción quedará vinculada permanentemente a su perfil administrativo en los registros de auditoría.</p>
+</div>
+</div>
+<!-- Authorization Section -->
+<div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex-shrink-0">
+<img alt="VotoSeguro Seal" class="rounded-full w-full h-full object-cover" data-alt="Abstract security seal pattern in dark colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXtSmUbNmWNNkgSRY3zDoB4gMet_AVf4kr8iNLjkCy6eJwUzYC5C-HcKJtGffgo3vnfY2rNXaMddkddsGe1XgNiWItqBROfo07k8KPEZgh69uZM2Z5pg7YfXIMoAWyEStmow5bmsxxZiNO0F77ADbKx_hOThcv39GGp6-2Meo0jrSvLAXPMXq-sE2BvOPpwvfEwfVt-m8PHwfhWW3dKHl797gQZYFbp0cfElH12CboR60AL-AVm9JZU_aVeq7fTXE1FfktAmeq7SE"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-900">VotoSeguro Electoral Systems</p>
+<p class="text-xs text-gray-500">Protocolo de Cierre de Jornada v4.2</p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+<button class="px-8 py-3 rounded-lg border border-gray-300 font-bold text-gray-700 hover:bg-gray-50 transition-all text-center">
+                                Cancelar
+                            </button>
+<button class="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="publish">publish</span>
+                                Autorizar publicación
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<p class="text-center mt-6 text-xs text-gray-400 max-w-lg mx-auto leading-loose">
+                Al proceder, usted confirma que ha verificado todos los campos y que cuenta con la autoridad delegada para el cierre oficial de este proceso electoral.
+            </p>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-white border-t border-gray-200 mt-auto">
+<div class="max-w-7xl mx-auto px-6 py-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-black flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-white text-[10px]" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<span class="text-sm font-bold">VotoSeguro</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-xs text-gray-500 hover:text-black transition-colors" href="#">Institutional Privacy</a>
+<a class="text-xs text-gray-500 hover:text-black transition-colors" href="#">Audit Protocol</a>
+<a class="text-xs text-gray-500 hover:text-black transition-colors" href="#">Technical Support</a>
+<a class="text-xs text-gray-500 hover:text-black transition-colors" href="#">Terms of Service</a>
+</div>
+<p class="text-xs text-gray-400">© 2024 VotoSeguro Electoral Systems. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</body></html>

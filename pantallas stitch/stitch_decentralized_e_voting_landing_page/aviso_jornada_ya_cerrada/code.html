@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                primary: {
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    600: '#0284c7',
+                    700: '#0369a1',
+                    900: '#0c4a6e',
+                },
+                surface: {
+                    50: '#f8fafc',
+                    100: '#f1f5f9',
+                    200: '#e2e8f0',
+                    600: '#475569',
+                    900: '#0f172a',
+                }
+            },
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface-50 text-surface-900 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-surface-200 px-6 h-16 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-primary-600 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+</div>
+<span class="text-xl font-headline font-bold text-primary-900">VotoSeguro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-surface-600 hover:bg-surface-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="w-10 h-10 rounded-full border border-surface-200 overflow-hidden">
+<img alt="admin profile" class="w-full h-full object-cover" data-alt="Official administrator headshot profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC23PpAP4NcLfby7PnH6mlWlVb1HxZAKnQUWW9NIoVcMcb5k6vo1bfmEF_H-Viybx6Glhd9OP5DpYGPPy8wuPecGh_ePsgVS2ixJW35ekexRqfMMxWYeHRjc-6LSoNvCHGLCoTGfGwd1Fm4bmj0ik4cRCG2BeSVnH365kNtherWUYyb044qDZczjW4ORe8Zslv0Nt0D_8Vsi1RmWGq_r16TyNIFBv_yYVN255JdiljaveGfwcPBT-GnZyen1wdCIQH7mrnn7yMEUmg"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Step: Authentication - Locked State Context) -->
+<div class="w-full bg-white border-b border-surface-100 py-4 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium text-surface-600">Election Closing Process</span>
+<span class="text-sm font-bold text-primary-600">20%</span>
+</div>
+<div class="w-full bg-surface-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-600 h-full w-[20%]"></div>
+</div>
+<p class="text-xs text-surface-600 mt-2">Step: Authentication</p>
+</div>
+</div>
+<!-- Main Content: Exclusion Protocol applied - Focus on the restriction -->
+<main class="flex-grow flex items-center justify-center px-6 py-12">
+<div class="max-w-4xl w-full">
+<!-- Bento Layout for Restriction Context -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Main Restriction Card -->
+<div class="md:col-span-8 bg-white rounded-xl shadow-sm border border-surface-200 p-8 md:p-12 flex flex-col items-center text-center">
+<div class="w-20 h-20 bg-surface-100 rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-surface-600 text-5xl">lock_person</span>
+</div>
+<h1 class="text-2xl md:text-3xl font-headline font-bold text-surface-900 mb-4">
+                        La jornada electoral ya fue cerrada previamente
+                    </h1>
+<p class="text-lg text-surface-600 max-w-lg mb-10">
+                        Ya existe un cierre válido y consolidado para este ciclo electoral. El sistema ha detectado una sesión de cierre previa y finalizada satisfactoriamente.
+                    </p>
+<!-- ButtonGroup Horizontal -->
+<div class="w-full flex flex-col sm:flex-row gap-4 justify-end items-center mt-auto">
+<button class="w-full sm:w-auto px-6 h-[52px] rounded-lg border border-surface-200 text-surface-600 font-medium hover:bg-surface-50 transition-colors">
+                            Ver estado actual
+                        </button>
+<button class="w-full sm:w-auto px-6 h-[52px] rounded-lg bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors">
+                            Ir al panel electoral
+                        </button>
+</div>
+</div>
+<!-- Info Side Cards (Bento style) -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<!-- Status Card -->
+<div class="bg-primary-900 text-white rounded-xl p-6 shadow-md relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-8xl">verified</span>
+</div>
+<h3 class="font-bold text-lg mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Estado: Consolidado
+                        </h3>
+<p class="text-primary-100 text-sm mb-4">La base de datos nacional ya ha recibido y validado los certificados de cierre para esta región.</p>
+<div class="pt-4 border-t border-primary-700/50">
+<span class="text-xs uppercase tracking-wider text-primary-200 font-semibold">Última actualización</span>
+<p class="text-sm font-mono mt-1">2024-05-24 18:42:05</p>
+</div>
+</div>
+<!-- Duplicity Prevention Info -->
+<div class="bg-white border border-surface-200 rounded-xl p-6">
+<div class="flex items-start gap-4">
+<div class="p-2 bg-surface-100 rounded-lg">
+<span class="material-symbols-outlined text-surface-600">security</span>
+</div>
+<div>
+<h4 class="font-bold text-surface-900">Seguridad Integrada</h4>
+<p class="text-sm text-surface-600 mt-1">Este bloqueo previene la duplicidad de actas y asegura la integridad del escrutinio final.</p>
+</div>
+</div>
+</div>
+<!-- Map/Location Context -->
+<div class="bg-white border border-surface-200 rounded-xl overflow-hidden flex-grow min-h-[160px] relative">
+<img alt="Regional map" class="w-full h-full object-cover" data-alt="Detailed map showing electoral district zones" data-location="Mexico City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqk4XOmXGTQSOP0jmeZpjGrATAyPkp6kuBXq0dgDRTPzlhbz6mVK-v6S0GD1sDxvlvj9eRT25_BdxYCZOTUKIHBK_t-U1qkFllXeVrRM4mlLzdiAy0CPdQUuXPfeH4dbb5OLebhojnNyvXI0-StenXQR-Od_7RHruxGj31r4THS1ZroKCSspLu3dBz-mn24HODAdpUa75VnLAsAXKXSY4rc6SozlSJYk35Vr1qoSQ287vOHXm97MB_ANFKRH-oibO7hXjY9k2-4ws"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-900/80 to-transparent flex flex-col justify-end p-4">
+<span class="text-white text-xs font-bold uppercase tracking-widest opacity-80">Distrito Electoral Central</span>
+<span class="text-white text-lg font-bold">Zona de Registro 04</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-surface-200 py-8 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-primary-900 font-bold text-lg">VotoSeguro</span>
+<p class="text-surface-600 text-sm text-center md:text-left">© 2024 VotoSeguro Institutional. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-x-8 gap-y-2">
+<a class="text-sm text-surface-600 hover:text-primary-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-sm text-surface-600 hover:text-primary-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm text-surface-600 hover:text-primary-600 transition-colors" href="#">Institutional Portal</a>
+<a class="text-sm text-surface-600 hover:text-primary-600 transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Revisión de Parámetros - VotoSeguro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                primary: {
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    600: '#0284c7',
+                    700: '#0369a1',
+                    900: '#0c4a6e',
+                },
+                success: {
+                    50: '#f0fdf4',
+                    100: '#dcfce7',
+                    600: '#16a34a',
+                    700: '#15803d',
+                },
+                surface: {
+                    50: '#f8fafc',
+                    100: '#f1f5f9',
+                    200: '#e2e8f0',
+                    800: '#1e293b',
+                    900: '#0f172a',
+                }
+            },
+            fontFamily: {
+              "headline": ["Public Sans", "sans-serif"],
+              "body": ["Public Sans", "sans-serif"],
+              "label": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-surface-50 font-body text-surface-900 antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-surface-200 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-primary-900 tracking-tight">VotoSeguro</span>
+<div class="hidden md:flex gap-6">
+<a class="text-sm font-medium text-surface-900" href="#">Dashboard</a>
+<a class="text-sm font-medium text-primary-600 border-b-2 border-primary-600 px-1 h-16 flex items-center" href="#">Elections</a>
+<a class="text-sm font-medium text-surface-900" href="#">Audit</a>
+<a class="text-sm font-medium text-surface-900" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-surface-800 hover:bg-surface-100 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-surface-200">
+<img alt="Admin Profile" class="w-8 h-8 rounded-full" data-alt="Professional circular profile picture for administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRUc8qoCbOorACyhjI4YvkUIHHtNc-FA3tappFuL2UQRFb04L08eFkMjUYePjTs9m5kO8BuMlIIQ6k92JsH63JQG90MykySrCNQGq0wryBkzypuqFaBobs7DacAMneHNrqd4SBOn216WSnTGU8Yrez9G7plPSWU_7cORMGhgUEyfc-EUv8YDydPjsodrpHrqzAGcr83gHJkM_bBmUrPPi0bz0oIW8lZoh6YbszZeY5KRIerWSuG1-PjlYu3Z8DSARKRXNpIBcbDoA"/>
+<span class="material-symbols-outlined text-surface-800">account_circle</span>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Step 2 focus) -->
+<div class="bg-white border-b border-surface-200 py-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm font-semibold text-primary-900">Election Setup Phase</span>
+<span class="text-sm font-medium text-surface-800">Step 2 of 4: Initialization</span>
+</div>
+<div class="w-full bg-surface-200 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-600 h-full rounded-full transition-all duration-500" style="width: 50%;"></div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<header class="mb-8">
+<h1 class="text-3xl font-bold font-headline text-surface-900">Revisión de Parámetros</h1>
+<p class="text-surface-800 mt-2">Verifique minuciosamente la configuración técnica antes de proceder con el despliegue del contrato.</p>
+</header>
+<!-- Bento Grid Layout for Parameters -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Principal Identity Card -->
+<div class="md:col-span-8 glass-panel p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-lg font-bold text-surface-900 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-600">info</span>
+                            Información General
+                        </h2>
+</div>
+<span class="bg-success-100 text-success-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                        Válido
+                    </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
+<div>
+<label class="block text-xs font-bold text-surface-800 uppercase tracking-wider mb-1">Nombre de la elección</label>
+<p class="text-lg font-medium">Elecciones Generales 2025</p>
+</div>
+<div>
+<label class="block text-xs font-bold text-surface-800 uppercase tracking-wider mb-1">Estado</label>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<p class="text-lg font-medium">Pendiente</p>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-surface-800 uppercase tracking-wider mb-1">Fecha/Hora de Apertura</label>
+<p class="text-surface-900">12 May 2025, 08:00 AM (GMT-5)</p>
+</div>
+<div>
+<label class="block text-xs font-bold text-surface-800 uppercase tracking-wider mb-1">Fecha/Hora de Cierre</label>
+<p class="text-surface-900">12 May 2025, 06:00 PM (GMT-5)</p>
+</div>
+</div>
+</div>
+<!-- Technical Infrastructure Card -->
+<div class="md:col-span-4 glass-panel p-6 rounded-xl shadow-sm bg-primary-900 border-none text-white">
+<h2 class="text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-100">database</span>
+                    Infraestructura
+                </h2>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-100">link</span>
+<span class="text-sm font-medium">Conexión Blockchain</span>
+</div>
+<span class="text-xs font-bold text-success-100">Activa</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-100">description</span>
+<span class="text-sm font-medium">Smart Contracts</span>
+</div>
+<span class="text-xs font-bold text-success-100">Listos</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-100">verified_user</span>
+<span class="text-sm font-medium">Estado de integridad</span>
+</div>
+<span class="text-xs font-bold text-success-100">Válido</span>
+</div>
+</div>
+</div>
+<!-- Candidates List Card -->
+<div class="md:col-span-5 glass-panel p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-bold text-surface-900 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-600">groups</span>
+                        Candidatos (Lista)
+                    </h2>
+<span class="bg-surface-100 text-surface-800 text-xs font-bold px-2 py-1 rounded">5 Inscritos</span>
+</div>
+<ul class="space-y-4">
+<li class="flex items-center justify-between border-b border-surface-100 pb-3">
+<div class="flex items-center gap-3">
+<img alt="Candidato 1" class="w-10 h-10 rounded-lg" data-alt="Portrait of a candidate in formal attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc2XIAuWaY-xOyjB4ifALPpYnWlgKQ_1pH3aMgNGSTrPqzfmfK_3S5FtRrpjzeOKpBjjGBrr87kcx65UC1iMvozdClRuFkTLd6YxXLZK_ott8Tc_1wr4q-LQqnKaWX579VhrvWITmcvc0X-dsOYHYDVp-trTaDMjRpYANq2gC2n0m2myuZwyUwzzPH8Porf1--_NTKa0K32my2C8kqdZyfXS5EYQ-oafWHqs4k1UtdptV4PuGOl1BGP1Jh3ap8Ytoyejea94rbipo"/>
+<div>
+<p class="text-sm font-bold">Alianza Democrática</p>
+<p class="text-xs text-surface-800">Lista 1</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-success-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</li>
+<li class="flex items-center justify-between border-b border-surface-100 pb-3">
+<div class="flex items-center gap-3">
+<img alt="Candidato 2" class="w-10 h-10 rounded-lg" data-alt="Portrait of a female political candidate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcAKXDve5f6PXUD7AFHeF9OzYpSj0DbplIMbkb2HU_Q_iaGqAJ2Nvn1iSs2AAldUM5K6umU796Zh4ZXolaraAcKKkDi5Qq5KNAViK9sUsguHAUT7-WG_BukdWqmAlzFkLHmWh0ScqPGAOoDO1ZWEWDYDYPhQy4kFKWTfEGA-kGaZnGWkOb7mmtWmbkIb2tvVSMq8-DrpQxcw_8dWx5RSh8FZTBK_h_NrrzOIlnodtcqGNVKx1f4PUC_6RnzYguAAqEjvZSYebhvWI"/>
+<div>
+<p class="text-sm font-bold">Frente de Unidad</p>
+<p class="text-xs text-surface-800">Lista 5</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-success-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</li>
+<li class="flex items-center justify-between border-b border-surface-100 pb-3">
+<div class="flex items-center gap-3">
+<img alt="Candidato 3" class="w-10 h-10 rounded-lg" data-alt="Portrait of a young political activist candidate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPKkl9MM3gzmqwa2nPGg9SOqbZB48v2-DYT7mBUdH1ydrdGH0MellrBN4V2E_0nKJip5DJy6QQ704srJBORZD_Vajvw07RtAO0Zij6Y8O7ZwBAyEl02udYNjOCmU2RAAi51kRCoaybJXKxaVM1FUIaJWGyDCn1uS7g_qFKhPYERhZkJf1nrt6AR4ROvMC4FGkgGRtzzeLFen5dq0CHTuaaN52o7v3bdLbjzIdVRrdMwOiLhlf-RQAmTSWZ4OXbt_479FQMBipstAo"/>
+<div>
+<p class="text-sm font-bold">Movimiento Ciudadano</p>
+<p class="text-xs text-surface-800">Lista 12</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-success-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</li>
+</ul>
+<button class="w-full mt-4 text-primary-600 text-sm font-semibold hover:underline">Ver lista completa</button>
+</div>
+<!-- Business Rules Card -->
+<div class="md:col-span-7 glass-panel p-6 rounded-xl shadow-sm border-l-4 border-l-primary-600">
+<h2 class="text-lg font-bold text-surface-900 mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-600">gavel</span>
+                    Reglas de negocio
+                </h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary-600 text-sm">settings_input_component</span>
+<span class="text-xs font-bold uppercase text-surface-800">Protocolo de Consenso</span>
+</div>
+<p class="text-sm font-medium">Prueba de Autoridad (PoA) con nodos institucionales validados.</p>
+</div>
+<div class="p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary-600 text-sm">lock</span>
+<span class="text-xs font-bold uppercase text-surface-800">Privacidad</span>
+</div>
+<p class="text-sm font-medium">Encriptación homomórfica para el conteo de votos sin revelar identidad.</p>
+</div>
+<div class="p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary-600 text-sm">emergency_home</span>
+<span class="text-xs font-bold uppercase text-surface-800">Cuórum Mínimo</span>
+</div>
+<p class="text-sm font-medium">Se requiere la participación del 30% del padrón para validez legal.</p>
+</div>
+<div class="p-4 bg-surface-50 rounded-lg border border-surface-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary-600 text-sm">history</span>
+<span class="text-xs font-bold uppercase text-surface-800">Periodo de Impugnación</span>
+</div>
+<p class="text-sm font-medium">48 horas posteriores al cierre para revisión de hashes de auditoría.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="mt-12 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-surface-200 pt-8">
+<button class="w-full sm:w-auto px-8 py-3 rounded-lg border border-surface-200 text-surface-800 font-bold hover:bg-surface-100 transition-colors">
+                Cancelar apertura
+            </button>
+<button class="w-full sm:w-auto px-10 py-3 rounded-lg bg-primary-600 text-white font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">rocket_launch</span>
+                Confirmar configuración
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-surface-200 py-8 mt-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-sm text-surface-800">
+                    © 2024 VotoSeguro - Institutional Electronic Voting System
+                </div>
+<div class="flex gap-8">
+<a class="text-sm font-medium text-surface-900 hover:text-primary-600" href="#">Terms of Service</a>
+<a class="text-sm font-medium text-surface-900 hover:text-primary-600" href="#">Privacy Policy</a>
+<a class="text-sm font-medium text-surface-900 hover:text-primary-600" href="#">Security Audit</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

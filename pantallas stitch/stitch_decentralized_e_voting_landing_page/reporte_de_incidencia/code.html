@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0f172a",
+                        secondary: "#64748b",
+                        critical: "#b91c1c",
+                        ongoing: "#0369a1",
+                        surface: "#f8fafc",
+                        border: "#e2e8f0"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-size: 20px; }
+    </style>
+</head>
+<body class="bg-surface text-primary flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="w-64 bg-white border-r border-border flex flex-col shrink-0">
+<div class="p-6">
+<h1 class="text-sm font-bold tracking-wider text-secondary">Admin Panel</h1>
+<p class="text-xs text-slate-400">Technical Monitoring</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50" href="#">
+<span class="material-symbols-outlined mr-3">lan</span>
+                Nodes
+            </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium bg-slate-100 text-primary rounded-lg" href="#">
+<span class="material-symbols-outlined mr-3">security</span>
+                Audit
+            </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50" href="#">
+<span class="material-symbols-outlined mr-3">warning</span>
+                Alerts
+            </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50" href="#">
+<span class="material-symbols-outlined mr-3">assessment</span>
+                Reports
+            </a>
+</nav>
+<div class="p-4 border-t border-border">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-8 h-8 rounded-full" data-alt="Profile picture of technical administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpcnohKYePr0bHggI--a5mZaJvmYUL5P7nRZZuq7IBFO_UIw8fmBb8h5s9KKuTs12i2bnammyziqJMVid8rhc9lQT1hBgnWyNb8FnNCxLmVwGbWrD_vd6Ab5EEI1DTj47lWSCHp7ocuAbBJ64mpNFTmdmyOALmqZyEFPnfWi6HWCleAmrg2aA3NUSq9GEesv-ENumI11Y3iOdqBQzJZSsAf8GyN4i9q9Wc6PitYHoDArzcjJsqYQWH_Izn4YoV_-hG4QtmzPHMfF8"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">VotoSeguro Admin</p>
+<p class="text-[10px] text-secondary">ID: 9942-X</p>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="h-16 bg-white border-b border-border flex items-center justify-between px-8">
+<div class="flex items-center gap-4 flex-1">
+<span class="font-bold text-lg tracking-tight">VotoSeguro</span>
+<div class="max-w-md w-full ml-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-slate-200" placeholder="Search logs, nodes or incidents..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-critical rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content (Reporte de Incidencia) -->
+<main class="flex-1 overflow-y-auto p-8">
+<!-- Header Section -->
+<div class="flex justify-between items-start mb-8">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="bg-critical/10 text-critical text-[10px] font-bold px-2 py-0.5 rounded border border-critical/20">INCIDENCIA CRÍTICA</span>
+<span class="text-secondary text-sm font-medium">Ticket: INC-2025-042</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tight mb-1">Red Blockchain: Desconexión masiva de nodos secundarios</h2>
+<p class="text-secondary">Informe técnico generado automáticamente por el sistema de monitoreo VotoSeguro.</p>
+</div>
+<button class="bg-critical text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-critical/20 flex items-center gap-2 hover:bg-red-800">
+<span class="material-symbols-outlined text-[18px]">priority_high</span>
+                    Escalar incidencia
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Status & Metrics -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Current Status Card -->
+<div class="bg-white p-6 rounded-xl border border-border shadow-sm">
+<h3 class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">Estado Actual</h3>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-ongoing/10 rounded-full flex items-center justify-center text-ongoing">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+<div>
+<p class="text-xl font-bold text-ongoing uppercase">En progreso</p>
+<p class="text-xs text-secondary">Actualizado hace 2 minutos</p>
+</div>
+</div>
+</div>
+<!-- Details Card -->
+<div class="bg-white p-6 rounded-xl border border-border shadow-sm">
+<h3 class="text-xs font-bold text-secondary uppercase tracking-widest mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                            Especificaciones
+                        </h3>
+<div class="space-y-4">
+<div class="flex justify-between border-b border-slate-50 pb-2">
+<span class="text-sm text-secondary">Categoría</span>
+<span class="text-sm font-semibold">Red Blockchain</span>
+</div>
+<div class="flex justify-between border-b border-slate-50 pb-2">
+<span class="text-sm text-secondary">Severidad</span>
+<span class="text-sm font-bold text-critical">Crítica (P1)</span>
+</div>
+<div class="flex justify-between border-b border-slate-50 pb-2">
+<span class="text-sm text-secondary">Hora de Inicio</span>
+<span class="text-sm font-semibold">12 May 2025, 03:42 AM</span>
+</div>
+<div class="flex justify-between">
+<span class="text-sm text-secondary">Impacto</span>
+<span class="text-sm font-semibold">42% de Nodos</span>
+</div>
+</div>
+</div>
+<!-- Responsible Card -->
+<div class="bg-primary text-white p-6 rounded-xl shadow-lg">
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Responsable Asignado</h3>
+<div class="flex items-center gap-3">
+<img alt="Admin Avatar" class="w-10 h-10 rounded-lg object-cover" data-alt="Technical Lead profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr6sx9wXMc2lrStPMYUxmtv9ZIklnIXZ_7JBh2vb_WZHnJ66__jGsHOkqTtGWLGtXwZMJdqd11MhmGo1tUosXdoA81-H2KRRlXBBK12HdnIN6MhmUOzGjdw2_QEO2jM0TYrZ2k1EzjVVOVK888_YzayN5F-QZ2Ngp4HeVqqLuLW7lFCzPRXm7hIDY8YEp_r4Hco8GlFb1msSFB7vZPQ-JKoi1ad0fIbN4EYO6KiGGgwLYAhO5sLazgI6BdITQnzJc-hO6DIqbY5Bc"/>
+<div>
+<p class="font-bold">Ing. Carlos Mendoza</p>
+<p class="text-xs text-slate-400">Chief Infrastructure Officer</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Incident Description & Timeline -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Documentation Style Card -->
+<div class="bg-white p-8 rounded-xl border border-border shadow-sm">
+<div class="flex items-center gap-2 mb-6 text-slate-400">
+<span class="material-symbols-outlined">description</span>
+<h3 class="text-xs font-bold uppercase tracking-widest">Descripción del Incidente</h3>
+</div>
+<div class="prose prose-slate max-w-none">
+<p class="text-lg text-slate-700 leading-relaxed mb-6">
+                                Se ha detectado una caída simultánea en el <strong>42% de los nodos secundarios</strong> localizados en el clúster regional de Latam. El fallo parece estar vinculado a un error en el protocolo de consenso tras la última actualización de firmware (v.4.2.1).
+                            </p>
+<h4 class="text-sm font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-ongoing">task_alt</span>
+                                Acciones Recomendadas
+                            </h4>
+<div class="space-y-3">
+<div class="flex gap-4 p-4 bg-slate-50 rounded-lg border-l-4 border-ongoing">
+<div class="font-bold text-ongoing text-sm">01.</div>
+<p class="text-sm text-slate-600">Reversión inmediata a la versión de firmware v.4.2.0 en los nodos afectados para estabilizar el quórum.</p>
+</div>
+<div class="flex gap-4 p-4 bg-slate-50 rounded-lg border-l-4 border-ongoing">
+<div class="font-bold text-ongoing text-sm">02.</div>
+<p class="text-sm text-slate-600">Aislamiento preventivo del tráfico de entrada en el segmento de red 10.42.x.x para evitar propagación de errores de sincronización.</p>
+</div>
+<div class="flex gap-4 p-4 bg-slate-50 rounded-lg border-l-4 border-slate-300">
+<div class="font-bold text-slate-400 text-sm">03.</div>
+<p class="text-sm text-slate-600">Monitoreo activo del 'Block Time' para asegurar que no exceda los 5 segundos durante la fase de recuperación.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Network Map / Visual Representation -->
+<div class="bg-white p-6 rounded-xl border border-border shadow-sm h-64 relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-critical via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10 flex flex-col h-full">
+<h3 class="text-xs font-bold text-secondary uppercase tracking-widest mb-4">Topología de Red Afectada</h3>
+<div class="flex-1 flex items-center justify-center">
+<!-- Abstract visual representation of network -->
+<div class="flex gap-8 items-center">
+<div class="w-4 h-4 bg-slate-200 rounded-full animate-pulse"></div>
+<div class="w-12 h-0.5 bg-slate-100"></div>
+<div class="w-16 h-16 border-2 border-critical border-dashed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-critical">lan</span>
+</div>
+<div class="w-12 h-0.5 bg-slate-100"></div>
+<div class="w-4 h-4 bg-slate-200 rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-center gap-4 mt-auto">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] text-secondary">Nodos OK</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-critical"></div>
+<span class="text-[10px] text-secondary">Nodos Caídos</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        critical: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        surface: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-alert-gradient {
+            background: radial-gradient(circle at top right, #fee2e2 0%, #ffffff 100%);
+        }
+        .pulse-red {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="bg-surface-50 font-body text-surface-900">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 bg-white border-b border-surface-200 h-16 flex items-center px-6 justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-critical-600 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<span class="font-headline font-bold text-xl tracking-tight text-surface-900">VotoSeguro</span>
+</div>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 text-sm">search</span>
+<input class="w-full pl-10 pr-4 py-1.5 bg-surface-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-critical-500" placeholder="on_left" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-surface-600 hover:bg-surface-100 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-critical-500 rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-surface-600 hover:bg-surface-100 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-200 overflow-hidden ml-2 border border-surface-200">
+<img alt="User Avatar" data-alt="User profile avatar placeholder image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYpirWVpsLRegZEViF4ch7yzN7T5Cyr8Pf8seZIPJ79MMHvLoVbVa1Xlpqn_l-2JhijT8PZ6agXctX3pOAEB8dVFcfNlPNHlsZJ9HKPD06T3vWYOw8b1RaimstaAo1gpLlxiPZLDreYdd5-qVXmsjAjsyYLy8I6bWjd_A6tvFiB3H9sxTkJPTqY5TJN29yec2GgC3E39wdga5oqdzU3kRG4GOApZlYhmDGg0Lan2usp7pDNh0EyV73PnPHyri8ENdQnXxGvF4efGw"/>
+</div>
+</div>
+</nav>
+<div class="flex min-h-[calc(100vh-64px)]">
+<!-- SideNavBar -->
+<aside class="w-64 bg-white border-r border-surface-200 flex flex-col">
+<div class="p-6">
+<h2 class="text-xs font-bold text-surface-400 uppercase tracking-widest mb-1">Admin Panel</h2>
+<p class="text-xs text-surface-500">Technical Monitoring</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-critical-600">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-critical-600">lan</span>
+<span class="text-sm font-medium">Nodes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-critical-600">security</span>
+<span class="text-sm font-medium">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-critical-50 text-critical-700 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="text-sm font-bold">Alerts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-surface-600 hover:bg-surface-50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-critical-600">assessment</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-surface-200">
+<div class="bg-surface-900 text-white p-4 rounded-xl flex items-center justify-between overflow-hidden relative">
+<div class="relative z-10">
+<p class="text-[10px] text-surface-400 font-bold uppercase tracking-wider">System Status</p>
+<p class="text-sm font-semibold text-critical-400">Threat Detected</p>
+</div>
+<span class="material-symbols-outlined text-critical-500 text-3xl relative z-10" style="font-variation-settings: 'FILL' 1;">gpp_maybe</span>
+<div class="absolute -right-4 -bottom-4 w-16 h-16 bg-critical-900/50 rounded-full blur-xl"></div>
+</div>
+</div>
+</aside>
+<!-- Main Content (Creative Canvas) -->
+<main class="flex-1 bg-alert-gradient p-8 overflow-y-auto">
+<div class="max-w-5xl mx-auto">
+<!-- Alert Header Section -->
+<div class="flex items-center justify-between mb-8">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 bg-critical-600 text-white text-[10px] font-bold rounded uppercase tracking-widest">Criticidad: Extrema</span>
+<span class="text-surface-400 text-xs font-medium">ID de Alerta: #CR-77291-B</span>
+</div>
+<h1 class="text-4xl font-headline font-extrabold text-surface-900 leading-tight">Actividad sospechosa detectada</h1>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex -space-x-2 mb-2">
+<img alt="Security Analyst 1" class="w-8 h-8 rounded-full border-2 border-white" data-alt="Headshot of security analyst 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-4xFh2g8N3W-6NLBfVZJsklDinbc_SPF2ictUCHBwG6VQa3feCKkvKP4WP13Y-OYeIo5kqWjjQeznkZlEBtm0ECYQ8E_hM5-qpH411rvcQZcICizhNuJNZVjT-NTPZv6qzMQkq_JeAQikqs_8pg44_rGzjr_dHRkqa3EJd6rt8f6ueBc1gJ_7b0TLxXKz4BF-BtDMHwYTU5UnNkdfgKRp-DfCtT8WBKYzAv40JXMvGtfbZT-ZtwZPC0g0GZ3L5QzJ1pwwZECT6No"/>
+<img alt="Security Analyst 2" class="w-8 h-8 rounded-full border-2 border-white" data-alt="Headshot of security analyst 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZSoPy2fgZEKLQje7K18Jk1jPaByGctMElRpOrNI5L5najSUqccsehXvLoud6jZPD1ovzpY8FXovaGIyg8rZvSUBkkZpPVVLo0qpq9vh9Hq9VEku7DUKPeMAHIMtToOENhobe-I1raRzQqA4pw-m01Br7HSg7wQulv2TD_dJwlYyEJOAWP8s22Q9NtnRRGgHvsNRZjZ3XEmZHzbpj8pbpynIhSCk1rzjFamVs0oHsEJLkcr62vL5no0euvjdFURaGFRYVk5RUg11g"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-200 flex items-center justify-center text-[10px] font-bold">+3</div>
+</div>
+<span class="text-xs text-surface-500">Equipo de respuesta activo</span>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Primary Incident Card -->
+<div class="col-span-12 lg:col-span-8 bg-white border border-critical-200 rounded-2xl shadow-xl shadow-critical-100/50 overflow-hidden flex flex-col">
+<div class="p-8 border-b border-surface-100 bg-critical-50/30 flex items-start gap-6">
+<div class="w-16 h-16 bg-critical-100 rounded-2xl flex items-center justify-center flex-shrink-0 pulse-red">
+<span class="material-symbols-outlined text-critical-600 text-4xl" style="font-variation-settings: 'FILL' 1;">report_problem</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold text-surface-900">Tipo: Intento de manipulación de bloque</h3>
+<span class="text-xs font-bold text-critical-600 bg-critical-100 px-3 py-1 rounded-full">Protocolo X-9 Activado</span>
+</div>
+<p class="text-surface-600 leading-relaxed mb-6">
+                                    Se ha detectado una firma de transacción inconsistente intentando reescribir la secuencia de bloques en la cadena de auditoría principal. La anomalía fue identificada por el motor de consenso heurístico.
+                                </p>
+<div class="flex gap-4">
+<button class="bg-critical-600 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-critical-700 transition-colors shadow-lg shadow-critical-200 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                                        Ver incidente
+                                    </button>
+<button class="bg-white text-surface-700 border border-surface-200 px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-surface-50 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">mail</span>
+                                        Notificar responsables
+                                    </button>
+</div>
+</div>
+</div>
+<div class="p-8 grid grid-cols-2 gap-8 bg-white">
+<div>
+<h4 class="text-xs font-bold text-surface-400 uppercase mb-4 tracking-wider">Acciones automáticas</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-3 bg-critical-50 rounded-xl border border-critical-100">
+<span class="material-symbols-outlined text-critical-600" style="font-variation-settings: 'FILL' 1;">lock_person</span>
+<div>
+<p class="text-sm font-bold text-critical-900 leading-none mb-1">Aislamiento de nodo</p>
+<p class="text-[10px] text-critical-600">Ejecutado a las 14:22:11</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-50 rounded-xl border border-surface-100 opacity-60">
+<span class="material-symbols-outlined text-surface-500">history_edu</span>
+<div>
+<p class="text-sm font-medium text-surface-700 leading-none mb-1">Instantánea de registro</p>
+<p class="text-[10px] text-surface-500">Pendiente de verificación</p>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-bold text-surface-400 uppercase mb-4 tracking-wider">Detalles de Red</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-surface-500">Componente:</span>
+<span class="font-bold text-surface-900">Nodo Central</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-surface-500">Dirección IP:</span>
+<span class="font-mono text-surface-700">192.168.1.105</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-surface-500">Carga CPU:</span>
+<div class="flex items-center gap-2">
+<div class="w-20 h-1.5 bg-surface-200 rounded-full overflow-hidden">
+<div class="w-4/5 h-full bg-critical-500"></div>
+</div>
+<span class="font-bold text-critical-600">82%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Stats / Context Cards -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Node Visualization -->
+<div class="bg-surface-900 rounded-2xl p-6 text-white overflow-hidden relative min-h-[220px] flex flex-col justify-between">
+<div class="relative z-10">
+<h4 class="text-xs font-bold text-surface-400 uppercase tracking-widest mb-4">Estado del Nodo</h4>
+<div class="flex items-center gap-4 mb-2">
+<div class="w-12 h-12 bg-critical-900/50 rounded-xl border border-critical-500/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-critical-400 text-3xl">hub</span>
+</div>
+<div>
+<p class="text-lg font-bold">NC-ALPHA-01</p>
+<p class="text-xs text-critical-400 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-critical-500 rounded-full animate-pulse"></span>
+                                            FUERA DE LÍNEA (CUARENTENA)
+                                        </p>
+</div>
+</div>
+</div>
+<!-- Simple Map/Network Pattern -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img alt="Network Diagram" class="w-full h-full object-cover grayscale invert" data-alt="Abstract global network data pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmxPfQ4ieV7v-HYDQ92WCN-MssDSddoBT1OFYbcw--lCgUQ5zZfA50OF3hOG5x5N-gXrRj4fxzIIcuUl7IuVQw3dPjglDsUA_HjPUtOixZtXx5hBsKlRFbT6mzVeRyGYmgyNjyxQ_nnAC_y0fR9bnjO1S2En6Rf9OKZLntnq8XhT1tYwD0NLyENlsifb-RNCewWGM2JjwAu10DB_Z9mqMElnqVkvtdrj5TC3TRV8y-7gdMz1l5PybhhCqm046Xc4x-w4E1QwNvllE"/>
+</div>
+<div class="relative z-10 grid grid-cols-2 gap-2 mt-4">
+<div class="bg-surface-800/80 backdrop-blur-sm p-3 rounded-lg border border-surface-700/50">
+<p class="text-[10px] text-surface-400 uppercase font-bold">Latencia</p>
+<p class="text-sm font-bold">N/A</p>
+</div>
+<div class="bg-surface-800/80 backdrop-blur-sm p-3 rounded-lg border border-surface-700/50">
+<p class="text-[10px] text-surface-400 uppercase font-bold">Uptime</p>
+<p class="text-sm font-bold text-surface-200">99.9%</p>
+</div>
+</div>
+</div>
+<!-- Mini Timeline -->
+<div class="bg-white border border-surface-200 rounded-2xl p-6">
+<h4 class="text-xs font-bold text-surface-400 uppercase tracking-widest mb-4">Cronología Reciente</h4>
+<div class="space-y-4">
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-critical-500 mt-1.5"></div>
+<div>
+<p class="text-xs font-bold text-surface-900">Aislamiento de nodo confirmado</p>
+<p class="text-[10px] text-surface-500">Hace 4 minutos</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-critical-500 mt-1.5"></div>
+<div>
+<p class="text-xs font-bold text-surface-900">Alerta extrema disparada</p>
+<p class="text-[10px] text-surface-500">Hace 6 minutos</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-surface-300 mt-1.5"></div>
+<div>
+<p class="text-xs font-medium text-surface-700">Tráfico inusual detectado</p>
+<p class="text-[10px] text-surface-500">Hace 12 minutos</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 text-xs font-bold text-surface-500 hover:text-surface-900 transition-colors flex items-center justify-center gap-1">
+                                Ver historial completo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Summary Card -->
+<div class="mt-8 bg-surface-900 rounded-2xl p-1 overflow-hidden">
+<div class="bg-surface-800 rounded-[calc(1rem-4px)] p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-900 rounded-full border border-surface-700">
+<span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+<span class="text-[10px] font-bold text-white uppercase tracking-tight">Otros Nodos: Seguros</span>
+</div>
+<p class="text-xs text-surface-400">Consenso global mantenido por el 94% de la red.</p>
+</div>
+<div class="text-[10px] text-surface-500 font-mono">
+                            VER: 4.2.1-STABLE // BUILD: 0x992F
+                        </div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

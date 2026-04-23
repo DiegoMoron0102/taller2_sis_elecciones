@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#197fe6",
+              "background-light": "#f6f7f8",
+              "background-dark": "#111921",
+            },
+            fontFamily: {
+              "display": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<title>Error de Comprobante - Votación Electrónica</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between border-b border-solid border-slate-200 dark:border-slate-800 px-6 py-4 lg:px-40 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">how_to_vote</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Votación Electrónica</h2>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</header>
+<main class="flex flex-1 flex-col items-center justify-center px-6 py-12">
+<div class="max-w-[480px] w-full flex flex-col items-center gap-8">
+<div class="w-full aspect-video rounded-xl bg-gradient-to-br from-primary/10 to-red-500/10 flex items-center justify-center border border-slate-200 dark:border-slate-800 overflow-hidden" data-alt="Digital illustration of a failed document generation process" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAoJ_U-Rw4wO92T6-ymHecTxTLPzrQuxWIPTRC3l10spTmle0GA_89ZGdgi8Rq8d6IS35XNJEvrBnz84bO0emkPY8uidVt29vzly4E2w1HeJzPVfDVukGPJwPsPRd-oY89XnNtYoc_REW2ZKk6TK_ZSNF6tWC4ye4-b05xacxM67X1bdAKde7GrCBaQbLmc7sC47swYXh6T84vMaWubncwgNAsbe1SUXnJh6_sAY6rYOl5M8OzZZrpUuBnhmhvcfJFf3468eVvMn9U"); background-size: cover; background-position: center;'>
+<div class="bg-white/90 dark:bg-slate-900/90 p-6 rounded-full shadow-xl">
+<span class="material-symbols-outlined text-6xl text-red-500">receipt_long_off</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-4 text-center">
+<h1 class="text-slate-900 dark:text-slate-100 text-2xl lg:text-3xl font-bold tracking-tight">Error al generar el comprobante</h1>
+<p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed">
+                            La transacción se consultó correctamente en la red descentralizada, pero no se pudo emitir el documento PDF en este momento debido a un problema temporal del servidor.
+                        </p>
+</div>
+<div class="flex flex-col w-full gap-3 mt-4">
+<button class="flex h-12 w-full items-center justify-center rounded-lg bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined mr-2">refresh</span>
+                            Reintentar
+                        </button>
+<button class="flex h-12 w-full items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base font-bold tracking-wide hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined mr-2">home</span>
+                            Volver al inicio
+                        </button>
+</div>
+<div class="flex items-center gap-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">info</span>
+<p class="text-xs text-blue-700 dark:text-blue-300">
+                            Su voto ha sido registrado de forma segura. Puede intentar descargar su comprobante más tarde desde el historial.
+                        </p>
+</div>
+</div>
+</main>
+<footer class="flex flex-col gap-4 px-6 py-10 text-center border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+<div class="flex justify-center gap-6 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined hover:text-primary cursor-pointer">security</span>
+<span class="material-symbols-outlined hover:text-primary cursor-pointer">account_balance</span>
+<span class="material-symbols-outlined hover:text-primary cursor-pointer">hub</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                    © 2024 Sistema de Votación Electrónica Descentralizada
+                </p>
+<p class="text-slate-400 dark:text-slate-600 text-xs">
+                    Impulsado por tecnología Blockchain para máxima transparencia
+                </p>
+</footer>
+</div>
+</div>
+</body></html>

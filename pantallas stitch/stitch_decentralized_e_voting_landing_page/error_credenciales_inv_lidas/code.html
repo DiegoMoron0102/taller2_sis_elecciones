@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Error de Autenticación - VotoSeguro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        error: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                        },
+                        surface: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            800: '#1e293b',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-50 text-surface-800 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-surface-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-600 rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+</div>
+<span class="text-xl font-bold text-primary-900 tracking-tight">VotoSeguro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-surface-800 hover:bg-surface-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error-600 rounded-full border-2 border-white"></span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-200 border border-surface-200 overflow-hidden">
+<img alt="admin profile" class="w-full h-full object-cover" data-alt="Close up profile photo of a professional administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDlgNWcgM4OwyIHfXVM4LQ15oZ7_KQcWzK3k2jU5XlHphA9XMtA1qq5ljSG2ycwwSnJAz-KdeHSlx_yT5U7UbnWzxaZAhHcP2PmWBNDew5hC7q5VPyKuyFuOuyc2zDjbWHTKSJPcD1XRk3sfHjpTaSdxs9R4qQPIKu8639AlM88x_H9gn82Gey1oKDsy5LcnEQtDW2hZKYhUSLDT4Ca-qX2jDbOAOm8oAGKWp_gHvuKaXWp8K99r_-aE0fVy4ulgiJqFoe6hpxG8k"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Applied to Authentication context) -->
+<div class="w-full bg-white px-6 py-4 border-b border-surface-100">
+<div class="max-w-7xl mx-auto">
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm font-semibold text-primary-900">Election Closing Process</span>
+<span class="text-xs font-medium text-surface-800 bg-surface-100 px-2 py-1 rounded">Step: Authentication</span>
+</div>
+<div class="w-full bg-surface-200 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-600 h-full rounded-full transition-all duration-500" style="width: 20%"></div>
+</div>
+</div>
+</div>
+<!-- Main Content: Linear Process - Exclusion Protocol applied (No NavBars sidebar) -->
+<main class="flex-grow flex items-center justify-center p-6 bg-gradient-to-b from-surface-50 to-white">
+<div class="max-w-2xl w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<!-- Left Side: Visual Indicator (Bento-style Error Graphic) -->
+<div class="md:col-span-5 flex flex-col items-center justify-center">
+<div class="relative">
+<div class="absolute inset-0 bg-error-100 blur-3xl rounded-full opacity-50"></div>
+<div class="relative w-48 h-48 rounded-3xl bg-white shadow-xl border border-error-100 flex items-center justify-center overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-2 bg-error-600"></div>
+<span class="material-symbols-outlined text-error-600 text-7xl" style="font-variation-settings: 'FILL' 1;">gpp_maybe</span>
+<div class="absolute bottom-4 left-4 right-4 h-1 bg-surface-100 rounded-full overflow-hidden">
+<div class="bg-error-600 h-full w-1/3"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Messaging & Actions -->
+<div class="md:col-span-7 space-y-6">
+<div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-50 text-error-700 mb-4 border border-error-100">
+                        Error de sistema
+                    </span>
+<h1 class="text-4xl font-headline font-bold text-surface-800 tracking-tight leading-tight">
+                        Credenciales inválidas
+                    </h1>
+<p class="mt-4 text-lg text-surface-800 leading-relaxed font-body">
+                        No fue posible validar la identidad del administrador. Por favor, verifique sus datos.
+                    </p>
+</div>
+<!-- Support Card -->
+<div class="bg-surface-50 rounded-xl p-4 border border-surface-200 flex gap-4 items-start">
+<span class="material-symbols-outlined text-surface-800">info</span>
+<div class="text-sm">
+<p class="font-semibold text-surface-800">¿Olvidó su contraseña?</p>
+<p class="text-surface-800 opacity-80">Si los errores persisten, contacte al soporte técnico institucional.</p>
+</div>
+</div>
+<!-- ButtonGroup -->
+<div class="flex flex-col sm:flex-row gap-3 justify-end items-stretch sm:items-center">
+<button class="px-8 py-3 h-[52px] rounded-lg border border-surface-200 text-surface-800 font-semibold hover:bg-surface-100 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+                        Volver
+                    </button>
+<button class="px-8 py-3 h-[52px] rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 shadow-lg shadow-primary-600/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">refresh</span>
+                        Intentar nuevamente
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-surface-200 py-8 px-6 mt-auto">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-surface-800 text-sm font-medium opacity-60">
+                © 2024 VotoSeguro Institutional. All rights reserved.
+            </div>
+<div class="flex flex-wrap justify-center gap-x-8 gap-y-2">
+<a class="text-sm font-semibold text-surface-800 hover:text-primary-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-sm font-semibold text-surface-800 hover:text-primary-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm font-semibold text-surface-800 hover:text-primary-600 transition-colors" href="#">Institutional Portal</a>
+<a class="text-sm font-semibold text-surface-800 hover:text-primary-600 transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

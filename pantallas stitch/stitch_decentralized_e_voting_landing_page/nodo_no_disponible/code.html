@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0f172a",
+              secondary: "#64748b",
+              error: "#dc2626",
+              warning: "#f59e0b",
+              surface: "#f8fafc",
+              border: "#e2e8f0"
+            },
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-primary min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="h-16 border-b border-border bg-white flex items-center justify-between px-6 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="font-headline font-bold text-xl tracking-tight uppercase">VotoSeguro</span>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm">search</span>
+<input class="w-full bg-slate-50 border border-border rounded-lg pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400" placeholder="Buscar..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-slate-100 rounded-full text-secondary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-slate-100 rounded-full text-secondary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-border">
+<img alt="User Avatar" class="h-full w-full object-cover" data-alt="User Avatar Profile Image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYI5Y6tOWBsTc4cva-jupQlBGK48BV-5b30ehsUHexVMsuJ5nuFkkb5GT6PdLxvVhzZLg9aVXQnH2_q0xuCcemTkAHEbDoo3UKGmFXIdP_DbXyTTwuXaDHgmEBHYORvm8TaQvADvEZrj5W-HxtvxiAqn73gGWjiadwpD6HXVbgkqK5EOJnTj2E8rS6OppyeUDafAWwtEmiT4kEtNABejYAsM2dCN3XUsi-zaaSpiOWCCfCFFVpOwPm77EacvNoynwb6nvRQBM7XuY"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1">
+<!-- SideNavBar -->
+<aside class="w-64 border-r border-border bg-white flex flex-col hidden lg:flex">
+<div class="p-6">
+<h2 class="font-headline font-semibold text-sm text-primary">Admin Panel</h2>
+<p class="text-xs text-secondary">Technical Monitoring</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-secondary hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm bg-slate-100 text-primary font-medium rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lan</span> Nodes
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-secondary hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">security</span> Audit
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-secondary hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined text-error">warning</span> Alerts
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-secondary hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined">assessment</span> Reports
+                </a>
+</nav>
+</aside>
+<!-- Main Content (Creative Canvas) -->
+<main class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-4xl mx-auto">
+<!-- Error Header Section -->
+<div class="flex flex-col items-center text-center mb-12">
+<div class="w-20 h-20 bg-red-50 text-error rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-5xl">cloud_off</span>
+</div>
+<h1 class="text-3xl font-headline font-bold text-slate-900 mb-2">Nodo no disponible</h1>
+<p class="text-secondary max-w-lg">Se ha detectado una interrupción en el enlace de datos. No es posible establecer una conexión en tiempo real con la unidad remota.</p>
+</div>
+<!-- Bento Grid Details -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Identification Card -->
+<div class="md:col-span-2 bg-white border border-border p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<span class="text-xs font-bold uppercase tracking-wider text-secondary">Detalle del identificador</span>
+<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-mono">ID: 0x8F22</span>
+</div>
+<h2 class="text-4xl font-mono font-bold text-primary mb-4">VS-NODE-12</h2>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+<div>
+<p class="text-[10px] uppercase text-secondary font-semibold">Tipo de Nodo</p>
+<p class="text-sm font-medium">Validador Principal</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-secondary font-semibold">Ubicación Lógica</p>
+<p class="text-sm font-medium">Cluster Alpha / Sector 4</p>
+</div>
+</div>
+</div>
+<!-- Status Card -->
+<div class="bg-white border border-border p-6 rounded-xl shadow-sm flex flex-col justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-secondary">Último estado conocido</span>
+<div class="mt-4">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-2.5 h-2.5 bg-warning rounded-full"></div>
+<span class="text-lg font-semibold">Inestable</span>
+</div>
+<p class="text-xs text-secondary italic">Registrado hace 42 minutos</p>
+</div>
+<div class="mt-6 flex flex-col gap-1">
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-warning w-[85%] h-full"></div>
+</div>
+<span class="text-[10px] text-secondary text-right">85% Latencia crítica</span>
+</div>
+</div>
+<!-- Communication Failure Details -->
+<div class="md:col-span-3 bg-white border border-border overflow-hidden rounded-xl shadow-sm">
+<div class="bg-slate-900 text-white px-6 py-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-xs font-mono">DIAGNÓSTICO TÉCNICO</span>
+</div>
+<div class="p-6">
+<h3 class="font-semibold text-lg mb-3">Explicación sobre fallo de comunicación</h3>
+<div class="space-y-4 text-sm text-secondary leading-relaxed">
+<p>El protocolo de enlace seguro ha reportado un error de <strong>Timeout (Err_Conn_Refused)</strong>. Los paquetes de sincronización (Heartbeat) no han sido recibidos por el orquestador central dentro del umbral de seguridad de 5000ms.</p>
+<div class="bg-slate-50 border-l-4 border-error p-4 rounded">
+<p class="font-mono text-xs text-slate-700">
+                                        [ERR-503] Remote socket unreachable at 192.168.1.112:8080<br/>
+                                        [WARN] Handshake sequence failed after 3 attempts.
+                                    </p>
+</div>
+<p>Causas probables: Interrupción del servicio de red local, fallo de hardware en la interfaz de red del nodo o saturación de peticiones entrantes.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary text-white px-8 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-lg">refresh</span>
+                        Reintentar consulta
+                    </button>
+<button class="bg-white border border-border text-primary px-8 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+                        Volver al dashboard
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

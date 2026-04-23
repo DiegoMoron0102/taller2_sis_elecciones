@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>VotoSeguro - Autenticación SSI/VC</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 md:px-10 py-3 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">verified_user</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">VotoSeguro</h2>
+</div>
+<div class="flex items-center gap-3">
+<span class="hidden md:block text-sm font-medium text-slate-600 dark:text-slate-400">ID de Sesión: 4429-X</span>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-8 px-4 md:px-0">
+<div class="layout-content-container flex flex-col max-w-[800px] flex-1 gap-6">
+<!-- Stepper/Progress Section -->
+<div class="flex flex-col gap-3 p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+<div class="flex gap-6 justify-between items-center">
+<p class="text-slate-900 dark:text-white text-base font-semibold leading-normal">Progreso de Votación</p>
+<p class="text-primary text-sm font-bold leading-normal">Paso 2 de 4</p>
+</div>
+<div class="rounded-full bg-slate-200 dark:bg-slate-700 h-2 w-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 50%;"></div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">info</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Fase Actual: Autenticación de Identidad Digital</p>
+</div>
+</div>
+<!-- Main Content Header -->
+<div class="flex flex-col gap-3 px-4 py-2">
+<h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Autenticación con SSI/VC</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg font-normal leading-normal">
+                            Utilice su Identidad Digital Descentralizada (Self-Sovereign Identity) para acceder al sistema de votación de forma segura y privada.
+                        </p>
+</div>
+<!-- External Service Status -->
+<div class="p-4">
+<div class="flex flex-1 flex-col items-start justify-between gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:flex-row sm:items-center">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined">cloud_done</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight">Servicio de Credenciales Digitales</p>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">Conectado de forma segura a la red de confianza</p>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+<span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-xs font-bold uppercase tracking-wider">Activo</span>
+</div>
+</div>
+</div>
+<!-- Action Card -->
+<div class="p-4">
+<div class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sm:flex-row">
+<div class="w-full sm:w-1/3 bg-primary/5 dark:bg-primary/20 flex items-center justify-center p-8">
+<div class="relative">
+<div class="absolute -inset-4 bg-primary/20 rounded-full blur-xl"></div>
+<span class="material-symbols-outlined text-primary text-7xl relative">qr_code_scanner</span>
+</div>
+</div>
+<div class="flex w-full grow flex-col items-start justify-center gap-4 p-6 sm:p-8">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Validar Credencial Verificable</h3>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">
+                                    Al hacer clic, se abrirá el portal seguro para escanear su código QR o vincular su billetera digital (Wallet) con su credencial de elector verificada.
+                                </p>
+<div class="flex flex-col sm:flex-row gap-4 w-full pt-2">
+<button class="flex flex-1 min-w-[200px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-sm font-bold leading-normal transition-transform active:scale-95 hover:bg-primary/90">
+<span class="material-symbols-outlined text-lg">fingerprint</span>
+<span class="truncate">Autenticar credencial digital</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Actions / Footer Navigation -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<button class="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+<span class="text-sm font-medium">Volver al inicio</span>
+</button>
+<div class="flex gap-4">
+<button class="px-6 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                Cancelar proceso
+                            </button>
+<button class="px-6 py-2 rounded-lg text-primary text-sm font-medium hover:bg-primary/5 transition-colors">
+                                ¿Necesita ayuda?
+                            </button>
+</div>
+</div>
+<!-- Security Badge -->
+<div class="flex justify-center items-center gap-2 py-8 opacity-50">
+<span class="material-symbols-outlined text-sm">lock</span>
+<p class="text-[10px] uppercase tracking-widest font-bold">Encriptación AES-256 de Extremo a Extremo</p>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

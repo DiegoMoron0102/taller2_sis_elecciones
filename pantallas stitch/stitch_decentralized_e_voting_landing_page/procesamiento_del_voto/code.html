@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-completed { color: #ec5b13; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="w-full border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-2xl">how_to_vote</span>
+</div>
+<h1 class="font-bold text-xl tracking-tight text-slate-800 dark:text-slate-100">Sistema Electoral</h1>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">lock</span>
+                Conexión Encriptada
+            </div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+<div class="w-full max-w-md bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+<!-- Loading Header -->
+<div class="text-center mb-10">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+<span class="material-symbols-outlined text-primary text-4xl animate-pulse">security</span>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Procesando su voto de forma segura...</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Su decisión está siendo protegida con tecnología de grado militar.</p>
+</div>
+<!-- Progress Bar Section -->
+<div class="space-y-3 mb-10">
+<div class="flex justify-between items-end">
+<span class="text-sm font-semibold text-primary uppercase tracking-wider">Progreso</span>
+<span class="text-2xl font-bold text-slate-800 dark:text-slate-100">40%</span>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 40%"></div>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 italic text-center">
+                    Construyendo boleta electrónica...
+                </p>
+</div>
+<!-- Checklist Section -->
+<div class="space-y-1">
+<!-- Step 1: Completed -->
+<div class="flex items-center gap-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
+<div class="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-slate-900 dark:text-slate-100 font-medium">Validando selección</span>
+</div>
+<!-- Step 2: In Progress -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-transparent">
+<div class="flex items-center justify-center w-6 h-6">
+<span class="material-symbols-outlined text-primary animate-spin">sync</span>
+</div>
+<span class="text-slate-900 dark:text-slate-100 font-bold">Construyendo boleta electrónica</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-transparent opacity-40">
+<div class="flex items-center justify-center w-6 h-6 border-2 border-slate-300 dark:border-slate-700 rounded-full"></div>
+<span class="text-slate-600 dark:text-slate-400">Cifrando boleta con clave pública</span>
+</div>
+<!-- Step 4: Pending -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-transparent opacity-40">
+<div class="flex items-center justify-center w-6 h-6 border-2 border-slate-300 dark:border-slate-700 rounded-full"></div>
+<span class="text-slate-600 dark:text-slate-400">Registrando boleta en blockchain</span>
+</div>
+<!-- Step 5: Pending -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-transparent opacity-40">
+<div class="flex items-center justify-center w-6 h-6 border-2 border-slate-300 dark:border-slate-700 rounded-full"></div>
+<span class="text-slate-600 dark:text-slate-400">Confirmando emisión</span>
+</div>
+</div>
+<!-- Security Footer -->
+<div class="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+                    Por favor, no cierre la aplicación ni refresque la página hasta que el proceso finalice por completo.
+                </p>
+</div>
+</div>
+<!-- Trust Badges -->
+<div class="mt-8 flex gap-6 grayscale opacity-50 contrast-125">
+<div class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+<span class="material-symbols-outlined text-base">verified_user</span>
+                Encriptación AES-256
+             </div>
+<div class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+<span class="material-symbols-outlined text-base">account_balance</span>
+                Sello Institucional
+             </div>
+<div class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+<span class="material-symbols-outlined text-base">hub</span>
+                Red Descentralizada
+             </div>
+</div>
+</main>
+<footer class="w-full py-6 px-6 border-t border-slate-200 dark:border-slate-800">
+<div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-slate-500 dark:text-slate-400">© 2024 Junta Nacional Electoral. Todos los derechos reservados.</p>
+<div class="flex gap-4">
+<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Términos de seguridad</a>
+<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Auditoría en vivo</a>
+</div>
+</div>
+</footer>
+</body></html>

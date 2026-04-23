@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1a1a1a",
+                        warning: "#f59e0b",
+                        surface: "#ffffff",
+                        muted: "#f4f4f5",
+                        border: "#e4e4e7"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-900">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 w-full bg-white border-b border-border h-16 flex items-center px-4 justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-black rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">shield</span>
+</div>
+<span class="font-headline font-bold text-xl tracking-tight">VotoSeguro</span>
+</div>
+<div class="hidden md:flex items-center bg-muted px-3 py-1.5 rounded-lg border border-border">
+<span class="material-symbols-outlined text-slate-400 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-muted rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-warning rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 hover:bg-muted rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-border">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO3wLQ8wHTYIQsT-xRWj-_6zCFlaPXADRGzlC4b6ZLbNOqhFu2cK37H7wET-rZvasLmZ-fCYvkSPMEo6hJfOYmiNEKVZ2vbj-nqwreyilJ5f6NI9vXbyK7J_UdwlxNEHpaY-cUe3GS12h2TiiruC6D1t1AQ8FaIsVLngz37wwvMMnXCafmouPMEuHrFmNbEKYHcuZc4Lq89oK9jei3eiyQVhKNKUYTbuhaZQnfMC2gk_OyHdp_AfRS4uEp4bNNCaELsLDzjalJl6k"/>
+</div>
+</div>
+</nav>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- SideNavBar -->
+<aside class="w-64 border-r border-border bg-white flex flex-col">
+<div class="p-6">
+<h2 class="font-headline font-semibold text-sm text-slate-500 uppercase tracking-wider">Admin Panel</h2>
+<p class="text-xs text-slate-400">Technical Monitoring</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-muted rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-muted rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">lan</span>
+<span class="font-medium">Nodes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-muted rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="font-medium">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-medium">Alerts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-muted rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content (Canvas) -->
+<main class="flex-1 overflow-y-auto p-8">
+<div class="max-w-5xl mx-auto">
+<!-- Warning Hero Section -->
+<div class="bg-amber-50 border border-amber-200 rounded-xl p-8 mb-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-amber-600 text-[120px]">warning</span>
+</div>
+<div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+<div class="bg-amber-100 p-4 rounded-xl">
+<span class="material-symbols-outlined text-amber-600 text-4xl" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div>
+<h1 class="text-2xl font-headline font-bold text-amber-900 mb-2">Datos de monitoreo incompletos</h1>
+<p class="text-amber-800 max-w-2xl leading-relaxed">
+                                Algunas métricas no se pudieron recolectar. La conexión con los nodos periféricos fue intermitente durante la última ventana de tiempo, lo que ha generado vacíos en el registro histórico.
+                            </p>
+<div class="mt-6 flex flex-wrap gap-3">
+<button class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">refresh</span>
+                                    Actualizar datos
+                                </button>
+<button class="bg-white border border-amber-200 hover:bg-amber-100 text-amber-900 px-6 py-2.5 rounded-lg font-medium transition-all shadow-sm">
+                                    Continuar
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Affected Components -->
+<h3 class="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-6">Componentes afectados</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Affected Component 1: Nodes -->
+<div class="md:col-span-2 bg-white border border-border p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="font-bold text-slate-900 text-lg">Nodos de Validación</h4>
+<p class="text-slate-500 text-sm">Disponibilidad de métricas por nodo</p>
+</div>
+<span class="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded">3 OFFLINE</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-muted rounded-lg border-l-4 border-amber-400">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">dns</span>
+<span class="text-sm font-medium">Node_Region_Alpha_01</span>
+</div>
+<span class="text-amber-600 text-xs font-semibold">Parcial (65%)</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-muted rounded-lg border-l-4 border-red-500">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">dns</span>
+<span class="text-sm font-medium">Node_Region_Gamma_09</span>
+</div>
+<span class="text-red-600 text-xs font-semibold">Sin Datos (0%)</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-muted rounded-lg border-l-4 border-amber-400">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">dns</span>
+<span class="text-sm font-medium">Node_Region_Delta_04</span>
+</div>
+<span class="text-amber-600 text-xs font-semibold">Parcial (42%)</span>
+</div>
+</div>
+</div>
+<!-- Affected Component 2: Network Latency -->
+<div class="bg-white border border-border p-6 rounded-xl shadow-sm flex flex-col">
+<div class="mb-4">
+<span class="material-symbols-outlined text-amber-500 mb-2">network_check</span>
+<h4 class="font-bold text-slate-900">Latencia de Red</h4>
+</div>
+<div class="flex-1 flex items-center justify-center relative">
+<!-- Abstract Graphic for Missing Data -->
+<div class="w-full h-32 bg-slate-50 rounded-lg flex items-center justify-center border-2 border-dashed border-slate-200">
+<div class="text-center">
+<span class="material-symbols-outlined text-slate-300 text-4xl">query_stats</span>
+<p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">Datos corruptos</p>
+</div>
+</div>
+</div>
+<p class="mt-4 text-xs text-slate-500 italic">No se pudo calcular el promedio de latencia regional debido a pérdida de paquetes.</p>
+</div>
+<!-- Affected Component 3: Storage -->
+<div class="bg-white border border-border p-6 rounded-xl shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<div class="p-2 bg-slate-100 rounded-lg">
+<span class="material-symbols-outlined text-slate-700">database</span>
+</div>
+<h4 class="font-bold text-slate-900 text-sm">Registro de Auditoría</h4>
+</div>
+<div class="space-y-2">
+<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full w-[35%]"></div>
+</div>
+<div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase">
+<span>Sincronizado</span>
+<span>65% Faltante</span>
+</div>
+</div>
+</div>
+<!-- Affected Component 4: Security Protocols -->
+<div class="md:col-span-2 bg-slate-900 text-white p-6 rounded-xl shadow-sm relative overflow-hidden">
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[140px]">security</span>
+</div>
+<div class="relative z-10">
+<h4 class="font-bold text-lg mb-4">Protocolos de Seguridad</h4>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10">
+<p class="text-slate-400 text-xs mb-1 uppercase font-bold">Integritad SHA-256</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<span class="text-sm font-medium">Verificado</span>
+</div>
+</div>
+<div class="bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10">
+<p class="text-slate-400 text-xs mb-1 uppercase font-bold">Sincronización de Llaves</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-red-400">cancel</span>
+<span class="text-sm font-medium">Interrumpido</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Summary Info -->
+<div class="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4 text-slate-400 text-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">schedule</span>
+                            Último intento: 14:02:33
+                        </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">info</span>
+                            ID Sesión: VS-9932-X
+                        </span>
+</div>
+<div class="flex gap-4">
+<button class="text-slate-600 hover:text-slate-900 font-medium text-sm underline decoration-slate-200 underline-offset-4">Ver logs técnicos</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

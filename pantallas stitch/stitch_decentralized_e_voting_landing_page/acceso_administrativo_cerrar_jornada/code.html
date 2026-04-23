@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        neutral: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            500: '#64748b',
+                            700: '#334155',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="bg-primary-600 p-2 rounded-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-primary-900">VotoSeguro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-neutral-500 hover:bg-neutral-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-neutral-200">
+<img class="w-full h-full object-cover" data-alt="admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKtOb2zLd-S5IlhL0AYatdpB-3YCb445Yf4JVh4DSgHT39Yve5obIpQKqTzvH5FKT0EPR9UlhB_z3yYyCssM3qSSsgWoxBxSrF3SEL7x8UbtJ3z-wh1f_Po7c-cddVGRLXDFxnWczzOl8AcLNOj6_6Oy40FZCQFDdf1g4wVvL6U5YZ1lsHdwgBrb1PmZjllp20vzJppD7nJikkNtk1-rOihylp6oBLk702ZwUuOcR7his-mUE1yzBmgOhZ8LgFdQiDtwNusOjPxR4"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar -->
+<div class="bg-white border-b border-neutral-200 px-6 py-3">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold text-neutral-700">Election Closing Process</span>
+<span class="text-xs font-medium text-primary-600">Step: Authentication</span>
+</div>
+<div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-600 h-full w-[20%] transition-all duration-500"></div>
+</div>
+</div>
+</div>
+<main class="flex-grow flex items-center justify-center p-6 bg-gradient-to-br from-neutral-50 to-neutral-100">
+<div class="max-w-md w-full">
+<!-- Header Section -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-16 h-16 bg-red-50 text-red-600 rounded-full mb-4 border border-red-100">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">lock_person</span>
+</div>
+<h1 class="text-3xl font-bold text-neutral-900 mb-2">Cerrar jornada electoral</h1>
+<p class="text-neutral-500">Esta acción finalizará oficialmente la recepción de votos</p>
+</div>
+<!-- Authentication Card -->
+<div class="bg-white rounded-xl shadow-xl border border-neutral-200 overflow-hidden">
+<div class="p-8">
+<form class="space-y-6" onsubmit="return false;">
+<div>
+<label class="block text-sm font-semibold text-neutral-700 mb-2" for="username">Usuario Institucional</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">badge</span>
+<input class="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent transition-all outline-none" id="username" name="username" placeholder="ID Administrador" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold text-neutral-700 mb-2" for="password">Contraseña</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">key</span>
+<input class="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent transition-all outline-none" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- ButtonGroup -->
+<div class="flex flex-col gap-3 pt-4">
+<button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 h-[52px]" type="submit">
+<span class="material-symbols-outlined">verified_user</span>
+                                Autenticar administrador
+                            </button>
+<button class="w-full bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 h-[52px]" type="button">
+                                Cancelar
+                            </button>
+</div>
+</form>
+</div>
+<!-- Security Banner -->
+<div class="bg-neutral-50 border-t border-neutral-100 p-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-neutral-500 text-lg mt-0.5">policy</span>
+<p class="text-xs text-neutral-500 leading-relaxed">
+                            Aviso de seguridad: Esta es una operación de alta prioridad. Todas las acciones realizadas en esta pantalla serán auditadas y vinculadas a su credencial institucional conforme a la ley electoral vigente.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Quick Info Grid -->
+<div class="grid grid-cols-2 gap-4 mt-8">
+<div class="bg-white p-4 rounded-lg border border-neutral-200 flex items-center gap-3">
+<div class="bg-blue-50 p-2 rounded text-blue-600">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold">Hora Local</p>
+<p class="text-sm font-semibold text-neutral-900">18:00:45</p>
+</div>
+</div>
+<div class="bg-white p-4 rounded-lg border border-neutral-200 flex items-center gap-3">
+<div class="bg-green-50 p-2 rounded text-green-600">
+<span class="material-symbols-outlined">hub</span>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold">Conexión</p>
+<p class="text-sm font-semibold text-neutral-900">Encriptada AES-256</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-neutral-200 py-8 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-neutral-500 text-sm">
+                    © 2024 VotoSeguro Institutional. All rights reserved.
+                </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors" href="#">Institutional Portal</a>
+<a class="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

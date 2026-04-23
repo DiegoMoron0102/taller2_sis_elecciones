@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                        "success": "#10b981",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Confirmación de Voto</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Navigation -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 md:px-20 py-4 bg-white dark:bg-slate-900/50">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">how_to_reg</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Sistema de Votación</h2>
+</div>
+<div class="flex items-center gap-4">
+<span class="hidden md:block text-sm font-medium text-slate-500 dark:text-slate-400">Sesión activa: Usuario 4829</span>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
+<div class="max-w-[640px] w-full flex flex-col gap-8">
+<!-- Success Header -->
+<div class="flex flex-col items-center text-center gap-4">
+<div class="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-success text-5xl">check_circle</span>
+</div>
+<h1 class="text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Voto emitido correctamente</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg max-w-md">
+                            Su participación ha sido procesada con éxito y cifrada de extremo a extremo mediante tecnología blockchain.
+                        </p>
+</div>
+<!-- Receipt Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+<div class="flex flex-col">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Registro Permanente</span>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Detalles del Comprobante</h3>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-success/10 text-success rounded-full">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span class="text-xs font-bold uppercase tracking-wide">Confirmado</span>
+</div>
+</div>
+<!-- Transaction Map/Visual Placeholder -->
+<div class="w-full h-32 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+<div class="absolute inset-0 opacity-20 bg-gradient-to-r from-primary to-success" data-alt="Abstract green and orange digital gradient pattern"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-600 text-6xl">security</span>
+</div>
+</div>
+<div class="p-6 space-y-4">
+<div class="flex justify-between items-center py-1">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Hash de transacción</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">0x7f8...3a92</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Fecha</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">24 de Mayo, 2024</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Hora</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">14:35:12 (GMT-5)</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Método</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">Biometría Digital</span>
+</div>
+<div class="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10 flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl">verified_user</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm italic">
+                                    "Este comprobante garantiza la inmutabilidad de su participación y el anonimato de su elección mediante protocolos de prueba de conocimiento cero."
+                                </p>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 w-full">
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold h-12 rounded-xl transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                            Finalizar sesión
+                        </button>
+<button class="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold h-12 rounded-xl transition-colors">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+                            Descargar comprobante (PDF)
+                        </button>
+</div>
+<p class="text-center text-slate-400 dark:text-slate-600 text-sm">
+                        ¿Necesita ayuda? Contacte al soporte técnico: <a class="text-primary underline" href="#">soporte@votacion.gob</a>
+</p>
+</div>
+</main>
+<footer class="py-8 px-6 text-center border-t border-slate-200 dark:border-slate-800">
+<div class="flex justify-center gap-6 mb-4">
+<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">share</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">print</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">mail</span>
+</div>
+<p class="text-slate-400 dark:text-slate-500 text-xs">© 2024 Sistema Nacional de Votación Electrónica Segura. Todos los derechos reservados.</p>
+</footer>
+</div>
+</div>
+</body></html>

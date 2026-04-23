@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                        "alert-red": "#dc2626",
+                        "alert-bg": "#fef2f2",
+                        "alert-border": "#fecaca"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Error de Cierre de Sesión - Seguridad del Sistema</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 md:px-10 py-3 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-4">
+<div class="text-alert-red">
+<span class="material-symbols-outlined text-3xl">shield_lock</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">Seguridad del Sistema</h2>
+</div>
+<button class="flex items-center justify-center rounded-lg h-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</header>
+<main class="flex flex-1 flex-col items-center justify-center px-4 py-12">
+<div class="w-full max-w-[520px] bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 flex flex-col items-center">
+<div class="mb-8 relative">
+<div class="absolute inset-0 bg-alert-red/10 rounded-full animate-pulse"></div>
+<div class="relative bg-alert-bg dark:bg-alert-red/20 text-alert-red rounded-full p-6 border-4 border-alert-border dark:border-alert-red/30">
+<span class="material-symbols-outlined text-6xl">error</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-4 text-center mb-10">
+<h1 class="text-slate-900 dark:text-slate-100 text-2xl md:text-3xl font-extrabold leading-tight tracking-tight">
+                            Error al finalizar la sesión
+                        </h1>
+<div class="bg-alert-bg dark:bg-alert-red/5 p-4 rounded-lg border-l-4 border-alert-red">
+<p class="text-slate-700 dark:text-slate-300 text-base font-medium leading-relaxed">
+                                No fue posible completar correctamente la invalidación de la sesión o del token. El sistema está protegiendo el acceso.
+                            </p>
+</div>
+</div>
+<div class="w-full flex flex-col gap-3">
+<button class="flex h-12 w-full items-center justify-center rounded-lg bg-alert-red px-6 text-white text-base font-bold tracking-wide hover:bg-red-700 transition-colors shadow-sm">
+<span class="material-symbols-outlined mr-2">refresh</span>
+                            Reintentar
+                        </button>
+<button class="flex h-12 w-full items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-base font-bold tracking-wide hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined mr-2">home</span>
+                            Ir al inicio
+                        </button>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 w-full">
+<div class="flex items-start gap-3 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm mt-0.5">info</span>
+<p class="text-xs font-normal leading-normal">
+                                Protocolo de Seguridad Activo: Si el problema persiste, por favor cierre todas las ventanas de su navegador y contacte al departamento de soporte técnico para verificar el estado de su credencial.
+                            </p>
+</div>
+</div>
+</div>
+<div class="mt-8 flex flex-col items-center gap-4 opacity-60">
+<div class="h-24 w-full max-w-[360px] bg-center bg-no-repeat bg-contain opacity-20 grayscale" data-alt="Marca de agua institucional con escudo de seguridad" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDp4SR49y8PNCRs-HxWs_W_xTc86x82T3jwUx73FrXeNZVfEjacF7wguGtq7HwUtywPHnWJ-eWAnJ0VjHXYCy2gqrFPKIcd7ZsIPI4Z8hL-aX8N2l452Tw9c7Ox6qDCHx6Ntfi-CYV-zvitsXuXWVrcLb2K8kmGd_ZwKzUnj9XeLP476XjFao0eCNSlrBSIndA8tH9p2Q4YFGpDiwvcuAtchVSU6RacnhPcH12MO5A8ja1Md_3_LljzGEBnMrGSWJox8W63V_ydQBU");'></div>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">CÓDIGO DE ERROR: AUTH_INVALIDATION_FAILED_S31</p>
+</div>
+</main>
+<footer class="py-6 px-10 text-center border-t border-slate-200 dark:border-slate-800">
+<p class="text-slate-400 dark:text-slate-500 text-xs">
+                    © 2024 Departamento de Ciberseguridad Institucional. Todos los derechos reservados.
+                </p>
+</footer>
+</div>
+</div>
+</body></html>

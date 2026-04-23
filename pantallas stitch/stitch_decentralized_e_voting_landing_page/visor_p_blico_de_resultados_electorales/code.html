@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#1e293b',
+                            foreground: '#f8fafc'
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            foreground: '#ffffff'
+                        },
+                        status: {
+                            success: '#10b981',
+                            info: '#3b82f6'
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-body text-slate-900">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 w-full bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+</div>
+<span class="font-headline font-bold text-xl tracking-tight text-primary">VotoSeguro</span>
+</div>
+<div class="hidden md:flex items-center bg-slate-100 rounded-lg px-3 py-2 w-96">
+<span class="material-symbols-outlined text-slate-500 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full" placeholder="Search by region or candidate..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-slate-100 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-slate-100 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300">
+<img alt="Admin Profile" data-alt="Admin Profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf0_om5VGjG_LV3dQPGURM8JlemLqR9GXW92pfL68VA9_CaKIj9SELDtQMvWL9t96ewgJDNv9Y-h0c7oZU6cwmYDiZQUlua34pSEiFiNGMYZiHRZgTA-FrmzmyM1IND8P_77-RwaaJ8qpgTtbwmFMs1UMzmBo_PLtIOMQGjkS6k5Os929ZRSgX6eUyJfEIy5Gu_I_uNq4q8d3eGEo_UIex53ZTifUCjaE3xwctjY2HknxyxQI9VGVj8tgxQnaasQK7XFpL3g5ZlR8"/>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<!-- Header Section -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full mb-4">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-xs font-semibold tracking-wide uppercase">Resultados oficiales publicados</span>
+</div>
+<h1 class="text-4xl font-headline font-extrabold text-slate-900 mb-2">Elección 2025</h1>
+<p class="text-slate-500 max-w-2xl">Visualización oficial de resultados escrutados. La integridad de estos datos está respaldada por firmas criptográficas y auditoría externa independiente.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">download</span>
+                    Exportar Datos
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-semibold hover:opacity-90 shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">share</span>
+                    Compartir
+                </button>
+</div>
+</header>
+<!-- ProgressBar Component -->
+<section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-10">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-accent">verified</span>
+<h3 class="font-bold text-slate-800">Election Audit Progress</h3>
+</div>
+<div class="text-right">
+<span class="text-2xl font-black text-primary">45%</span>
+<p class="text-xs text-slate-400 font-medium">Verifying encrypted ballots</p>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
+<div class="bg-accent h-full rounded-full transition-all duration-1000" style="width: 45%"></div>
+</div>
+</section>
+<!-- Bento Grid: Main Stats & Participation -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<!-- Participation Summary Card -->
+<div class="md:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+<div>
+<h3 class="text-slate-500 font-semibold text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">group</span>
+                        RESUMEN DE PARTICIPACIÓN
+                    </h3>
+<div class="space-y-6">
+<div>
+<p class="text-4xl font-black text-slate-900">78.4%</p>
+<p class="text-slate-400 text-xs font-medium uppercase mt-1">Participación Ciudadana</p>
+</div>
+<div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-6">
+<div>
+<p class="text-lg font-bold text-slate-800">12,450,231</p>
+<p class="text-slate-400 text-[10px] font-bold uppercase">Votos Totales</p>
+</div>
+<div>
+<p class="text-lg font-bold text-slate-800">0.02%</p>
+<p class="text-slate-400 text-[10px] font-bold uppercase">Votos Nulos</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 bg-slate-50 rounded-xl p-4 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-xs font-semibold text-slate-600">Sistema en línea - Hash: 0x82f...a12</span>
+</div>
+</div>
+<!-- Results Bar Chart Card -->
+<div class="md:col-span-2 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-slate-500 font-semibold text-sm mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bar_chart</span>
+                    TOTALES POR CANDIDATO
+                </h3>
+<div class="space-y-8">
+<!-- Candidate 1 -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-accent">
+<img alt="Candidate A" data-alt="Candidate photo professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQDMc-Omrg-mcAgDjd6S9gbwlehhRwpNaGEwxZGobEDs_4WD7y5vUYYquJFVAKVb0Z-rEEdv9DBYzhgbVULcNQUZUrlQGn2vihVqWb8eWOKx2qrG7V91HDN0JvvR5AiyYxLWYw-dZR6emvS_BfEl1CI0nRCMnknULYmQnVKmKGgy0AkSpVc8idbk8cZaHKq-7ps_L58FuPdGUq4xbHnHTu5IcEfud7h-NvBY0CHrdTu6VvSRuWuMUPpkn7Qeq8LgsC9xaOx4pkEz8"/>
+</div>
+<div>
+<p class="font-bold text-slate-900">Alianza por el Progreso</p>
+<p class="text-xs text-slate-500">Candidato A</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-slate-900">52.1%</p>
+<p class="text-[10px] text-slate-400 font-bold uppercase">6,486,570 VOTOS</p>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+<div class="bg-accent h-full rounded-full" style="width: 52.1%"></div>
+</div>
+</div>
+<!-- Candidate 2 -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-slate-300">
+<img alt="Candidate B" data-alt="Candidate photo professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0lZ-UVznuesyyLXR_40oUsNKwLNu8KpqZHVrh-akxjkedMXNTlniUjKSWi7sFOpq83BzOzeIJDzWPXwaZkAjcJAJ6bhkJN64SAxHPIfwRhJSrlncVKhKjvyRQE5wvfozPDsCpWaIA-127EoF88viozyREnTXfvDTfCeDsOe_aTjaACMSSEuZbWzS5h2CiaL3kHqZ5LW2IQRlQMd_7n42VvM30lEnLdhDyNeR03A9ahV1bb2zPXZQyUpWPSaT7DwvumJRdZSXyb2g"/>
+</div>
+<div>
+<p class="font-bold text-slate-900">Frente Ciudadano</p>
+<p class="text-xs text-slate-500">Candidato B</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-slate-900">41.8%</p>
+<p class="text-[10px] text-slate-400 font-bold uppercase">5,204,196 VOTOS</p>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+<div class="bg-slate-400 h-full rounded-full" style="width: 41.8%"></div>
+</div>
+</div>
+<!-- Candidate 3 -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-slate-300">
+<img alt="Candidate C" data-alt="Candidate photo professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyhl6S1IVBcDeVqbkaOE0GUxSErQO4IT84wbn7AJnZhtI80AyIDZf-_o-OAV5KGghl_I2TN7LjkAej7QXpx_AaHibQTwfxtXgdibxwnFCLXpn_0r6xydWqqsP1MBatSQ-eTpR9vGJw0FBzLugo4izb0xbmfof3-66m513jmJEx9_SbaNwm2wj_RO0ITCFg11WqdZJgvLKdm5j_rl2EGBxW2is9saDEPOTUa8svByIApayIkyuVKyjxJtBfHjCYorsnpEm6NsMfAK4"/>
+</div>
+<div>
+<p class="font-bold text-slate-900">Movimiento Innovación</p>
+<p class="text-xs text-slate-500">Candidato C</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-black text-slate-900">6.1%</p>
+<p class="text-[10px] text-slate-400 font-bold uppercase">759,465 VOTOS</p>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+<div class="bg-slate-300 h-full rounded-full" style="width: 6.1%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Evidence & Audit Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+<!-- Audit Section -->
+<div class="bg-primary text-white p-8 rounded-2xl shadow-xl overflow-hidden relative">
+<div class="relative z-10">
+<h3 class="text-blue-400 font-bold text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">security</span>
+                        SECCIÓN PARA AUDITORES
+                    </h3>
+<p class="text-slate-300 mb-8 leading-relaxed">
+                        Acceda a la consola de verificación técnica para validar las firmas digitales de cada acta y el encadenamiento de resultados mediante tecnología blockchain.
+                    </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="bg-slate-800/50 p-4 rounded-xl border border-white/10">
+<p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Sha-256 Merkle Root</p>
+<code class="text-xs text-blue-200 break-all font-mono">f3a9e2d810c5b4...e72d1f9a</code>
+</div>
+<div class="bg-slate-800/50 p-4 rounded-xl border border-white/10">
+<p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Block Height</p>
+<p class="font-mono text-lg font-bold">#2,948,102</p>
+</div>
+</div>
+<button class="mt-8 w-full py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">analytics</span>
+                        Abrir Dashboard de Auditoría
+                    </button>
+</div>
+<!-- Abstract Decorative Background -->
+<div class="absolute -right-20 -bottom-20 w-64 h-64 bg-accent/20 rounded-full blur-3xl"></div>
+</div>
+<!-- Evidence Package Card -->
+<div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-slate-500 font-semibold text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">folder_zip</span>
+                    PAQUETE DE EVIDENCIAS
+                </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:border-accent group cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="bg-slate-100 p-2 rounded-lg group-hover:bg-blue-50">
+<span class="material-symbols-outlined text-slate-600 group-hover:text-accent">description</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Actas Digitalizadas (PDF)</p>
+<p class="text-xs text-slate-400">Firmado digitalmente • 1.2 GB</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">download</span>
+</div>
+<div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:border-accent group cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="bg-slate-100 p-2 rounded-lg group-hover:bg-blue-50">
+<span class="material-symbols-outlined text-slate-600 group-hover:text-accent">database</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Raw Data (JSON/CSV)</p>
+<p class="text-xs text-slate-400">Public Ledger • 450 MB</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">download</span>
+</div>
+<div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:border-accent group cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="bg-slate-100 p-2 rounded-lg group-hover:bg-blue-50">
+<span class="material-symbols-outlined text-slate-600 group-hover:text-accent">policy</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Informe Técnico de Auditoría</p>
+<p class="text-xs text-slate-400">Validado por Observadores • 12 MB</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">download</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="bg-white border-t border-slate-200 mt-20 py-12">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="bg-slate-800 p-1 rounded-md">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+</div>
+<span class="font-headline font-bold text-lg tracking-tight text-slate-800">VotoSeguro</span>
+</div>
+<nav class="flex flex-wrap justify-center gap-x-8 gap-y-4">
+<a class="text-sm font-medium text-slate-500 hover:text-accent transition-colors" href="#">Institutional Privacy</a>
+<a class="text-sm font-medium text-slate-500 hover:text-accent transition-colors" href="#">Audit Protocol</a>
+<a class="text-sm font-medium text-slate-500 hover:text-accent transition-colors" href="#">Technical Support</a>
+<a class="text-sm font-medium text-slate-500 hover:text-accent transition-colors" href="#">Terms of Service</a>
+</nav>
+</div>
+<div class="mt-8 pt-8 border-t border-slate-100 text-center">
+<p class="text-sm text-slate-400">© 2024 VotoSeguro Electoral Systems. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</body></html>

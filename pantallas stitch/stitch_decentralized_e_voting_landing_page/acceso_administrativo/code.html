@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                primary: "#1e293b",
+                secondary: "#475569",
+                accent: "#2563eb",
+                muted: "#f8fafc",
+                border: "#e2e8f0"
+              }
+            },
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-brand-primary">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-brand-primary text-white shadow-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight">VotoSeguro</span>
+<nav class="hidden md:flex space-x-6">
+<a class="text-slate-300 hover:text-white text-sm font-medium" href="#">Dashboard</a>
+<a class="text-slate-300 hover:text-white text-sm font-medium border-b-2 border-white pb-1" href="#">Elections</a>
+<a class="text-slate-300 hover:text-white text-sm font-medium" href="#">Audit</a>
+<a class="text-slate-300 hover:text-white text-sm font-medium" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-300 hover:text-white">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-2 border-l border-slate-700 pl-4">
+<img alt="Admin Profile" class="h-8 w-8 rounded-full border border-slate-500" data-alt="Professional portrait of a male administrative officer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAoYkBZbTR6gZjK4yHpIPn0CxvBUsC3SDQD3BvPxIynrdapcvALRt1cEH9M5lAe0hWaAnZdGzCi9vJs5423Mdi-SCKHXtGChCilNj88p6QYmJzojYyYisk3qmr_MgKFt104Mv8e5kfwZCNh2eBO44iXtcumE13jdeOf6wxewy-FxFzEWv4S9M5rgA4lj28Dna353nvp7RUFBTerRKyQGDXCItLFSEnYUOe5sSWeKqiMGX3NtbQc2RA-0IJ9f0EtH7PyrBkJb0soCk"/>
+<span class="material-symbols-outlined text-slate-300">account_circle</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- ProgressBar (Shared Component) -->
+<div class="bg-white border-b border-brand-border">
+<div class="max-w-3xl mx-auto py-6 px-4">
+<div class="flex justify-between items-end mb-2">
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wider text-brand-secondary">Election Setup Phase</h2>
+<p class="text-sm text-slate-500">Step 1 of 4: Initialization</p>
+</div>
+<span class="text-sm font-bold text-brand-accent">25%</span>
+</div>
+<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+<div class="bg-brand-accent h-full w-1/4"></div>
+</div>
+</div>
+</div>
+<!-- Main Content: Linear Process (Authentication) -->
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 bg-white rounded-xl shadow-xl overflow-hidden border border-brand-border">
+<!-- Information Panel -->
+<div class="lg:col-span-5 bg-brand-primary p-8 lg:p-12 text-white flex flex-col justify-between">
+<div>
+<div class="inline-flex items-center justify-center p-3 bg-brand-accent/20 rounded-lg mb-6">
+<span class="material-symbols-outlined text-brand-accent text-3xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Abrir jornada electoral</h1>
+<p class="text-slate-300 text-lg leading-relaxed">Autenticación requerida para habilitar el proceso de votación</p>
+</div>
+<div class="mt-12">
+<div class="flex items-start gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-brand-accent">info</span>
+<p class="text-xs text-slate-300 leading-normal">Esta acción será auditada y registrada en el log del sistema</p>
+</div>
+</div>
+</div>
+<!-- Form Panel -->
+<div class="lg:col-span-7 p-8 lg:p-12 bg-white">
+<form class="space-y-6">
+<div>
+<label class="block text-sm font-semibold text-brand-primary mb-2" for="username">Usuario Institucional</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 text-sm">badge</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-brand-border rounded-lg focus:ring-brand-accent focus:border-brand-accent text-sm" id="username" name="username" placeholder="ID de administrador" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold text-brand-primary mb-2" for="credential">Credencial</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 text-sm">key</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-brand-border rounded-lg focus:ring-brand-accent focus:border-brand-accent text-sm" id="credential" name="credential" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+<div class="pt-4 space-y-3">
+<button class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-brand-primary hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors" type="button">
+                            Autenticar administrador
+                        </button>
+<button class="w-full flex justify-center items-center py-3 px-4 border border-brand-border rounded-lg shadow-sm text-sm font-bold text-brand-secondary bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 transition-colors" type="button">
+                            Cancelar
+                        </button>
+</div>
+<div class="mt-8 flex justify-center">
+<div class="flex -space-x-2">
+<img alt="Audit team 1" class="inline-block h-8 w-8 rounded-full ring-2 ring-white" data-alt="Portrait of a male security auditor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkY6iwsUUIc289W4gHApWRDS9v4Yt6FSfRI0nTiUYV1OloyCRkwLRCJ9ueTVxQwd1LBBiUuOc5waL96ARi9_wfP8v-0_AbQwCLk3f5aPqTPumtGssg0KFm71TrfyvLdUIWixVDOkLn-F3l0wMto2QTcj7w8blUV4oAtnGQLgiwsUv-6J5M5wv0x1LUTe2IAPgvPLNO3trpK5Yx03Oxs7ZlnDYZAwSAwtnkV0q3nX-Dls28VAOU3I7H_cHpznYf5nl8ykf1x1AECzI"/>
+<img alt="Audit team 2" class="inline-block h-8 w-8 rounded-full ring-2 ring-white" data-alt="Portrait of a female election supervisor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZSKBiEK_GDxehL27-T-qiBYOhQeqkqqzZ-eUYpth579KPR20BFDje0ieACaQsZoLClCwoyl_PjyJfbfY6c9bUwWUlNKRD5CgrQr9E5iPmGEwxHgENScqRpHJq9R3RqkERCv1qyyTVjs8WdLyHBvXlUO_P53toF2SYVBreO78QZuwDbSV_A8O2prdXNSyKim0KCYNNZyQUg5QZOpf22HJGjDaHr6SLtrcUHshSnZILr8q1iALirXJAhVRlCjD91igC06EJRUbGb6Y"/>
+<div class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-muted text-[10px] font-bold text-brand-secondary ring-2 ring-white">+2</div>
+</div>
+<p class="ml-3 text-xs text-slate-500 self-center">Firmas digitales requeridas: 2 de 3 activas</p>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-white border-t border-brand-border py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-sm text-brand-secondary">© 2024 VotoSeguro - Institutional Electronic Voting System</p>
+<div class="flex gap-8">
+<a class="text-sm text-brand-secondary hover:text-brand-accent transition-colors" href="#">Terms of Service</a>
+<a class="text-sm text-brand-secondary hover:text-brand-accent transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm text-brand-secondary hover:text-brand-accent transition-colors" href="#">Security Audit</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

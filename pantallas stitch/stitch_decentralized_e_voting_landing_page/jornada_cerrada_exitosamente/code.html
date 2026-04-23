@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VotoSeguro - Cierre de Jornada</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        neutral: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            400: '#94a3b8',
+                            600: '#475569',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-white border-b border-neutral-200 px-6 h-16 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="text-primary-900 font-headline font-bold text-xl tracking-tight">VotoSeguro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-neutral-200 overflow-hidden border border-neutral-200">
+<img alt="admin profile" class="w-full h-full object-cover" data-alt="admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8LQwm2_jqJRUrYNhdaRAYaGsXJmBBh3ZjcIpCCT_-GSA02bQ1mioAeQq2f1lqHpnRRBaeeqiuPNMWXz5E3-yV0IfmEhfQMNjgCaH3XdplcrCNUgmlie_w9G8IoxOaEc3b_Ys8rj_y-4r8tYphWeD9VOywgPdgdqcK64x83wiphwRtOb2LwwrZgFQqYyQplSE1enVVxUditoN-XsiiK-RjpG3mK2CcUDzB_J0t4b2ApwOiI8twOjkJFa8jG_TBpmp1FhcL9edr2wk"/>
+</div>
+</div>
+</nav>
+<!-- ProgressBar (Task Focus Mode) -->
+<div class="bg-white border-b border-neutral-100 py-4 px-6">
+<div class="max-w-3xl mx-auto">
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-label font-medium text-neutral-600">Election Closing Process</span>
+<span class="text-xs font-label text-neutral-400">Step: Authentication</span>
+</div>
+<div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-600 h-full rounded-full transition-all duration-500" style="width: 20%"></div>
+</div>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<!-- Visual Hero Section (Asymmetric) -->
+<div class="md:col-span-5 relative">
+<div class="bg-success-50 rounded-xl p-8 border border-success-100 relative overflow-hidden">
+<div class="absolute -top-12 -right-12 w-48 h-48 bg-success-100 rounded-full opacity-50"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="w-20 h-20 bg-success-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-success-500/20">
+<span class="material-symbols-outlined text-white text-4xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h1 class="font-headline text-2xl font-bold text-neutral-900 leading-tight">Jornada electoral cerrada exitosamente</h1>
+<p class="mt-4 text-neutral-600 text-sm leading-relaxed">
+                            Todos los protocolos de seguridad han sido validados y la integridad de los datos está garantizada por el sistema de encriptación institucional.
+                        </p>
+</div>
+</div>
+<!-- Abstract decorative card -->
+<div class="mt-6 bg-white border border-neutral-200 rounded-lg p-4 shadow-sm flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-600" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="text-xs font-bold text-neutral-900 uppercase tracking-wider">Blockchain Validated</p>
+<p class="text-[10px] text-neutral-500">Security Layer Alpha-7</p>
+</div>
+</div>
+</div>
+<!-- Details Bento Grid -->
+<div class="md:col-span-7 grid grid-cols-1 gap-4">
+<!-- Status Checklist -->
+<div class="bg-white border border-neutral-200 rounded-xl p-6 shadow-sm">
+<h3 class="font-headline text-sm font-semibold text-neutral-400 uppercase tracking-widest mb-4">Verificación de Sistema</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-500" data-icon="check_circle">check_circle</span>
+<span class="text-sm font-medium text-neutral-700">Estado Cerrado</span>
+</div>
+<span class="text-[10px] font-mono text-neutral-400">ID: SEC-01</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-500" data-icon="check_circle">check_circle</span>
+<span class="text-sm font-medium text-neutral-700">Votos Bloqueados</span>
+</div>
+<span class="text-[10px] font-mono text-neutral-400">DB: LOCKED</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-success-500" data-icon="check_circle">check_circle</span>
+<span class="text-sm font-medium text-neutral-700">Snapshot Generado</span>
+</div>
+<span class="text-[10px] font-mono text-neutral-400">FILE: BK_882</span>
+</div>
+</div>
+</div>
+<!-- Hash and Timestamp Card -->
+<div class="bg-neutral-900 rounded-xl p-6 text-white shadow-xl">
+<div class="flex items-center gap-2 mb-4 text-primary-100">
+<span class="material-symbols-outlined text-sm" data-icon="fingerprint">fingerprint</span>
+<span class="text-xs font-label tracking-widest uppercase">Certificado de Cierre</span>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] text-neutral-400 uppercase mb-1">Hash de Cierre</p>
+<p class="font-mono text-xs break-all bg-neutral-800 p-2 rounded border border-neutral-700 text-primary-100">
+                                0x82f1a9238c82381f92e0231923a1029384c20d029384f29304a2039482c1
+                            </p>
+</div>
+<div class="flex justify-between items-center pt-2">
+<div>
+<p class="text-[10px] text-neutral-400 uppercase">Timestamp</p>
+<p class="text-sm font-medium">2024-10-27 | 18:00:42 UTC</p>
+</div>
+<div class="h-10 w-10 bg-neutral-800 rounded flex items-center justify-center border border-neutral-700">
+<span class="material-symbols-outlined text-neutral-400" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ButtonGroup -->
+<div class="flex flex-col sm:flex-row gap-3 justify-end mt-4">
+<button class="px-6 py-3 border border-neutral-300 rounded-lg text-neutral-700 font-medium text-sm hover:bg-neutral-100 transition-colors flex items-center justify-center gap-2">
+                        Ver detalle del cierre
+                    </button>
+<button class="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium text-sm hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                        Ir al panel de monitoreo
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-neutral-200 py-6 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-neutral-500 order-2 md:order-1">
+                © 2024 VotoSeguro Institutional. All rights reserved.
+            </p>
+<div class="flex flex-wrap justify-center gap-6 order-1 md:order-2">
+<a class="text-xs text-neutral-600 hover:text-primary-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-xs text-neutral-600 hover:text-primary-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-xs text-neutral-600 hover:text-primary-600 transition-colors" href="#">Institutional Portal</a>
+<a class="text-xs text-neutral-600 hover:text-primary-600 transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

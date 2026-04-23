@@ -1,0 +1,26 @@
+{
+  "name": "evote3-demo",
+  "version": "1.0.0",
+  "description": "Sistema de votación con nullifiers anónimos para testnet",
+  "main": "scripts/generateNullifiers.js",
+  "scripts": {
+    "generate": "node scripts/generateNullifiers.js",
+    "generate:5": "node scripts/generateNullifiers.js 5",
+    "generate:10": "node scripts/generateNullifiers.js 10"
+  },
+  "keywords": [
+    "blockchain",
+    "voting",
+    "ethereum",
+    "nullifiers",
+    "zk",
+    "sepolia"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/eVote3"
+  }
+}
