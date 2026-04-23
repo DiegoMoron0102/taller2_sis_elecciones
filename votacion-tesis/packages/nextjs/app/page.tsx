@@ -2,61 +2,70 @@
 
 import Link from "next/link";
 import type { NextPage } from "next";
-import { CheckBadgeIcon, DocumentMagnifyingGlassIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import VotingShell from "~~/components/voting/VotingShell";
 
 const Home: NextPage = () => {
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5 max-w-4xl text-center">
-          <h1>
-            <span className="block text-2xl mb-2">Prototipo de Grado</span>
-            <span className="block text-4xl font-bold">Sistema de Votación Descentralizada Verificable</span>
-          </h1>
-          <p className="mt-6 text-lg">
-            Elecciones presidenciales con identidad verificable, voto anónimo cifrado y escrutinio auditable.
-          </p>
-          <p className="mt-2 text-sm opacity-70">
-            Diego Morón Mejía — Universidad Católica Boliviana &quot;San Pablo&quot; — Taller de Grado 2
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Link href="/verificar" className="btn btn-primary">
-              Verificar elegibilidad
-            </Link>
-            <Link href="/resultados" className="btn btn-ghost">
-              Ver resultados públicos
-            </Link>
-          </div>
+    <VotingShell>
+      <section className="rounded-2xl bg-gradient-to-br from-[#197fe6]/10 via-white to-white dark:from-[#197fe6]/20 dark:via-slate-900 dark:to-slate-900 border border-slate-200 dark:border-slate-800 p-8 md:p-12 shadow-sm">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[#197fe6]/10 text-[#197fe6] px-3 py-1 text-xs font-bold uppercase tracking-wider">
+          <span className="material-symbols-outlined text-base">verified_user</span>
+          Prototipo de Grado · UCB
+        </span>
+        <h1 className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
+          Sistema de Votación Descentralizada Verificable
+        </h1>
+        <p className="mt-4 text-slate-600 dark:text-slate-400 text-base md:text-lg max-w-3xl">
+          Identidad verificable, voto anónimo cifrado y auditoría universal. Diseñado para restaurar
+          la confianza ciudadana mediante criptografía moderna y registro inmutable en blockchain.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/verificar"
+            className="inline-flex items-center gap-2 px-6 h-12 rounded-xl bg-[#197fe6] text-white font-bold shadow-lg shadow-[#197fe6]/20 hover:brightness-110 transition-all"
+          >
+            <span className="material-symbols-outlined">how_to_vote</span>
+            Iniciar votación
+          </Link>
+          <Link
+            href="/explorer"
+            className="inline-flex items-center gap-2 px-6 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <span className="material-symbols-outlined">search</span>
+            Explorador público
+          </Link>
         </div>
+      </section>
 
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-8 flex-col md:flex-row max-w-6xl mx-auto">
-            <div className="flex flex-col bg-base-100 px-8 py-8 text-center items-center max-w-xs rounded-3xl">
-              <CheckBadgeIcon className="h-10 w-10 fill-secondary" />
-              <h3 className="font-bold mt-2">Identidad Verificable</h3>
-              <p className="text-sm mt-2">
-                Credenciales digitales firmadas (W3C VC) que separan elegibilidad de identidad.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-8 py-8 text-center items-center max-w-xs rounded-3xl">
-              <LockClosedIcon className="h-10 w-10 fill-secondary" />
-              <h3 className="font-bold mt-2">Voto Anónimo Cifrado</h3>
-              <p className="text-sm mt-2">
-                Cifrado ElGamal + pruebas de conocimiento cero (Noir) para proteger el secreto del sufragio.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-8 py-8 text-center items-center max-w-xs rounded-3xl">
-              <DocumentMagnifyingGlassIcon className="h-10 w-10 fill-secondary" />
-              <h3 className="font-bold mt-2">Auditoría Universal</h3>
-              <p className="text-sm mt-2">
-                Cualquier tercero puede reproducir el conteo con el paquete de evidencias publicado.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          {
+            icon: "verified",
+            title: "Identidad Verificable",
+            desc: "Credenciales firmadas (W3C VC) separan elegibilidad de identidad.",
+          },
+          {
+            icon: "lock",
+            title: "Voto Anónimo Cifrado",
+            desc: "ElGamal + ZK proofs aseguran el secreto del sufragio.",
+          },
+          {
+            icon: "policy",
+            title: "Auditoría Universal",
+            desc: "Cualquier tercero reproduce el conteo con el paquete de evidencias.",
+          },
+        ].map(card => (
+          <article
+            key={card.title}
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm"
+          >
+            <span className="material-symbols-outlined text-3xl text-[#197fe6]">{card.icon}</span>
+            <h3 className="mt-3 font-bold text-lg">{card.title}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{card.desc}</p>
+          </article>
+        ))}
+      </section>
+    </VotingShell>
   );
 };
 
