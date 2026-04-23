@@ -1,0 +1,9 @@
+# Ignorar todo por defecto en el repo raíz
+*
+
+# Mantener este archivo
+!.gitignore
+
+# Solo versionar el proyecto principal de tesis
+!votacion-tesis/
+!votacion-tesis/**

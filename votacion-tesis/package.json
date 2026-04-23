@@ -1,0 +1,44 @@
+{
+  "name": "votacion-descentralizada",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema de votación electrónica descentralizada verificable para elecciones presidenciales — Proyecto de Grado UCB",
+  "author": "Diego Morón Mejía",
+  "workspaces": {
+    "packages": [
+      "packages/hardhat",
+      "packages/nextjs",
+      "packages/circuits",
+      "packages/backend"
+    ]
+  },
+  "scripts": {
+    "chain": "yarn workspace @votacion/hardhat chain",
+    "compile": "yarn workspace @votacion/hardhat compile",
+    "deploy": "yarn workspace @votacion/hardhat deploy",
+    "test": "yarn workspace @votacion/hardhat test",
+    "start": "yarn workspace @votacion/nextjs dev",
+    "next:build": "yarn workspace @votacion/nextjs build",
+    "next:lint": "yarn workspace @votacion/nextjs lint",
+    "hardhat:lint": "yarn workspace @votacion/hardhat lint",
+    "lint": "yarn next:lint && yarn hardhat:lint",
+    "format": "yarn workspace @votacion/nextjs format && yarn workspace @votacion/hardhat format",
+    "account": "yarn workspace @votacion/hardhat account",
+    "account:generate": "yarn workspace @votacion/hardhat account:generate",
+    "account:import": "yarn workspace @votacion/hardhat account:import",
+    "fork": "yarn workspace @votacion/hardhat fork",
+    "verify": "yarn workspace @votacion/hardhat verify",
+    "backend:dev": "yarn workspace @votacion/backend dev",
+    "circuits:compile": "yarn workspace @votacion/circuits compile",
+    "postinstall": "husky",
+    "precommit": "lint-staged"
+  },
+  "packageManager": "yarn@4.13.0",
+  "devDependencies": {
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10"
+  },
+  "engines": {
+    "node": ">=20.18.3"
+  }
+}

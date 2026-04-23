@@ -1,0 +1,12 @@
+{
+  "name": "@votacion/circuits",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Circuitos Noir para pruebas de conocimiento cero del sistema de votación",
+  "scripts": {
+    "compile": "nargo compile",
+    "test": "nargo test",
+    "vk": "bb write_vk --oracle_hash keccak -b ./target/voto_circuit.json -o ./target/",
+    "verifier": "bb write_solidity_verifier -k ./target/vk -o ../hardhat/contracts/Verifier.sol"
+  }
+}

@@ -1,0 +1,73 @@
+// Schema de Prisma — Base de datos off-chain
+// SQLite para prototipo; migrable a PostgreSQL para producción.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Administradores electorales. Solo ellos pueden abrir/cerrar la jornada y publicar resultados.
+model Administrador {
+  id          String   @id @default(cuid())
+  nombre      String
+  email       String   @unique
+  passwordHash String  // bcrypt
+  creadoEn    DateTime @default(now())
+
+  logs LogAuditoria[] @relation("AdminLogs")
+}
+
+/// Configuración global de la elección (una sola fila en producción).
+model ConfiguracionEleccion {
+  id           String    @id @default(cuid())
+  nombre       String
+  descripcion  String?
+  fechaInicio  DateTime?
+  fechaFin     DateTime?
+  estado       String   @default("PENDIENTE") // PENDIENTE | CONFIGURADA | ABIERTA | CERRADA | ESCRUTADA
+  creadoEn     DateTime  @default(now())
+  actualizadoEn DateTime @updatedAt
+}
+
+/// Registro de auditoría de acciones críticas del sistema.
+/// Nunca contiene datos que puedan vincular votante con voto.
+model LogAuditoria {
+  id        String   @id @default(cuid())
+  accion    String   // ej: "ABRIR_JORNADA", "PUBLICAR_RESULTADOS", "VOTO_EMITIDO"
+  actor     String   // ej: "admin:clx123", "sistema", "anonimo"
+  detalle   String?
+  timestamp DateTime @default(now())
+
+  administrador   Administrador? @relation("AdminLogs", fields: [administradorId], references: [id])
+  administradorId String?
+
+  @@index([accion])
+  @@index([timestamp])
+}
+
+/// Sesión del votante. Solo guardamos el HASH del token, nunca el token en claro.
+/// El token en sí lo conserva el votante.
+model SesionVotante {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  usado      Boolean   @default(false)
+  creadoEn   DateTime  @default(now())
+  usadoEn    DateTime?
+
+  @@index([usado])
+}
+
+/// Credencial Verificable emitida al votante.
+/// La credencial completa (con firma) se entrega al votante; aquí solo guardamos su hash.
+model CredencialEmitida {
+  id             String   @id @default(cuid())
+  credencialHash String   @unique // SHA-256 de la VC serializada
+  numeroPadron   String   @unique // identificador del padrón (offuscado en logs)
+  emitidaEn      DateTime @default(now())
+
+  @@index([emitidaEn])
+}

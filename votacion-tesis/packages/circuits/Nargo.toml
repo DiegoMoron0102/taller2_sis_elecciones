@@ -1,0 +1,9 @@
+[package]
+name = "voto_circuit"
+type = "bin"
+authors = ["Diego Morón Mejía"]
+compiler_version = ">=0.36.0"
+description = "Circuito ZK para validar emisión de voto anónimo sin revelar identidad"
+
+[dependencies]
+# binary_merkle_root = { tag = "v0.1.2", git = "https://github.com/privacy-scaling-explorations/zk-kit.noir", directory = "packages/binary-merkle-root" }
