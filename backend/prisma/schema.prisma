@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Administrador {
+  id       String @id @default(cuid())
+  nombre   String
+  email    String @unique
+  password String  // bcrypt hash
+  creadoEn DateTime @default(now())
+}
+
+model ConfiguracionEleccion {
+  id          String @id @default(cuid())
+  nombre      String
+  descripcion String?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  estado      String @default("pendiente") // pendiente | abierta | cerrada
+  creadoEn    DateTime @default(now())
+}
+
+model LogAuditoria {
+  id        String @id @default(cuid())
+  accion    String
+  actor     String
+  detalle   String?
+  timestamp DateTime @default(now())
+}
+
+model SesionVotante {
+  id           String @id @default(cuid())
+  tokenHash    String @unique  // hash del token, no el token mismo
+  usado        Boolean @default(false)
+  creadoEn     DateTime @default(now())
+  usadoEn      DateTime?
+}
