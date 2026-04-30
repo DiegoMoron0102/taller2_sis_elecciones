@@ -46,9 +46,11 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
-  console.log(`💚 Health check en http://localhost:${PORT}/health`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+    console.log(`💚 Health check en http://localhost:${PORT}/health`);
+  });
+}
 
 export default app;

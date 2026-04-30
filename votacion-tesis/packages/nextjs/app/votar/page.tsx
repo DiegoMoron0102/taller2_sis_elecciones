@@ -157,13 +157,22 @@ export default function VotarPage() {
             <span><b>Nullifier:</b> {resultado.boleta?.nullifier}</span>
             <span><b>Comprobante:</b> {resultado.hashComprobante}</span>
           </div>
-          <a
-            href="/explorer"
-            className="mt-2 inline-flex items-center justify-center gap-2 px-8 h-11 rounded-xl bg-[#197fe6] text-white font-bold"
-          >
-            Ver en Explorer
-            <span className="material-symbols-outlined">open_in_new</span>
-          </a>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <a
+              href={`/comprobar?txHash=${resultado.transaccion?.hash}`}
+              className="inline-flex items-center justify-center gap-2 px-8 h-11 rounded-xl bg-[#197fe6] text-white font-bold"
+            >
+              <span className="material-symbols-outlined">receipt_long</span>
+              Verificar comprobante
+            </a>
+            <a
+              href="/explorer"
+              className="inline-flex items-center justify-center gap-2 px-8 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold"
+            >
+              <span className="material-symbols-outlined">search</span>
+              Ver en Explorer
+            </a>
+          </div>
         </div>
       )}
     </VotingShell>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap");
+/* Public Sans y Material Symbols Outlined se cargan via <link> en app/layout.tsx
+   (los @import url se reordenaban tras @layer y Turbopack los rechaza). */
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 

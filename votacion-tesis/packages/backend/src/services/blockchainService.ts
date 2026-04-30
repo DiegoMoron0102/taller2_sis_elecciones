@@ -121,4 +121,36 @@ export class BlockchainService {
     }
     return candidatos;
   }
+
+  static async verificarComprobante(txHash: string) {
+    const provider = this.getProvider();
+    const receipt = await provider.getTransactionReceipt(txHash);
+    if (!receipt) return null;
+
+    const bulletinAddress = process.env.BULLETIN_BOARD_ADDRESS;
+    if (!bulletinAddress) throw new Error("BULLETIN_BOARD_ADDRESS no configurado");
+
+    const iface = new ethers.Interface([
+      "event BoletaRegistrada(uint256 indexed id, bytes32 indexed nullifier, uint256 bloque)",
+    ]);
+    const topicHash = iface.getEvent("BoletaRegistrada")!.topicHash;
+
+    const log = receipt.logs.find(
+      l => l.address.toLowerCase() === bulletinAddress.toLowerCase() && l.topics[0] === topicHash,
+    );
+    if (!log) return null;
+
+    const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
+    const boletaId = Number(parsed!.args.id);
+    const boleta = await this.obtenerBoleta(boletaId);
+
+    return {
+      txHash,
+      blockNumber: receipt.blockNumber,
+      boletaId,
+      nullifier: boleta.nullifier,
+      timestamp: boleta.timestamp,
+      estado: "registrado" as const,
+    };
+  }
 }

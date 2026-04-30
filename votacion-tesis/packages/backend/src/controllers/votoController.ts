@@ -38,4 +38,26 @@ export class VotoController {
       });
     }
   }
+
+  static async comprobante(req: Request, res: Response) {
+    try {
+      const { txHash } = req.query;
+      if (!txHash || typeof txHash !== "string") {
+        return res.status(400).json({ error: "txHash requerido" });
+      }
+      if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+        return res.status(400).json({ error: "Formato de txHash inválido" });
+      }
+      const resultado = await VotoService.verificarComprobante(txHash);
+      if (!resultado) {
+        return res.status(404).json({ error: "Transacción no encontrada o no corresponde a una boleta" });
+      }
+      return res.status(200).json(resultado);
+    } catch (error) {
+      return res.status(500).json({
+        error: "No se pudo verificar el comprobante",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
 }

@@ -105,4 +105,8 @@ export class VotoService {
     }
     return boletas;
   }
+
+  static async verificarComprobante(txHash: string) {
+    return BlockchainService.verificarComprobante(txHash);
+  }
 }

@@ -39,9 +39,13 @@ El objetivo académico es evolucionar desde esta base hacia:
   - `GET /api/voto/boletas`
   - contratos desplegados y boletas registradas on-chain
 
+- **Sprint 3 (verificación):**
+  - `GET /api/voto/comprobante?txHash=...`
+  - Página `/comprobar`: verificación on-chain por txHash
+  - Parseo de evento `BoletaRegistrada` desde `ethers.TransactionReceipt`
+
 ### ⚠️ Pendiente (siguientes sprints)
 
-- Verificación individual por txHash (Sprint 3)
 - Panel administrativo completo (Sprint 4)
 - Escrutinio cooperativo y resultados (Sprint 5)
 - Monitoreo/auditoría avanzada (Sprint 6)
@@ -156,6 +160,7 @@ URLs:
 - `POST /api/voto/emitir`
 - `GET /api/voto/estado-eleccion`
 - `GET /api/voto/boletas`
+- `GET /api/voto/comprobante?txHash=...`
 
 ### Infra
 

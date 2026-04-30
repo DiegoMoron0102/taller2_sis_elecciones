@@ -34,6 +34,13 @@ const Home: NextPage = () => {
             <span className="material-symbols-outlined">search</span>
             Explorador público
           </Link>
+          <Link
+            href="/comprobar"
+            className="inline-flex items-center gap-2 px-6 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <span className="material-symbols-outlined">receipt_long</span>
+            Verificar comprobante
+          </Link>
         </div>
       </section>
 
