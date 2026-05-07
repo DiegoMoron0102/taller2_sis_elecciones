@@ -61,6 +61,29 @@ model SesionVotante {
   @@index([usado])
 }
 
+/// Votante elegible del padrón.
+/// Cargado por el administrador antes de la elección.
+model VotanteElegible {
+  id           String   @id @default(cuid())
+  numeroPadron String   @unique // ej: LP123456
+  nombre       String?
+  ci           String?
+  registradoEn DateTime @default(now())
+
+  @@index([numeroPadron])
+}
+
+/// Candidato en la elección.
+model Candidato {
+  id           String   @id @default(cuid())
+  nombre       String
+  descripcion  String?
+  indice       Int      @unique // posición en la boleta (0, 1, 2...)
+  creadoEn     DateTime @default(now())
+
+  @@index([indice])
+}
+
 /// Credencial Verificable emitida al votante.
 /// La credencial completa (con firma) se entrega al votante; aquí solo guardamos su hash.
 model CredencialEmitida {

@@ -39,8 +39,11 @@ export class VotoService {
       throw new Error("La elección está cerrada");
     }
 
-    const candidatos = await BlockchainService.obtenerCandidatos();
-    if (input.candidatoId >= candidatos.length) {
+    const totalCandidatos = await prisma.candidato.count();
+    if (totalCandidatos === 0) {
+      throw new Error("No hay candidatos registrados");
+    }
+    if (input.candidatoId >= totalCandidatos) {
       throw new Error("Candidato fuera de rango");
     }
 
@@ -83,11 +86,16 @@ export class VotoService {
   }
 
   static async estadoEleccion() {
-    const [abierta, candidatos, totalBoletas] = await Promise.all([
+    const [abierta, totalBoletas, candidatosDB] = await Promise.all([
       BlockchainService.eleccionAbierta(),
-      BlockchainService.obtenerCandidatos(),
       BlockchainService.totalBoletas(),
+      prisma.candidato.findMany({ orderBy: { indice: "asc" } }),
     ]);
+
+    // Formato "nombre - descripcion" para que el frontend pueda separar nombre y partido
+    const candidatos = candidatosDB.map(c =>
+      c.descripcion ? `${c.nombre} - ${c.descripcion}` : c.nombre,
+    );
 
     return {
       abierta,

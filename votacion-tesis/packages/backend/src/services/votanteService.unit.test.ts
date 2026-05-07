@@ -7,9 +7,17 @@ vi.mock("../lib/prisma", () => ({
       create: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
     credencialEmitida: {
-      upsert: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+    },
+    votanteElegible: {
+      findUnique: vi.fn(),
     },
     logAuditoria: {
       create: vi.fn(),
@@ -80,8 +88,10 @@ describe("VotanteService.verificarFormatoCredencial", () => {
 describe("VotanteService.emitirTokenAnonimo", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (prisma.votanteElegible.findUnique as any).mockResolvedValue({ id: "el-1", numeroPadron: "LP123456" });
+    (prisma.credencialEmitida.findUnique as any).mockResolvedValue(null);
     (prisma.sesionVotante.create as any).mockResolvedValue({ id: "sess-001" });
-    (prisma.credencialEmitida.upsert as any).mockResolvedValue({});
+    (prisma.credencialEmitida.create as any).mockResolvedValue({});
     (prisma.logAuditoria.create as any).mockResolvedValue({});
   });
 
@@ -106,9 +116,47 @@ describe("VotanteService.emitirTokenAnonimo", () => {
     });
 
     expect(prisma.sesionVotante.create).toHaveBeenCalledTimes(1);
-    expect(prisma.credencialEmitida.upsert).toHaveBeenCalledTimes(1);
+    expect(prisma.credencialEmitida.create).toHaveBeenCalledTimes(1);
     expect(prisma.logAuditoria.create).toHaveBeenCalledTimes(1);
     expect((prisma.logAuditoria.create as any).mock.calls[0][0].data.accion).toBe("TOKEN_EMITIDO");
+  });
+
+  it("revoca token anterior no usado y emite uno nuevo", async () => {
+    const tokenHashAnterior = "a".repeat(64);
+    (prisma.credencialEmitida.findUnique as any).mockResolvedValue({
+      numeroPadron: "LP123456",
+      credencialHash: tokenHashAnterior,
+    });
+    (prisma.sesionVotante.findUnique as any).mockResolvedValue({ id: "sess-vieja", tokenHash: tokenHashAnterior, usado: false });
+    (prisma.sesionVotante.delete as any).mockResolvedValue({});
+    (prisma.credencialEmitida.delete as any).mockResolvedValue({});
+
+    const res = await VotanteService.emitirTokenAnonimo({
+      numeroPadron: "LP123456",
+      nombre: "Juan Perez",
+      ci: "12345678L",
+    });
+
+    expect(prisma.sesionVotante.delete).toHaveBeenCalledWith({ where: { tokenHash: tokenHashAnterior } });
+    expect(prisma.credencialEmitida.delete).toHaveBeenCalledWith({ where: { numeroPadron: "LP123456" } });
+    expect(res.token).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("lanza error si el padrón ya emitió su voto (sesión usada)", async () => {
+    const tokenHashAnterior = "b".repeat(64);
+    (prisma.credencialEmitida.findUnique as any).mockResolvedValue({
+      numeroPadron: "LP123456",
+      credencialHash: tokenHashAnterior,
+    });
+    (prisma.sesionVotante.findUnique as any).mockResolvedValue({ id: "sess-usada", tokenHash: tokenHashAnterior, usado: true });
+
+    await expect(
+      VotanteService.emitirTokenAnonimo({
+        numeroPadron: "LP123456",
+        nombre: "Juan Perez",
+        ci: "12345678L",
+      }),
+    ).rejects.toThrow("ya emitió su voto");
   });
 
   it("lanza error si la credencial es inválida (no toca la BD)", async () => {

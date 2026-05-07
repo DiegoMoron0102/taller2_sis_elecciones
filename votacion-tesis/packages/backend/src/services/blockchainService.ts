@@ -9,9 +9,17 @@ const NULLIFIER_SET_ABI = [
 
 const BULLETIN_BOARD_ABI = [
   "function registrarBoleta(bytes votoCifrado, bytes pruebaZK, bytes32 nullifier) external",
+  "function abrirEleccion() external",
+  "function cerrarEleccion() external",
   "function eleccionAbierta() external view returns (bool)",
   "function totalBoletas() external view returns (uint256)",
   "function obtenerBoleta(uint256 id) external view returns (tuple(bytes votoCifrado, bytes pruebaZK, bytes32 nullifier, uint256 bloque, uint256 timestamp))",
+] as const;
+
+const ESCRUTINIO_ABI = [
+  "function habilitarConteo() external",
+  "function conteoHabilitado() external view returns (bool)",
+  "function estaPublicado() external view returns (bool)",
 ] as const;
 
 const ADMIN_PARAMS_ABI = [
@@ -64,6 +72,19 @@ export class BlockchainService {
     const address = process.env.ADMIN_PARAMS_ADDRESS;
     if (!address) throw new Error("ADMIN_PARAMS_ADDRESS no configurado");
     return new ethers.Contract(address, ADMIN_PARAMS_ABI, this.getProvider());
+  }
+
+  private static async escrutinioWriteContract() {
+    const signer = await this.getSigner();
+    const address = process.env.ESCRUTINIO_ADDRESS;
+    if (!address) throw new Error("ESCRUTINIO_ADDRESS no configurado");
+    return new ethers.Contract(address, ESCRUTINIO_ABI, signer);
+  }
+
+  private static escrutinioReadContract() {
+    const address = process.env.ESCRUTINIO_ADDRESS;
+    if (!address) throw new Error("ESCRUTINIO_ADDRESS no configurado");
+    return new ethers.Contract(address, ESCRUTINIO_ABI, this.getProvider());
   }
 
   static async registrarNullifierElegible(nullifier: string) {
@@ -120,6 +141,34 @@ export class BlockchainService {
       candidatos.push(await contract.candidato(i));
     }
     return candidatos;
+  }
+
+  static async abrirEleccion() {
+    const contract = await this.bulletinBoardWriteContract();
+    const tx = await contract.abrirEleccion();
+    await tx.wait();
+  }
+
+  static async cerrarEleccion() {
+    const contract = await this.bulletinBoardWriteContract();
+    const tx = await contract.cerrarEleccion();
+    await tx.wait();
+  }
+
+  static async habilitarConteo() {
+    const contract = await this.escrutinioWriteContract();
+    const tx = await contract.habilitarConteo();
+    await tx.wait();
+  }
+
+  static async conteoHabilitado(): Promise<boolean> {
+    const contract = this.escrutinioReadContract();
+    return Boolean(await contract.conteoHabilitado());
+  }
+
+  static async resultadosPublicados(): Promise<boolean> {
+    const contract = this.escrutinioReadContract();
+    return Boolean(await contract.estaPublicado());
   }
 
   static async verificarComprobante(txHash: string) {

@@ -19,8 +19,16 @@ function mockEleccionAbierta(abierta = true) {
   vi.spyOn(BlockchainService, "eleccionAbierta").mockResolvedValue(abierta);
 }
 
-function mockCandidatos(candidatos: string[]) {
-  vi.spyOn(BlockchainService, "obtenerCandidatos").mockResolvedValue(candidatos);
+function mockCandidatosDB(cantidad: number) {
+  const rows = Array.from({ length: cantidad }, (_, i) => ({
+    id: `c${i}`,
+    nombre: String.fromCharCode(65 + i),
+    descripcion: null,
+    indice: i,
+    creadoEn: new Date(),
+  }));
+  vi.spyOn(prisma.candidato, "count").mockResolvedValue(cantidad);
+  vi.spyOn(prisma.candidato, "findMany").mockResolvedValue(rows as any);
 }
 
 function mockPrismaOk() {
@@ -86,7 +94,7 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
   it("PU-08: rechaza si candidato está fuera de rango", async () => {
     mockTokenOk();
     mockEleccionAbierta(true);
-    mockCandidatos(["A", "B"]);
+    mockCandidatosDB(2);
 
     await expect(VotoService.emitirVoto({ candidatoId: 5, token: tokenValido })).rejects.toThrow(
       "Candidato fuera de rango",
@@ -96,7 +104,7 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
   it("PU-09: rechaza si el nullifier ya fue usado (doble voto)", async () => {
     mockTokenOk();
     mockEleccionAbierta(true);
-    mockCandidatos(["A", "B"]);
+    mockCandidatosDB(2);
     vi.spyOn(BlockchainService, "esNullifierElegible").mockResolvedValue(true);
     vi.spyOn(BlockchainService, "fueNullifierUsado").mockResolvedValue(true);
 
@@ -108,7 +116,7 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
   it("PU-10: emite voto correctamente cuando todo es válido", async () => {
     mockTokenOk();
     mockEleccionAbierta(true);
-    mockCandidatos(["A", "B", "C"]);
+    mockCandidatosDB(3);
     vi.spyOn(BlockchainService, "esNullifierElegible").mockResolvedValue(false);
     vi.spyOn(BlockchainService, "registrarNullifierElegible").mockResolvedValue(undefined);
     vi.spyOn(BlockchainService, "fueNullifierUsado").mockResolvedValue(false);
@@ -135,7 +143,7 @@ describe("VotoService.estadoEleccion", () => {
 
   it("PU-11: agrega estado, candidatos y total de boletas", async () => {
     mockEleccionAbierta(true);
-    mockCandidatos(["A", "B"]);
+    mockCandidatosDB(2);
     vi.spyOn(BlockchainService, "totalBoletas").mockResolvedValue(7);
 
     const estado = await VotoService.estadoEleccion();

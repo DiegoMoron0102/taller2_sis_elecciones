@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import authRoutes from "./routes/authRoutes";
 import votoRoutes from "./routes/votoRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
@@ -41,6 +42,7 @@ app.get("/", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/voto", votoRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });

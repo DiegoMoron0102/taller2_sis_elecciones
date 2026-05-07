@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "crear-admin": "tsx scripts/crearAdmin.ts"
   },
   "dependencies": {
     "@noble/curves": "^1.6.0",

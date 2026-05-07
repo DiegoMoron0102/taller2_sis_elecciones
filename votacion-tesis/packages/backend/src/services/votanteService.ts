@@ -8,9 +8,9 @@ export class VotanteService {
       return { valida: false, motivo: "Todos los campos son obligatorios" };
     }
 
-    const padronRegex = /^[A-Z]{2}\d{6}$/;
+    const padronRegex = /^[A-Z]{2}\d{6,8}$/;
     if (!padronRegex.test(input.numeroPadron)) {
-      return { valida: false, motivo: "Número de padrón inválido. Formato esperado: LP123456" };
+      return { valida: false, motivo: "Número de padrón inválido. Formato esperado: 2 letras + 6 a 8 dígitos (ej: LP123456)" };
     }
 
     const ciRegex = /^[0-9]{7,8}[A-Z]?$/i;
@@ -31,6 +31,31 @@ export class VotanteService {
       throw new Error(verificacion.motivo ?? "Credencial inválida");
     }
 
+    const elegible = await prisma.votanteElegible.findUnique({
+      where: { numeroPadron: input.numeroPadron },
+    });
+    if (!elegible) {
+      throw new Error("Número de padrón no encontrado en el registro electoral");
+    }
+
+    // credencialHash almacena el tokenHash para poder vincular con SesionVotante
+    const credencialExistente = await prisma.credencialEmitida.findUnique({
+      where: { numeroPadron: input.numeroPadron },
+    });
+    if (credencialExistente) {
+      const sesionAnterior = await prisma.sesionVotante.findUnique({
+        where: { tokenHash: credencialExistente.credencialHash },
+      });
+      if (sesionAnterior?.usado) {
+        throw new Error("Este número de padrón ya emitió su voto");
+      }
+      // Token emitido pero no usado: revocar sesión anterior y permitir nueva emisión
+      if (sesionAnterior) {
+        await prisma.sesionVotante.delete({ where: { tokenHash: credencialExistente.credencialHash } });
+      }
+      await prisma.credencialEmitida.delete({ where: { numeroPadron: input.numeroPadron } });
+    }
+
     const token = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -39,22 +64,9 @@ export class VotanteService {
       select: { id: true },
     });
 
-    const credencialSerializada = JSON.stringify({
-      numeroPadron: input.numeroPadron,
-      nombre: input.nombre,
-      ci: input.ci,
-    });
-    const credencialHash = crypto.createHash("sha256").update(credencialSerializada).digest("hex");
-
-    await prisma.credencialEmitida.upsert({
-      where: { numeroPadron: input.numeroPadron },
-      create: {
-        numeroPadron: input.numeroPadron,
-        credencialHash,
-      },
-      update: {
-        credencialHash,
-      },
+    // Guardar tokenHash en credencialHash para vincularlo con SesionVotante
+    await prisma.credencialEmitida.create({
+      data: { numeroPadron: input.numeroPadron, credencialHash: tokenHash },
     });
 
     await prisma.logAuditoria.create({

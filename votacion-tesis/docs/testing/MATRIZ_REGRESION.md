@@ -46,13 +46,32 @@ Asegurar que los cambios no rompan funcionalidades previamente validadas del sis
 | REG-027 | Contrato | Escrutinio rechaza doble habilitación | Conteo ya habilitado | Revierte con `ConteoYaHabilitado` | ✅ PC-07 |
 | REG-028 | Contrato | Escrutinio publica resultados y los devuelve | Conteo habilitado | Suma correcta y hash evidencias guardado | ✅ PC-08 |
 | REG-029 | Contrato | Escrutinio impide doble publicación | Resultados ya publicados | Revierte con `ResultadosYaPublicados` | ✅ PC-09 |
+| REG-030 | Backend unitario | Admin login válido → retorna JWT | Admin existe, password correcta | Token + nombre + email en respuesta | ✅ PA-admin-01 |
+| REG-031 | Backend unitario | Admin login inválido → rechaza | Password incorrecta o admin inexistente | Lanza "Credenciales inválidas" | ✅ PA-admin-02 |
+| REG-032 | Backend integración | JWT middleware protege rutas admin | Sin Authorization header | 401 con mensaje explícito | ✅ PA-04 |
+| REG-033 | Backend integración | JWT inválido → 401 | Token basura o expirado | `requireAdmin` rechaza con 401 | ✅ PA-05 |
+| REG-034 | Backend integración | Admin login endpoint público | Credenciales válidas (mock) | 200 con token JWT | ✅ PA-01 |
+| REG-035 | Backend unitario | agregarCandidato asigna índice correcto | Sin candidatos previos / con candidatos | índice = 0 o último+1 | ✅ PA-admin-07 |
+| REG-036 | Backend unitario | agregarVotanteElegible limpia credencial previa | Padrón con CredencialEmitida stale | deleteMany ejecutado antes de create | ✅ PA-admin-08 |
+| REG-037 | Backend unitario | agregarVotanteElegible rechaza duplicado | Padrón ya en VotanteElegible | Lanza "ya está registrado" | ✅ PA-admin-09 |
+| REG-038 | Backend unitario | emitirTokenAnonimo revoca token no usado | CredencialEmitida existe, sesión no usada | Revoca sesión antigua, emite nueva | ✅ PU-votante-re-emit |
+| REG-039 | Backend unitario | emitirTokenAnonimo bloquea si ya votó | SesionVotante.usado=true | Lanza "ya emitió su voto" | ✅ PU-votante-block |
+| REG-040 | Backend unitario | estadoEleccion lee candidatos desde SQLite | Candidatos en Prisma, no en contrato | candidatos[] = filas de Candidato | ✅ PU-11 |
+| REG-041 | Backend integración | GET /api/admin/candidatos con JWT válido | Candidatos en BD | 200 con lista de candidatos | ✅ PA-07 |
+| REG-042 | Backend integración | POST /api/admin/padron agrega votante | Padrón no existe | 201 con datos del votante | ✅ PA-11 |
+| REG-043 | E2E | Landing muestra branding VotoSeguro | Dev server activo | "VotoSeguro" visible + CTAs presentes | ✅ PE-01 |
+| REG-044 | E2E | Verificar credencial inválida → error UI | Campos con formato incorrecto | Mensaje de error en pantalla | ✅ PE-03 |
+| REG-045 | E2E | Verificar válida → token en localStorage | Padrón elegible en backend | Token persistido + redirección a /votar | ✅ PE-04 |
+| REG-046 | E2E | Votar → seleccionar candidato y emitir | Token válido + elección abierta | Panel de confirmación con txHash | ✅ PE-05 |
+| REG-047 | E2E | Explorer muestra boletas on-chain | Al menos 1 boleta registrada | Tabla con fila de boleta | ✅ PE-06 |
+| REG-048 | E2E | /comprobar con txHash no existente | txHash inválido | Estado "no encontrado" visible | ✅ PE-08 |
 
 ---
 
 ## Registro de ejecución
 
-| Fecha | Commit | Backend | Contratos | Frontend | Cobertura backend | Casos REG OK |
-|---|---|---|---|---|---|---|
-| 2026-04-27 | ver `RESULTADO_2026-04-27.md` | 18/18 | 5/5 | 26/26 | sin medir | 25/25 |
-| 2026-04-30 | ver `RESULTADO_2026-04-30.md` | **27/27** | **10/10** | 26/26 | services 71.37%, votoService 91.56%, votanteService 100% | **29/29** |
-| _pendiente_ | _pendiente_ | - | - | - | - | Ejecutar antes del próximo checkpoint. |
+| Fecha | Commit | Backend | Contratos | Frontend | E2E | Cobertura backend | Casos REG OK |
+|---|---|---|---|---|---|---|---|
+| 2026-04-27 | ver `RESULTADO_2026-04-27.md` | 18/18 | 5/5 | 26/26 | — | sin medir | 25/25 |
+| 2026-04-30 | ver `RESULTADO_2026-04-30.md` | **27/27** | **10/10** | 26/26 | — | services 71.37%, votoService 91.56%, votanteService 100% | **29/29** |
+| 2026-05-07 | ver `RESULTADO_2026-05-07.md` | **62/62** | **10/10** | 26/26 | **9/9** | votanteService 97.75%, votoService 90.21%, adminService 55.5% | **48/48** |
