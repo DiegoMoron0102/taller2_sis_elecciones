@@ -5,6 +5,9 @@ import app from "../index";
 import { VotanteService } from "../services/votanteService";
 import { VotoService } from "../services/votoService";
 import * as AdminService from "../services/adminService";
+import * as EscrutinioService from "../services/escrutinioService";
+import { emitirVC } from "../lib/vcAuthority";
+import { generarPruebaSchnorr, calcularTokenPoint, MENSAJE_SCHNORR_PREFIX } from "../lib/schnorr";
 
 process.env.NODE_ENV = "test";
 
@@ -268,9 +271,21 @@ describe("API admin — padrón de votantes", () => {
     expect(res.body.votantes[0].numeroPadron).toBe("LP123456");
   });
 
-  it("PA-11: POST /api/admin/padron agrega votante elegible", async () => {
+  it("PA-11: POST /api/admin/padron agrega votante elegible y retorna VC", async () => {
     vi.spyOn(AdminService, "agregarVotanteElegible").mockResolvedValue({
-      id: "v2", numeroPadron: "CB789012", nombre: "María", registradoEn: new Date(),
+      id: "v2",
+      numeroPadron: "CB789012",
+      nombre: "María",
+      ci: null,
+      registradoEn: new Date(),
+      vc: {
+        "@context": ["https://www.w3.org/2018/credentials/v1"],
+        type: ["VerifiableCredential", "CredencialElectoral"],
+        issuer: "did:votoseguro:authority",
+        issuanceDate: "2026-05-10T12:00:00.000Z",
+        credentialSubject: { id: "did:padron:CB789012", numeroPadron: "CB789012", nombre: "María", elegible: true },
+        proof: { type: "EcdsaSecp256k1Signature2019", created: "2026-05-10T12:00:00.000Z", verificationMethod: "did:votoseguro:authority#key-1", proofValue: "aa".repeat(64) },
+      },
     } as any);
 
     const res = await request(app)
@@ -280,6 +295,8 @@ describe("API admin — padrón de votantes", () => {
 
     expect(res.status).toBe(201);
     expect(res.body.votante.numeroPadron).toBe("CB789012");
+    expect(res.body.vc).toBeTruthy();
+    expect(res.body.vc.type).toContain("CredencialElectoral");
   });
 
   it("PA-12: POST /api/admin/padron retorna 400 si padrón ya existe", async () => {
@@ -294,5 +311,235 @@ describe("API admin — padrón de votantes", () => {
 
     expect(res.status).toBe(400);
     expect(res.body.mensaje).toContain("ya está registrado");
+  });
+});
+
+// ─── Escrutinio cooperativo ───────────────────────────────────────────────────
+
+describe("API admin — escrutinio cooperativo", () => {
+  const JWT_SECRET = "clave-secreta-test";
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    process.env.JWT_ADMIN_SECRET = JWT_SECRET;
+  });
+
+  function tokenValido() {
+    return jwt.sign({ adminId: "admin-1", email: "admin@test.com" }, JWT_SECRET, { expiresIn: "1h" });
+  }
+
+  it("PE-01: GET /api/admin/escrutinio/estado retorna estado completo con token válido", async () => {
+    vi.spyOn(EscrutinioService, "obtenerEstadoEscrutinio").mockResolvedValue({
+      inicializado: false,
+      conteoHabilitado: false,
+      resultadosPublicados: false,
+      totalBoletas: 2,
+      votosContabilizados: 2,
+      shamir: null,
+    });
+
+    const res = await request(app)
+      .get("/api/admin/escrutinio/estado")
+      .set("Authorization", `Bearer ${tokenValido()}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("inicializado");
+    expect(res.body).toHaveProperty("conteoHabilitado");
+    expect(res.body).toHaveProperty("resultadosPublicados");
+  });
+
+  it("PE-02: GET /api/admin/escrutinio/estado retorna 401 sin token", async () => {
+    const res = await request(app).get("/api/admin/escrutinio/estado");
+    expect(res.status).toBe(401);
+  });
+
+  it("PE-03: POST /api/admin/escrutinio/inicializar retorna 200 cuando no está inicializado", async () => {
+    vi.spyOn(EscrutinioService, "inicializarShares").mockReturnValue({
+      compartimentos: [1, 2, 3, 4, 5].map(i => ({
+        indice: i,
+        valor: "a".repeat(64),
+        fechaGeneracion: "2026-01-01",
+      })),
+      config: { hashSecreto: "a".repeat(64), n: 5, umbral: 3, fechaGeneracion: "2026-01-01" },
+    });
+
+    const res = await request(app)
+      .post("/api/admin/escrutinio/inicializar")
+      .set("Authorization", `Bearer ${tokenValido()}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.mensaje).toContain("generados exitosamente");
+    expect(res.body.indicesDisponibles).toHaveLength(5);
+  });
+
+  it("PE-04: POST /api/admin/escrutinio/inicializar retorna 400 si ya inicializado", async () => {
+    vi.spyOn(EscrutinioService, "inicializarShares").mockImplementation(() => {
+      throw new Error("Los compartimentos ya fueron inicializados");
+    });
+
+    const res = await request(app)
+      .post("/api/admin/escrutinio/inicializar")
+      .set("Authorization", `Bearer ${tokenValido()}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.mensaje).toContain("ya fueron inicializados");
+  });
+
+  it("PE-05: POST /api/admin/escrutinio/ejecutar retorna 400 si faltan shares", async () => {
+    const res = await request(app)
+      .post("/api/admin/escrutinio/ejecutar")
+      .set("Authorization", `Bearer ${tokenValido()}`)
+      .send({ indicesShares: [1, 2] }); // umbral es 3
+
+    expect(res.status).toBe(400);
+  });
+
+  it("PE-06: POST /api/admin/escrutinio/ejecutar retorna 400 si escrutinio falla", async () => {
+    vi.spyOn(EscrutinioService, "ejecutarEscrutinio").mockRejectedValue(
+      new Error("El conteo no está habilitado"),
+    );
+
+    const res = await request(app)
+      .post("/api/admin/escrutinio/ejecutar")
+      .set("Authorization", `Bearer ${tokenValido()}`)
+      .send({ indicesShares: [1, 2, 3] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.mensaje).toContain("no está habilitado");
+  });
+
+  it("PE-reset-01: POST /api/admin/escrutinio/resetear retorna 200 con numeroJornada", async () => {
+    vi.spyOn(EscrutinioService, "resetearEscrutinio").mockResolvedValue({ txHash: "0xabc", numeroJornada: 1 });
+
+    const res = await request(app)
+      .post("/api/admin/escrutinio/resetear")
+      .set("Authorization", `Bearer ${tokenValido()}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.numeroJornada).toBe(1);
+    expect(res.body.txHash).toBe("0xabc");
+  });
+
+  it("PE-reset-02: POST /api/admin/escrutinio/resetear retorna 401 sin token", async () => {
+    const res = await request(app).post("/api/admin/escrutinio/resetear");
+    expect(res.status).toBe(401);
+  });
+
+  it("PE-reset-03: POST /api/admin/escrutinio/resetear retorna 400 si falla el servicio", async () => {
+    vi.spyOn(EscrutinioService, "resetearEscrutinio").mockRejectedValue(new Error("Error de red"));
+
+    const res = await request(app)
+      .post("/api/admin/escrutinio/resetear")
+      .set("Authorization", `Bearer ${tokenValido()}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.mensaje).toContain("Error de red");
+  });
+});
+
+// ─── Resultados públicos ──────────────────────────────────────────────────────
+
+describe("API voto — resultados públicos", () => {
+  beforeEach(() => vi.restoreAllMocks());
+
+  it("PE-07: GET /api/voto/resultados retorna publicado=false cuando no hay resultados", async () => {
+    vi.spyOn(EscrutinioService, "obtenerResultadosPublicos").mockResolvedValue(null);
+
+    const res = await request(app).get("/api/voto/resultados");
+
+    expect(res.status).toBe(200);
+    expect(res.body.publicado).toBe(false);
+  });
+
+  it("PE-07b: GET /api/voto/resultados retorna datos cuando están publicados", async () => {
+    vi.spyOn(EscrutinioService, "obtenerResultadosPublicos").mockResolvedValue({
+      publicado: true,
+      totalVotos: 5,
+      hashPaqueteEvidencias: "0x" + "a".repeat(64),
+      timestamp: 1700000000,
+      candidatos: [
+        { indice: 0, nombre: "Diego", descripcion: "PDC", votos: 3 },
+        { indice: 1, nombre: "Ana", descripcion: "Libre", votos: 2 },
+      ],
+    });
+
+    const res = await request(app).get("/api/voto/resultados");
+
+    expect(res.status).toBe(200);
+    expect(res.body.publicado).toBe(true);
+    expect(res.body.totalVotos).toBe(5);
+    expect(res.body.candidatos).toHaveLength(2);
+    expect(res.body.candidatos[0].votos).toBe(3);
+  });
+});
+
+// ─── Sprint 6 — VC + Schnorr (integración real) ───────────────────────────────
+
+const VC_TEST_KEY = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+
+describe("API Sprint 6 — verificar-elegibilidad con VC ECDSA real", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    process.env.VC_AUTHORITY_PRIVATE_KEY = VC_TEST_KEY;
+  });
+
+  it("PS6-01: POST /api/auth/verificar-elegibilidad acepta VC firmada válida", async () => {
+    const vc = emitirVC("LP123456", "Juan Pérez");
+    vi.spyOn(VotanteService, "emitirTokenAnonimo").mockResolvedValue({
+      token: "a".repeat(64),
+      tokenHash: "b".repeat(64),
+      sessionId: "sesion-vc-test",
+      expiresIn: 3600,
+    });
+
+    const res = await request(app)
+      .post("/api/auth/verificar-elegibilidad")
+      .send({ vc });
+
+    expect(res.status).toBe(200);
+    expect(res.body.token).toHaveLength(64);
+    expect(res.body.sessionId).toBe("sesion-vc-test");
+  });
+
+  it("PS6-02: POST /api/auth/verificar-elegibilidad acepta formato legado sin VC", async () => {
+    vi.spyOn(VotanteService, "emitirTokenAnonimo").mockResolvedValue({
+      token: "c".repeat(64),
+      tokenHash: "d".repeat(64),
+      sessionId: "sesion-legacy",
+      expiresIn: 3600,
+    });
+
+    const res = await request(app)
+      .post("/api/auth/verificar-elegibilidad")
+      .send({ numeroPadron: "LP123456", nombre: "Juan Perez", ci: "12345678L" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.sessionId).toBe("sesion-legacy");
+  });
+});
+
+describe("API Sprint 6 — emitir voto con prueba Schnorr real", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("PS6-03: POST /api/voto/emitir acepta schnorrProof en el body", async () => {
+    const token = "f".repeat(64);
+    const schnorrProof = generarPruebaSchnorr(token, `${MENSAJE_SCHNORR_PREFIX}:0`);
+
+    vi.spyOn(VotoService, "emitirVoto").mockResolvedValue({
+      mensaje: "Voto emitido exitosamente",
+      boleta: { votoCifrado: "0x" + "a".repeat(64), pruebaZK: "0x" + "b".repeat(64), nullifier: "0x" + "c".repeat(64) },
+      transaccion: { hash: "0xdeadbeef", bloque: 5 },
+      hashComprobante: "e".repeat(64),
+      timestamp: new Date().toISOString(),
+    });
+
+    const res = await request(app)
+      .post("/api/voto/emitir")
+      .send({ candidatoId: 0, token, schnorrProof });
+
+    expect(res.status).toBe(200);
+    expect(res.body.mensaje).toBe("Voto emitido exitosamente");
   });
 });

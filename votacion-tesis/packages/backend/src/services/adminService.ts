@@ -2,6 +2,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 import { BlockchainService } from "./blockchainService";
+import { emitirVC, type CredencialVerificable } from "../lib/vcAuthority";
 
 // Deriva clave con scrypt y compara de forma segura para evitar timing attacks
 async function verificarPassword(candidata: string, hashAlmacenado: string): Promise<boolean> {
@@ -75,8 +76,13 @@ export async function abrirJornada(adminId: string) {
 
   await BlockchainService.abrirEleccion();
 
+  // Resetear estado de sesión para que los votantes puedan autenticarse de nuevo
+  await prisma.sesionVotante.deleteMany({});
+  await prisma.credencialEmitida.deleteMany({});
+  await prisma.votoContabilizado.deleteMany({});
+
   await prisma.configuracionEleccion.updateMany({
-    where: { estado: { in: ["PENDIENTE", "CONFIGURADA"] } },
+    where: { estado: { in: ["PENDIENTE", "CONFIGURADA", "CERRADA", "ESCRUTADA", "FINALIZADA"] } },
     data: { estado: "ABIERTA", fechaInicio: new Date() },
   });
 
@@ -84,7 +90,7 @@ export async function abrirJornada(adminId: string) {
     data: {
       accion: "ABRIR_JORNADA",
       actor: `admin:${adminId}`,
-      detalle: "Jornada electoral abierta",
+      detalle: "Jornada electoral abierta — sesiones y contabilización reseteadas",
       administradorId: adminId,
     },
   });
@@ -185,7 +191,11 @@ export async function obtenerVotantesElegibles() {
   });
 }
 
-export async function agregarVotanteElegible(numeroPadron: string, nombre?: string, ci?: string) {
+export async function agregarVotanteElegible(
+  numeroPadron: string,
+  nombre?: string,
+  ci?: string,
+): Promise<{ id: string; numeroPadron: string; nombre: string | null; registradoEn: Date; vc: CredencialVerificable | null }> {
   const existe = await prisma.votanteElegible.findUnique({
     where: { numeroPadron },
   });
@@ -194,9 +204,21 @@ export async function agregarVotanteElegible(numeroPadron: string, nombre?: stri
   // Limpiar credencial de sesiones anteriores para evitar bloqueo al re-inscribir
   await prisma.credencialEmitida.deleteMany({ where: { numeroPadron } });
 
-  return prisma.votanteElegible.create({
+  const votante = await prisma.votanteElegible.create({
     data: { numeroPadron, nombre, ci },
   });
+
+  // Sprint 6: emitir VC firmada ECDSA si la autoridad está configurada
+  let vc: CredencialVerificable | null = null;
+  if (process.env.VC_AUTHORITY_PRIVATE_KEY) {
+    try {
+      vc = emitirVC(numeroPadron, nombre ?? numeroPadron, votante.registradoEn.toISOString());
+    } catch {
+      // No bloquear el registro si la clave no es válida
+    }
+  }
+
+  return { ...votante, vc };
 }
 
 export async function cargarPadronCSV(

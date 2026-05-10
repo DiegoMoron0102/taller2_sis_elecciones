@@ -118,6 +118,9 @@ test.describe("VotoSeguro — Flujo E2E (PE-01..PE-06)", () => {
   test("PE-03: Verificar — credencial inválida muestra error en pantalla", async ({ page }) => {
     await gotoReady(page, "/verificar");
 
+    // Sprint 6: la página carga en modo VC por defecto; cambiar a modo legado
+    await page.getByRole("button", { name: /Campos individuales/i }).click();
+
     await page.getByPlaceholder("LP123456").fill("LP000000");
     await page.getByPlaceholder("Juan Pérez").fill("Juan Test");
     await page.getByPlaceholder("12345678L").fill("12345678L");
@@ -129,6 +132,9 @@ test.describe("VotoSeguro — Flujo E2E (PE-01..PE-06)", () => {
 
   test("PE-04: Verificar — credencial válida emite token y persiste en localStorage", async ({ page }) => {
     await gotoReady(page, "/verificar");
+
+    // Sprint 6: la página carga en modo VC por defecto; cambiar a modo legado
+    await page.getByRole("button", { name: /Campos individuales/i }).click();
 
     await page.getByPlaceholder("LP123456").fill("LP123456");
     await page.getByPlaceholder("Juan Pérez").fill("Juan Lopez");

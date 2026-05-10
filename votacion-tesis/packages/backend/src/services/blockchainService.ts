@@ -20,6 +20,10 @@ const ESCRUTINIO_ABI = [
   "function habilitarConteo() external",
   "function conteoHabilitado() external view returns (bool)",
   "function estaPublicado() external view returns (bool)",
+  "function publicarResultados(uint256[] calldata totalesPorCandidato, bytes32 hashPaqueteEvidencias) external",
+  "function obtenerResultados() external view returns (tuple(uint256[] totalesPorCandidato, uint256 totalVotos, bytes32 hashPaqueteEvidencias, uint256 timestamp, bool publicado))",
+  "function resetearJornada() external",
+  "function numeroJornada() external view returns (uint256)",
 ] as const;
 
 const ADMIN_PARAMS_ABI = [
@@ -169,6 +173,33 @@ export class BlockchainService {
   static async resultadosPublicados(): Promise<boolean> {
     const contract = this.escrutinioReadContract();
     return Boolean(await contract.estaPublicado());
+  }
+
+  static async publicarResultados(totalesPorCandidato: number[], hashPaqueteEvidencias: string) {
+    const contract = await this.escrutinioWriteContract();
+    const tx = await contract.publicarResultados(totalesPorCandidato, hashPaqueteEvidencias);
+    const receipt = await tx.wait();
+    return { txHash: tx.hash as string, blockNumber: Number(receipt?.blockNumber ?? 0) };
+  }
+
+  static async obtenerResultados() {
+    const contract = this.escrutinioReadContract();
+    const r = await contract.obtenerResultados();
+    return {
+      totalesPorCandidato: (r.totalesPorCandidato as bigint[]).map(Number),
+      totalVotos: Number(r.totalVotos),
+      hashPaqueteEvidencias: r.hashPaqueteEvidencias as string,
+      timestamp: Number(r.timestamp),
+      publicado: Boolean(r.publicado),
+    };
+  }
+
+  static async resetearJornada(): Promise<{ txHash: string; numeroJornada: number }> {
+    const contract = await this.escrutinioWriteContract();
+    const tx = await contract.resetearJornada();
+    const receipt = await tx.wait();
+    const numeroJornada = Number(await this.escrutinioReadContract().numeroJornada());
+    return { txHash: receipt.hash as string, numeroJornada };
   }
 
   static async verificarComprobante(txHash: string) {

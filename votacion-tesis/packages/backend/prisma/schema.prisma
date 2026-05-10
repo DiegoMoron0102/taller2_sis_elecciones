@@ -52,11 +52,12 @@ model LogAuditoria {
 /// Sesión del votante. Solo guardamos el HASH del token, nunca el token en claro.
 /// El token en sí lo conserva el votante.
 model SesionVotante {
-  id         String    @id @default(cuid())
-  tokenHash  String    @unique
-  usado      Boolean   @default(false)
-  creadoEn   DateTime  @default(now())
-  usadoEn    DateTime?
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  tokenPoint  String?   // punto secp256k1 comprimido hex; base para prueba Schnorr
+  usado       Boolean   @default(false)
+  creadoEn    DateTime  @default(now())
+  usadoEn     DateTime?
 
   @@index([usado])
 }
@@ -93,4 +94,16 @@ model CredencialEmitida {
   emitidaEn      DateTime @default(now())
 
   @@index([emitidaEn])
+}
+
+/// Registro de voto contabilizado para el escrutinio.
+/// Solo guarda el índice del candidato, nunca datos que vinculen al votante.
+/// votoCifradoElgamal: JSON de ParCifrado[] (cifrado homomórfico); nulo en modo legado.
+model VotoContabilizado {
+  id                  String   @id @default(cuid())
+  candidatoIndice     Int
+  votoCifradoElgamal  String?
+  emitidoEn           DateTime @default(now())
+
+  @@index([candidatoIndice])
 }

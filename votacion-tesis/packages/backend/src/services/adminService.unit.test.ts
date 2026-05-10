@@ -7,8 +7,14 @@ vi.mock("../lib/prisma", () => ({
     candidato: { findFirst: vi.fn(), create: vi.fn(), delete: vi.fn(), findMany: vi.fn() },
     votanteElegible: { findUnique: vi.fn(), create: vi.fn(), findMany: vi.fn() },
     credencialEmitida: { deleteMany: vi.fn() },
+    sesionVotante: { deleteMany: vi.fn() },
+    votoContabilizado: { deleteMany: vi.fn() },
     configuracionEleccion: { findFirst: vi.fn(), updateMany: vi.fn() },
   },
+}));
+
+vi.mock("../lib/vcAuthority", () => ({
+  emitirVC: vi.fn().mockReturnValue({ credentialSubject: { numeroPadron: "LP123456" }, proof: { proofValue: "aa".repeat(64) } }),
 }));
 
 vi.mock("./blockchainService", () => ({
@@ -169,12 +175,21 @@ describe("adminService.agregarVotanteElegible", () => {
   it("crea votante y limpia credencialEmitida previa", async () => {
     (prisma.votanteElegible.findUnique as any).mockResolvedValue(null);
     (prisma.credencialEmitida.deleteMany as any).mockResolvedValue({});
-    (prisma.votanteElegible.create as any).mockResolvedValue({ id: "v1", numeroPadron: "LP123456" });
+    (prisma.votanteElegible.create as any).mockResolvedValue({
+      id: "v1",
+      numeroPadron: "LP123456",
+      nombre: "Juan Pérez",
+      ci: "12345678L",
+      registradoEn: new Date(),
+    });
 
-    await agregarVotanteElegible("LP123456", "Juan Pérez", "12345678L");
+    const resultado = await agregarVotanteElegible("LP123456", "Juan Pérez", "12345678L");
 
     expect(prisma.credencialEmitida.deleteMany).toHaveBeenCalledWith({ where: { numeroPadron: "LP123456" } });
     expect(prisma.votanteElegible.create).toHaveBeenCalledTimes(1);
+    expect(resultado.numeroPadron).toBe("LP123456");
+    // vc puede ser null si VC_AUTHORITY_PRIVATE_KEY no está configurada en este test
+    expect("vc" in resultado).toBe(true);
   });
 
   it("lanza error si el padrón ya está registrado", async () => {
@@ -230,15 +245,21 @@ describe("adminService.abrirJornada", () => {
     await expect(abrirJornada("admin-1")).rejects.toThrow("ya está abierta");
   });
 
-  it("abre jornada y actualiza BD cuando estaba cerrada", async () => {
+  it("abre jornada, resetea sesiones/votos y actualiza BD", async () => {
     (BlockchainService.eleccionAbierta as any).mockResolvedValue(false);
     (BlockchainService.abrirEleccion as any).mockResolvedValue(undefined);
+    (prisma.sesionVotante.deleteMany as any).mockResolvedValue({});
+    (prisma.credencialEmitida.deleteMany as any).mockResolvedValue({});
+    (prisma.votoContabilizado.deleteMany as any).mockResolvedValue({});
     (prisma.configuracionEleccion.updateMany as any).mockResolvedValue({});
     (prisma.logAuditoria.create as any).mockResolvedValue({});
 
     await abrirJornada("admin-1");
 
     expect(BlockchainService.abrirEleccion).toHaveBeenCalledTimes(1);
+    expect(prisma.sesionVotante.deleteMany).toHaveBeenCalledWith({});
+    expect(prisma.credencialEmitida.deleteMany).toHaveBeenCalledWith({});
+    expect(prisma.votoContabilizado.deleteMany).toHaveBeenCalledWith({});
     expect(prisma.logAuditoria.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ accion: "ABRIR_JORNADA" }) }),
     );

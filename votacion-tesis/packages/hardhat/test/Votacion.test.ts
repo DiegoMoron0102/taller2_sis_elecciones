@@ -169,4 +169,38 @@ describe("Contratos de Votación (PC-01..PC-09)", function () {
       escrutinio.publicarResultados([1n], hashEvidencias),
     ).to.be.revertedWithCustomError(escrutinio, "ConteoNoHabilitado");
   });
+
+  it("PC-10: resetearJornada permite habilitar conteo en nueva jornada", async () => {
+    const { escrutinio } = await deployEscrutinio();
+    const hashEvidencias = keccak256(toUtf8Bytes("evidencias"));
+    const totales = [3n, 1n];
+
+    // Jornada 1: habilitar + publicar
+    await (await escrutinio.habilitarConteo()).wait();
+    await (await escrutinio.publicarResultados(totales, hashEvidencias)).wait();
+    expect(await escrutinio.conteoHabilitado()).to.be.true;
+    expect(await escrutinio.estaPublicado()).to.be.true;
+
+    // Resetear
+    const tx = await escrutinio.resetearJornada();
+    await tx.wait();
+    expect(await escrutinio.conteoHabilitado()).to.be.false;
+    expect(await escrutinio.estaPublicado()).to.be.false;
+    expect(await escrutinio.numeroJornada()).to.equal(1n);
+
+    // Jornada 2: puede habilitar y publicar de nuevo
+    await (await escrutinio.habilitarConteo()).wait();
+    await (await escrutinio.publicarResultados([5n, 2n], hashEvidencias)).wait();
+    expect(await escrutinio.estaPublicado()).to.be.true;
+  });
+
+  it("PC-11: resetearJornada incrementa numeroJornada en cada llamada", async () => {
+    const { escrutinio } = await deployEscrutinio();
+
+    expect(await escrutinio.numeroJornada()).to.equal(0n);
+    await (await escrutinio.resetearJornada()).wait();
+    expect(await escrutinio.numeroJornada()).to.equal(1n);
+    await (await escrutinio.resetearJornada()).wait();
+    expect(await escrutinio.numeroJornada()).to.equal(2n);
+  });
 });

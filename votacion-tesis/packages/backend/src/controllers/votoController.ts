@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { VotoService } from "../services/votoService";
+import * as EscrutinioService from "../services/escrutinioService";
 
 export class VotoController {
   static async emitir(req: Request, res: Response) {
     try {
-      const { candidatoId, token } = req.body;
-      const result = await VotoService.emitirVoto({ candidatoId, token });
+      const { candidatoId, token, schnorrProof } = req.body;
+      const result = await VotoService.emitirVoto({ candidatoId, token, schnorrProof });
       return res.status(200).json(result);
     } catch (error) {
       return res.status(400).json({
@@ -34,6 +35,21 @@ export class VotoController {
     } catch (error) {
       return res.status(500).json({
         error: "No se pudieron obtener boletas",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async resultados(_req: Request, res: Response) {
+    try {
+      const resultado = await EscrutinioService.obtenerResultadosPublicos();
+      if (!resultado) {
+        return res.status(200).json({ publicado: false, mensaje: "Los resultados aún no han sido publicados" });
+      }
+      return res.status(200).json(resultado);
+    } catch (error) {
+      return res.status(500).json({
+        error: "No se pudieron obtener los resultados",
         mensaje: error instanceof Error ? error.message : "Error desconocido",
       });
     }

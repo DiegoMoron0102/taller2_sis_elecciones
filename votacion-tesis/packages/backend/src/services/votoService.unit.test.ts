@@ -3,6 +3,7 @@ import { VotoService } from "./votoService";
 import { VotanteService } from "./votanteService";
 import { BlockchainService } from "./blockchainService";
 import { prisma } from "../lib/prisma";
+import { generarPruebaSchnorr, calcularTokenPoint, MENSAJE_SCHNORR_PREFIX } from "../lib/schnorr";
 
 const tokenValido = "t".repeat(64);
 const tokenHashValido = "hash-token-ok";
@@ -33,6 +34,7 @@ function mockCandidatosDB(cantidad: number) {
 
 function mockPrismaOk() {
   vi.spyOn(prisma.logAuditoria, "create").mockResolvedValue({} as any);
+  vi.spyOn(prisma.votoContabilizado, "create").mockResolvedValue({} as any);
 }
 
 describe("VotoService — funciones puras", () => {
@@ -48,20 +50,6 @@ describe("VotoService — funciones puras", () => {
     expect(a).toBe(b);
     expect(a.startsWith("0x")).toBe(true);
     expect(a).toHaveLength(66);
-  });
-
-  it("cifrarVoto retorna hex prefixed y varía entre llamadas", () => {
-    const a = VotoService.cifrarVoto(1);
-    const b = VotoService.cifrarVoto(1);
-    expect(a.startsWith("0x")).toBe(true);
-    expect(b.startsWith("0x")).toBe(true);
-    expect(a).not.toBe(b);
-  });
-
-  it("generarPruebaZK es determinista para mismos inputs", () => {
-    const a = VotoService.generarPruebaZK("0xabc", "0x123");
-    const b = VotoService.generarPruebaZK("0xabc", "0x123");
-    expect(a).toBe(b);
   });
 });
 
@@ -133,6 +121,57 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
     expect(res.transaccion.bloque).toBe(42);
     expect(res.boleta.nullifier.startsWith("0x")).toBe(true);
     expect(res.hashComprobante).toHaveLength(64);
+  });
+
+  it("PU-schnorr-ok: acepta prueba Schnorr válida", async () => {
+    const token = "f1e2d3c4b5a697".repeat(4) + "f1e2d3c4"; // 64 hex chars
+    vi.spyOn(VotanteService, "validarToken").mockResolvedValue({
+      valido: true,
+      sessionId: "s1",
+      tokenHash: tokenHashValido,
+    });
+    vi.spyOn(prisma.sesionVotante, "findUnique").mockResolvedValue({
+      id: "s1",
+      tokenHash: tokenHashValido,
+      tokenPoint: calcularTokenPoint(token),
+      usado: false,
+      creadoEn: new Date(),
+      usadoEn: null,
+    } as any);
+    mockEleccionAbierta(true);
+    mockCandidatosDB(2);
+    vi.spyOn(BlockchainService, "esNullifierElegible").mockResolvedValue(false);
+    vi.spyOn(BlockchainService, "registrarNullifierElegible").mockResolvedValue(undefined);
+    vi.spyOn(BlockchainService, "fueNullifierUsado").mockResolvedValue(false);
+    vi.spyOn(BlockchainService, "registrarBoleta").mockResolvedValue({ txHash: "0xabc", blockNumber: 1 });
+    vi.spyOn(VotanteService, "marcarTokenUsado").mockResolvedValue(undefined);
+
+    const schnorrProof = generarPruebaSchnorr(token, `${MENSAJE_SCHNORR_PREFIX}:0`);
+    const res = await VotoService.emitirVoto({ candidatoId: 0, token, schnorrProof });
+
+    expect(res.mensaje).toBe("Voto emitido exitosamente");
+  });
+
+  it("PU-schnorr-fail: rechaza prueba Schnorr inválida", async () => {
+    const token = "f1e2d3c4b5a697".repeat(4) + "f1e2d3c4";
+    vi.spyOn(VotanteService, "validarToken").mockResolvedValue({
+      valido: true,
+      sessionId: "s1",
+      tokenHash: tokenHashValido,
+    });
+    vi.spyOn(prisma.sesionVotante, "findUnique").mockResolvedValue({
+      id: "s1",
+      tokenHash: tokenHashValido,
+      tokenPoint: calcularTokenPoint(token),
+      usado: false,
+      creadoEn: new Date(),
+      usadoEn: null,
+    } as any);
+
+    const pruebaFalsa = { R: "02" + "aa".repeat(32), s: "bb".repeat(32) };
+    await expect(
+      VotoService.emitirVoto({ candidatoId: 0, token, schnorrProof: pruebaFalsa }),
+    ).rejects.toThrow("Prueba Schnorr inválida");
   });
 });
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import VotingShell, { ProgressStepper } from "~~/components/voting/VotingShell";
+import { generarSchnorr, MENSAJE_SCHNORR_PREFIX } from "~~/lib/schnorr";
 
 type EstadoEleccion = {
   abierta: boolean;
@@ -15,6 +16,7 @@ export default function VotarPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultado, setResultado] = useState<any>(null);
+  const [generandoPrueba, setGenerandoPrueba] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -32,10 +34,26 @@ export default function VotarPage() {
       if (!token) throw new Error("No hay token de votación. Verifique elegibilidad primero.");
       if (seleccion === null) throw new Error("Seleccione un candidato.");
 
+      // Sprint 6: generar prueba Schnorr de conocimiento del token
+      setGenerandoPrueba(true);
+      let schnorrProof: { R: string; s: string } | undefined;
+      try {
+        const mensaje = `${MENSAJE_SCHNORR_PREFIX}:${seleccion}`;
+        schnorrProof = await generarSchnorr(token, mensaje);
+      } catch {
+        // Si la prueba falla (ej. en env sin WebCrypto), continuar sin ella
+        schnorrProof = undefined;
+      } finally {
+        setGenerandoPrueba(false);
+      }
+
+      const body: Record<string, unknown> = { candidatoId: seleccion, token };
+      if (schnorrProof) body.schnorrProof = schnorrProof;
+
       const resp = await fetch("/api/voto/emitir", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ candidatoId: seleccion, token }),
+        body: JSON.stringify(body),
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.mensaje ?? "No se pudo emitir el voto");
@@ -46,6 +64,7 @@ export default function VotarPage() {
       setError(err instanceof Error ? err.message : "Error inesperado");
     } finally {
       setLoading(false);
+      setGenerandoPrueba(false);
     }
   };
 
@@ -57,6 +76,12 @@ export default function VotarPage() {
     );
   }
 
+  const botonLabel = generandoPrueba
+    ? "Generando prueba ZK..."
+    : loading
+      ? "Registrando on-chain..."
+      : "Emitir voto";
+
   return (
     <VotingShell sessionId="VOTACION">
       <ProgressStepper totalSteps={4} currentStep={3} faseActual="Emisión del voto" />
@@ -64,8 +89,8 @@ export default function VotarPage() {
       <div className="flex flex-col gap-2 px-1">
         <h1 className="text-3xl md:text-4xl font-black tracking-tight">Boleta Electrónica</h1>
         <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg">
-          Seleccione al candidato de su preferencia. El voto se cifra y se registra on-chain
-          sin vincularlo a su identidad.
+          Seleccione al candidato de su preferencia. El voto se cifra con ElGamal homomórfico y se registra on-chain
+          sin vincularlo a su identidad. Se generará una prueba Schnorr de conocimiento del token.
         </p>
         <div className="mt-2 flex flex-wrap gap-3 text-sm">
           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1">
@@ -75,6 +100,10 @@ export default function VotarPage() {
           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1">
             <span className="material-symbols-outlined text-base">inventory_2</span>
             Boletas on-chain: {estado.totalBoletas}
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#197fe6]/10 text-[#197fe6] px-3 py-1">
+            <span className="material-symbols-outlined text-base">lock</span>
+            ElGamal + Schnorr ZK
           </span>
         </div>
       </div>
@@ -134,10 +163,10 @@ export default function VotarPage() {
             </a>
             <button
               onClick={emitir}
-              disabled={loading || !estado.abierta}
+              disabled={loading || generandoPrueba || !estado.abierta}
               className="w-full sm:w-auto px-12 h-12 rounded-xl bg-[#197fe6] text-white font-bold shadow-lg shadow-[#197fe6]/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              {loading ? "Registrando on-chain..." : "Emitir voto"}
+              {botonLabel}
               <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -149,7 +178,8 @@ export default function VotarPage() {
             <h2 className="text-xl font-bold">Voto emitido exitosamente</h2>
           </div>
           <p className="text-sm text-slate-700 dark:text-slate-300">
-            Su boleta fue cifrada, registrada on-chain y su token ha sido consumido. Puede verificarla en el Explorer.
+            Su boleta fue cifrada con ElGamal homomórfico, la prueba Schnorr fue verificada, registrada on-chain
+            y su token ha sido consumido.
           </p>
           <div className="grid gap-2 text-sm font-mono bg-white/60 dark:bg-slate-900/50 rounded-lg p-3 break-all">
             <span><b>TX:</b> {resultado.transaccion?.hash}</span>

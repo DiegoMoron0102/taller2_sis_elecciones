@@ -336,6 +336,7 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
+  const [vcActual, setVcActual] = useState<{ vc: unknown; padron: string } | null>(null);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -350,9 +351,19 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
 
   useEffect(() => { cargar(); }, [cargar]);
 
+  const descargarVC = (vc: unknown, numeroPadron: string) => {
+    const blob = new Blob([JSON.stringify(vc, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `VC_${numeroPadron}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const agregarIndividual = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); setExito(""); setCargando(true);
+    setError(""); setExito(""); setCargando(true); setVcActual(null);
     try {
       const res = await fetch("/api/admin/padron", {
         method: "POST",
@@ -362,6 +373,7 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje ?? "Error");
       setExito(`Padrón ${padron} agregado`);
+      if (data.vc) setVcActual({ vc: data.vc, padron });
       setPadron(""); setNombre(""); setCi("");
       await cargar();
     } catch (err) {
@@ -449,6 +461,23 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
             <span className="material-symbols-outlined text-base">person_add</span>
             Agregar al padrón
           </button>
+          {vcActual && (
+            <div className="flex items-center gap-3 rounded-lg border border-[#197fe6]/30 bg-[#197fe6]/5 p-3">
+              <span className="material-symbols-outlined text-[#197fe6] text-xl">verified_user</span>
+              <div className="flex-1 text-xs text-slate-700 dark:text-slate-300">
+                <p className="font-bold">Credencial Verificable generada — ECDSA secp256k1</p>
+                <p className="text-slate-500">Entregue este archivo al votante {vcActual.padron}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => descargarVC(vcActual.vc, vcActual.padron)}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-[#197fe6] text-white text-xs font-bold hover:bg-blue-700"
+              >
+                <span className="material-symbols-outlined text-sm">download</span>
+                Descargar VC
+              </button>
+            </div>
+          )}
         </form>
       ) : (
         <form onSubmit={cargarCSV} className="flex flex-col gap-3">
@@ -502,6 +531,294 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
   );
 }
 
+// ─── Panel Escrutinio ─────────────────────────────────────────────────────────
+
+const SHARES_N = 5;
+const SHARES_UMBRAL = 3;
+
+interface EstadoEscrutinio {
+  inicializado: boolean;
+  conteoHabilitado: boolean;
+  resultadosPublicados: boolean;
+  totalBoletas: number;
+  votosContabilizados: number;
+  shamir: { n: number; umbral: number; fechaGeneracion: string } | null;
+}
+
+interface ResultadoEscrutinio {
+  totalesPorCandidato: number[];
+  totalVotos: number;
+  txHash: string;
+  blockNumber: number;
+  hashEvidencias: string;
+}
+
+function PanelEscrutinio({ token }: { token: string }) {
+  const [estado, setEstado] = useState<EstadoEscrutinio | null>(null);
+  const [resultado, setResultado] = useState<ResultadoEscrutinio | null>(null);
+  const [sharesSeleccionadas, setSharesSeleccionadas] = useState<number[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [ejecutando, setEjecutando] = useState(false);
+  const [inicializando, setInicializando] = useState(false);
+  const [resetando, setResetando] = useState(false);
+  const [error, setError] = useState("");
+  const [exito, setExito] = useState("");
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const cargarEstado = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/escrutinio/estado", { headers });
+      if (res.ok) setEstado(await res.json());
+    } finally {
+      setCargando(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  useEffect(() => { cargarEstado(); }, [cargarEstado]);
+
+  const inicializar = async () => {
+    setError(""); setExito(""); setInicializando(true);
+    try {
+      const res = await fetch("/api/admin/escrutinio/inicializar", { method: "POST", headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error");
+      setExito(`${data.mensaje}. Umbral: ${data.umbral} de ${data.n} compartimentos.`);
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setInicializando(false);
+    }
+  };
+
+  const toggleShare = (indice: number) => {
+    setSharesSeleccionadas(prev =>
+      prev.includes(indice) ? prev.filter(i => i !== indice) : [...prev, indice],
+    );
+  };
+
+  const ejecutar = async () => {
+    if (!estado || sharesSeleccionadas.length < (estado.shamir?.umbral ?? 3)) {
+      setError(`Seleccione al menos ${estado?.shamir?.umbral ?? 3} compartimentos`);
+      return;
+    }
+    setError(""); setExito(""); setEjecutando(true);
+    try {
+      const res = await fetch("/api/admin/escrutinio/ejecutar", {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ indicesShares: sharesSeleccionadas }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error");
+      setResultado(data);
+      setExito("Escrutinio ejecutado y resultados publicados en cadena");
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setEjecutando(false);
+    }
+  };
+
+  const resetear = async () => {
+    if (!confirm("¿Está seguro de reiniciar el escrutinio para una nueva jornada? Esta acción borra los compartimentos Shamir actuales y resetea los flags del contrato.")) return;
+    setError(""); setExito(""); setResetando(true);
+    try {
+      const res = await fetch("/api/admin/escrutinio/resetear", { method: "POST", headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error");
+      setResultado(null);
+      setSharesSeleccionadas([]);
+      setExito(`Nueva jornada #${data.numeroJornada} iniciada. El escrutinio fue reiniciado.`);
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setResetando(false);
+    }
+  };
+
+  if (cargando) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <span className="material-symbols-outlined text-[#197fe6] text-3xl animate-spin">progress_activity</span>
+      </div>
+    );
+  }
+
+  const n = estado?.shamir?.n ?? 5;
+  const umbral = estado?.shamir?.umbral ?? 3;
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Estado del escrutinio */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Boletas</p>
+          <p className="text-2xl font-bold text-[#197fe6]">{estado?.totalBoletas ?? 0}</p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Contabilizados</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{estado?.votosContabilizados ?? 0}</p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Compartimentos</p>
+          <p className={`text-lg font-bold ${estado?.inicializado ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
+            {estado?.inicializado ? `${n} generados` : "Pendiente"}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Resultados</p>
+          <p className={`text-lg font-bold ${estado?.resultadosPublicados ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
+            {estado?.resultadosPublicados ? "Publicados" : "Pendiente"}
+          </p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl p-4 text-sm">
+          <span className="material-symbols-outlined">error</span>{error}
+        </div>
+      )}
+      {exito && (
+        <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl p-4 text-sm">
+          <span className="material-symbols-outlined">check_circle</span>{exito}
+        </div>
+      )}
+
+      {/* Resultados publicados */}
+      {estado?.resultadosPublicados && resultado && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-emerald-500">verified</span>
+            <h3 className="font-semibold text-slate-900 dark:text-white">Resultados publicados en cadena</h3>
+          </div>
+          <div className="flex flex-col gap-1">
+            {resultado.totalesPorCandidato.map((votos, i) => (
+              <div key={i} className="flex justify-between text-sm px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <span className="text-slate-600 dark:text-slate-400">Candidato #{i}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{votos} votos</span>
+              </div>
+            ))}
+            <div className="flex justify-between text-sm px-3 py-2 border-t border-slate-200 dark:border-slate-700 mt-1">
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Total</span>
+              <span className="font-bold text-[#197fe6]">{resultado.totalVotos} votos</span>
+            </div>
+          </div>
+          <div className="text-xs text-slate-400 font-mono break-all">
+            <span className="font-semibold text-slate-500">txHash: </span>{resultado.txHash}
+          </div>
+          <a
+            href="/resultados"
+            className="text-sm text-[#197fe6] hover:underline flex items-center gap-1 self-start"
+          >
+            <span className="material-symbols-outlined text-base">open_in_new</span>
+            Ver página pública de resultados
+          </a>
+        </div>
+      )}
+
+      {estado?.resultadosPublicados && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-amber-300 dark:border-amber-700 p-5 shadow-sm flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-amber-600">restart_alt</span>
+            <h3 className="font-semibold text-slate-900 dark:text-white">Nueva jornada electoral</h3>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Los resultados de esta jornada han sido publicados on-chain permanentemente. Para iniciar una nueva jornada, reinicie el escrutinio: se borrarán los compartimentos Shamir actuales y se restablecerán los flags del contrato.
+          </p>
+          <button
+            onClick={resetear}
+            disabled={resetando}
+            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
+          >
+            {resetando
+              ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Reiniciando...</>
+              : <><span className="material-symbols-outlined text-base">restart_alt</span>Reiniciar para nueva jornada</>}
+          </button>
+        </div>
+      )}
+
+      {!estado?.resultadosPublicados && (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col gap-5">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#197fe6]">key</span>
+            <h3 className="font-semibold text-slate-900 dark:text-white">Shamir Secret Sharing</h3>
+          </div>
+
+          {!estado?.conteoHabilitado && (
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
+              <span className="material-symbols-outlined text-base">warning</span>
+              Primero habilite el escrutinio en la pestaña "Jornada"
+            </div>
+          )}
+
+          {estado?.conteoHabilitado && !estado.inicializado && (
+            <div className="flex flex-col gap-3">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Genere los <strong>{SHARES_N} compartimentos</strong> Shamir. Se necesitarán <strong>{SHARES_UMBRAL}</strong> de ellos para reconstruir el secreto y ejecutar el conteo cooperativo.
+              </p>
+              <button
+                onClick={inicializar}
+                disabled={inicializando}
+                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
+              >
+                {inicializando
+                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Generando...</>
+                  : <><span className="material-symbols-outlined text-base">vpn_key</span>Generar compartimentos Shamir</>}
+              </button>
+            </div>
+          )}
+
+          {estado?.conteoHabilitado && estado.inicializado && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Seleccione al menos <strong>{umbral}</strong> de los <strong>{n}</strong> compartimentos para ejecutar el escrutinio:
+                </p>
+                <p className="text-xs text-slate-400">Generados el {new Date(estado.shamir!.fechaGeneracion).toLocaleString("es-BO")}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: n }, (_, i) => i + 1).map(indice => (
+                  <button
+                    key={indice}
+                    onClick={() => toggleShare(indice)}
+                    className={`w-12 h-12 rounded-xl font-bold text-sm transition-all border-2 ${
+                      sharesSeleccionadas.includes(indice)
+                        ? "bg-purple-600 border-purple-600 text-white shadow-md"
+                        : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-purple-400"
+                    }`}
+                  >
+                    {indice}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-slate-500">
+                {sharesSeleccionadas.length} de {umbral} requeridos seleccionados
+                {sharesSeleccionadas.length >= umbral
+                  ? <span className="text-emerald-500 ml-1">✓ listo</span>
+                  : <span className="text-amber-500 ml-1">— faltan {umbral - sharesSeleccionadas.length}</span>}
+              </p>
+              <button
+                onClick={ejecutar}
+                disabled={ejecutando || sharesSeleccionadas.length < umbral}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
+              >
+                {ejecutando
+                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Ejecutando...</>
+                  : <><span className="material-symbols-outlined text-base">analytics</span>Ejecutar escrutinio</>}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 
 function Dashboard({ token, nombre, onLogout }: { token: string; nombre: string; onLogout: () => void }) {
@@ -510,7 +827,7 @@ function Dashboard({ token, nombre, onLogout }: { token: string; nombre: string;
   const [mensajeExito, setMensajeExito] = useState("");
   const [mensajeError, setMensajeError] = useState("");
   const [cargandoEstado, setCargandoEstado] = useState(true);
-  const [tabActiva, setTabActiva] = useState<"jornada" | "candidatos" | "padron" | "logs">("jornada");
+  const [tabActiva, setTabActiva] = useState<"jornada" | "candidatos" | "padron" | "escrutinio" | "logs">("jornada");
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -566,6 +883,7 @@ function Dashboard({ token, nombre, onLogout }: { token: string; nombre: string;
     { id: "jornada" as const, etiqueta: "Jornada", icono: "how_to_vote" },
     { id: "candidatos" as const, etiqueta: "Candidatos", icono: "people" },
     { id: "padron" as const, etiqueta: "Padrón", icono: "how_to_reg" },
+    { id: "escrutinio" as const, etiqueta: "Escrutinio", icono: "analytics" },
     { id: "logs" as const, etiqueta: "Auditoría", icono: "history" },
   ];
 
@@ -700,6 +1018,10 @@ function Dashboard({ token, nombre, onLogout }: { token: string; nombre: string;
 
       {tabActiva === "padron" && (
         <PanelPadron token={token} eleccionAbierta={estado?.eleccionAbierta ?? false} />
+      )}
+
+      {tabActiva === "escrutinio" && (
+        <PanelEscrutinio token={token} />
       )}
 
       {tabActiva === "logs" && (

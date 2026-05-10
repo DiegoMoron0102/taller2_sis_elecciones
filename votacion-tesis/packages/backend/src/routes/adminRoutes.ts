@@ -24,4 +24,10 @@ router.get("/padron", requireAdmin, AdminController.obtenerVotantesElegibles);
 router.post("/padron", requireAdmin, AdminController.agregarVotanteElegible);
 router.post("/padron/csv", requireAdmin, AdminController.cargarPadronCSV);
 
+// Escrutinio cooperativo (Shamir)
+router.get("/escrutinio/estado", requireAdmin, AdminController.obtenerEstadoEscrutinio);
+router.post("/escrutinio/inicializar", requireAdmin, AdminController.inicializarEscrutinio);
+router.post("/escrutinio/ejecutar", requireAdmin, AdminController.ejecutarEscrutinio);
+router.post("/escrutinio/resetear", requireAdmin, AdminController.resetearEscrutinio);
+
 export default router;

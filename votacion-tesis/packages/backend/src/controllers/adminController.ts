@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import * as AdminService from "../services/adminService";
+import * as EscrutinioService from "../services/escrutinioService";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -156,12 +157,13 @@ export class AdminController {
       return;
     }
     try {
-      const votante = await AdminService.agregarVotanteElegible(
+      const resultado = await AdminService.agregarVotanteElegible(
         parsed.data.numeroPadron,
         parsed.data.nombre,
         parsed.data.ci,
       );
-      res.status(201).json({ mensaje: "Votante agregado al padrón", votante });
+      const { vc, ...votante } = resultado;
+      res.status(201).json({ mensaje: "Votante agregado al padrón", votante, vc: vc ?? null });
     } catch (error) {
       res.status(400).json({
         error: "No se pudo agregar votante",
@@ -179,6 +181,74 @@ export class AdminController {
     } catch (error) {
       res.status(400).json({
         error: "Error al cargar padrón",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async obtenerEstadoEscrutinio(_req: Request, res: Response) {
+    try {
+      const estado = await EscrutinioService.obtenerEstadoEscrutinio();
+      res.status(200).json(estado);
+    } catch (error) {
+      res.status(500).json({
+        error: "Error al obtener estado de escrutinio",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async inicializarEscrutinio(_req: Request, res: Response) {
+    try {
+      const resultado = EscrutinioService.inicializarShares();
+      res.status(200).json({
+        mensaje: "Compartimentos Shamir generados exitosamente",
+        n: resultado.config.n,
+        umbral: resultado.config.umbral,
+        fechaGeneracion: resultado.config.fechaGeneracion,
+        indicesDisponibles: resultado.compartimentos.map(c => c.indice),
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo inicializar el escrutinio",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async ejecutarEscrutinio(req: Request, res: Response) {
+    const schema = z.object({
+      indicesShares: z.array(z.number().int().min(1).max(EscrutinioService.SHARES_N)).min(EscrutinioService.SHARES_UMBRAL),
+    });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Datos inválidos", detalle: parsed.error.flatten() });
+      return;
+    }
+    try {
+      const resultado = await EscrutinioService.ejecutarEscrutinio(
+        parsed.data.indicesShares,
+        req.admin!.adminId,
+      );
+      res.status(200).json({ mensaje: "Escrutinio ejecutado exitosamente", ...resultado });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo ejecutar el escrutinio",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async resetearEscrutinio(req: Request, res: Response) {
+    try {
+      const resultado = await EscrutinioService.resetearEscrutinio(req.admin!.adminId);
+      res.status(200).json({
+        mensaje: "Escrutinio reiniciado para nueva jornada",
+        ...resultado,
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo reiniciar el escrutinio",
         mensaje: error instanceof Error ? error.message : "Error desconocido",
       });
     }

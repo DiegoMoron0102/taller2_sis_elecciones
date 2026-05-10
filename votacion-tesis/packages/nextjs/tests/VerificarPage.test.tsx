@@ -13,8 +13,14 @@ describe("VerificarPage (PF-01)", () => {
     expect(screen.getByText(/Autenticación con SSI\/VC/i)).toBeInTheDocument();
   });
 
-  it("muestra los tres campos del formulario de credencial", () => {
+  it("muestra textarea de VC por defecto (modo vc)", () => {
     render(<VerificarPage />);
+    expect(screen.getByPlaceholderText(/\{"@context"/i)).toBeInTheDocument();
+  });
+
+  it("muestra los tres campos del formulario al cambiar a modo legado", () => {
+    render(<VerificarPage />);
+    fireEvent.click(screen.getByRole("button", { name: /Campos individuales/i }));
     expect(screen.getByPlaceholderText("LP123456")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Juan Pérez")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("12345678L")).toBeInTheDocument();
@@ -27,13 +33,14 @@ describe("VerificarPage (PF-01)", () => {
     expect(btn).not.toBeDisabled();
   });
 
-  it("muestra mensaje de error cuando la API devuelve error", async () => {
+  it("muestra mensaje de error cuando la API devuelve error (modo legado)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ mensaje: "Credencial inválida en servidor" }),
     }));
 
     render(<VerificarPage />);
+    fireEvent.click(screen.getByRole("button", { name: /Campos individuales/i }));
 
     fireEvent.change(screen.getByPlaceholderText("LP123456"), { target: { value: "LP999999" } });
     fireEvent.change(screen.getByPlaceholderText("Juan Pérez"), { target: { value: "Juan Perez" } });
@@ -45,7 +52,7 @@ describe("VerificarPage (PF-01)", () => {
     });
   });
 
-  it("llama a router.push('/votar') cuando la API responde con token", async () => {
+  it("llama a router.push('/votar') cuando la API responde con token (modo legado)", async () => {
     const { useRouter } = await import("next/navigation");
     const pushMock = vi.fn();
     vi.mocked(useRouter).mockReturnValue({ push: pushMock } as any);
@@ -56,6 +63,7 @@ describe("VerificarPage (PF-01)", () => {
     }));
 
     render(<VerificarPage />);
+    fireEvent.click(screen.getByRole("button", { name: /Campos individuales/i }));
 
     fireEvent.change(screen.getByPlaceholderText("LP123456"), { target: { value: "LP123456" } });
     fireEvent.change(screen.getByPlaceholderText("Juan Pérez"), { target: { value: "Juan Lopez" } });
@@ -67,12 +75,14 @@ describe("VerificarPage (PF-01)", () => {
     });
   });
 
-  it("el botón muestra 'Verificando credencial...' mientras carga", async () => {
+  it("el botón muestra 'Verificando credencial...' mientras carga (modo legado)", async () => {
     let resolvePromise!: (v: any) => void;
     const fetchPromise = new Promise(resolve => { resolvePromise = resolve; });
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(fetchPromise));
 
     render(<VerificarPage />);
+    fireEvent.click(screen.getByRole("button", { name: /Campos individuales/i }));
+
     fireEvent.change(screen.getByPlaceholderText("LP123456"), { target: { value: "LP123456" } });
     fireEvent.change(screen.getByPlaceholderText("Juan Pérez"), { target: { value: "Juan Lopez" } });
     fireEvent.change(screen.getByPlaceholderText("12345678L"), { target: { value: "12345678L" } });
