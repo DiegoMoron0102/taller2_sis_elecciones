@@ -23,7 +23,7 @@ packages/
 ├── hardhat/    → contratos Solidity + Hardhat
 ├── nextjs/     → frontend App Router
 ├── backend/    → API Express + Prisma + SQLite
-└── circuits/   → Noir (alcance futuro)
+└── circuits/   → reservado para extensiones futuras
 ```
 
 ### Modelos Prisma iniciales

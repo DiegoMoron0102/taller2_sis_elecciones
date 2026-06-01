@@ -156,7 +156,7 @@ Este detalle es crítico — el mensaje vincula la prueba a un candidato especí
 
 **Preguntas frecuentes:**
 - *¿Por qué SHA-256 y no otro hash?* — SHA-256 es el estándar NIST, está disponible en Node.js nativo sin dependencias, y cumple las propiedades de oráculo aleatorio requeridas por la demostración de seguridad de Fiat-Shamir [Bellare & Rogaway, 1993].
-- *¿Es esta una "ZK proof real"?* — Sí. El protocolo de Schnorr con Fiat-Shamir es una **NIZKPoK (Non-Interactive Zero-Knowledge Proof of Knowledge)** formalmente demostrada en la literatura criptográfica. La diferencia con Noir/PLONK es que Schnorr es específica para el enunciado del logaritmo discreto, mientras que los SNARKs son de propósito general. Para el enunciado concreto del sistema ("conozco mi token"), Schnorr es igualmente rigurosa y más eficiente.
+- *¿Es esta una "ZK proof real"?* — Sí. El protocolo de Schnorr con Fiat-Shamir es una **NIZKPoK (Non-Interactive Zero-Knowledge Proof of Knowledge)** formalmente demostrada en la literatura criptográfica. Es específica para el enunciado del logaritmo discreto, igualmente rigurosa y más eficiente que los SNARKs de propósito general para el enunciado concreto del sistema ("conozco el token cuyo punto es tokenPoint").
 - *¿Dónde se verifica la prueba?* — En `packages/backend/src/services/votoService.ts`, dentro de `emitirVoto()`. El backend lee `tokenPoint` de la BD y ejecuta `verificarSchnorr()`.
 
 ---
@@ -530,9 +530,9 @@ Respuesta estructurada:
 
 ## MÓDULO 10 — Preguntas duras del tribunal
 
-### "¿Por qué no usaron Noir/ZK-SNARKs?"
+### "¿Por qué usaron Schnorr y no ZK-SNARKs de propósito general?"
 
-> "El sistema implementa una NIZKPoK mediante el protocolo de Schnorr con la transformación de Fiat-Shamir [Schnorr 1991, Fiat & Shamir 1986]. Esta es una prueba de conocimiento cero formalmente demostrada, específica para la relación de logaritmo discreto que necesitamos probar. Los ZK-SNARKs como los de Noir son adecuados para computaciones arbitrarias expresadas como circuitos, pero para el enunciado concreto de 'conozco el token cuyo punto es tokenPoint', la construcción de Schnorr es igualmente rigurosa, más eficiente, y con fundamento teórico sólido. El paquete de circuitos Noir está estructurado en el monorepo para una extensión futura que incorpore pruebas de membresía Merkle."
+> "El sistema implementa una NIZKPoK mediante el protocolo de Schnorr con la transformación de Fiat-Shamir [Schnorr 1991, Fiat & Shamir 1986]. Esta es una prueba de conocimiento cero formalmente demostrada, específica para la relación de logaritmo discreto que necesitamos probar. Los ZK-SNARKs son adecuados para computaciones arbitrarias expresadas como circuitos aritméticos, pero para el enunciado concreto de 'conozco el token cuyo punto es tokenPoint', la construcción de Schnorr es igualmente rigurosa, más eficiente, sin necesidad de setup de confianza, y con fundamento teórico ampliamente aceptado en la literatura criptográfica."
 
 ### "¿Cómo garantizan que la clave privada ElGamal no fue vista por el administrador?"
 

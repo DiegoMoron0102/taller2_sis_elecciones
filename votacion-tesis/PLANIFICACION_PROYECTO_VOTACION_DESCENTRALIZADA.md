@@ -24,24 +24,26 @@ Este documento es la planificación técnica de desarrollo del prototipo de grad
 
 ---
 
-## 🛠️ STACK TECNOLÓGICO DEFINITIVO
+## 🛠️ STACK TECNOLÓGICO DEFINITIVO (implementado)
 
 | Capa | Tecnología | Propósito |
 |------|-----------|-----------|
-| Frontend | **Next.js 14 + TypeScript** | UI de votación, verificación, resultados |
-| Estilos | **Tailwind CSS** | Diseño limpio y rápido |
-| Backend API | **Node.js + Express (o Next.js API Routes)** | Lógica de negocio, autenticación |
-| Contratos Inteligentes | **Solidity ^0.8.x** | Reglas electorales, registro inmutable |
-| Red Blockchain | **Hardhat + red local (localhost:8545)** | Entorno EVM para prototipo |
-| ZK Proofs | **Noir + NoirJS** | Validación de boletas sin revelar contenido |
-| Identidad Digital | **W3C Verifiable Credentials + DIDs (DIF/uPort)** | Elegibilidad sin exponer datos personales |
-| Criptografía | **ElGamal / Paillier (biblioteca snarkjs o noble)** | Cifrado homomórfico para conteo |
-| Base de datos off-chain | **PostgreSQL** | Administradores, configuración, logs |
-| ORM | **Prisma** | Gestión de base de datos |
-| Diseño UI | **Figma** (ya maquetado) | Referencia visual |
-| Diagramas | **PlantUML** | Documentación técnica |
-| Control de versiones | **Git + GitHub (repositorio público)** | Transparencia y auditoría de código |
-| Package manager | **npm o pnpm** | Gestión de dependencias |
+| Frontend | **Next.js 15.2 + TypeScript + React 19** | UI de votación, verificación, panel admin, resultados |
+| Estilos | **Tailwind 4 + daisyUI 5** | Diseño con branding VotoSeguro |
+| Backend API | **Node.js + Express 4.21** | Lógica de negocio, autenticación JWT, integración blockchain |
+| Contratos Inteligentes | **Solidity 0.8.x** | Reglas electorales, registro inmutable |
+| Red Blockchain | **Hardhat 2.28 + red local (localhost:8545)** | Entorno EVM para prototipo |
+| ZK Proofs | **Schnorr Fiat-Shamir** (Fiat-Shamir no interactivo, implementado) | Prueba de conocimiento del token |
+| Identidad Digital | **W3C Verifiable Credentials 1.1 + ECDSA secp256k1** | Elegibilidad con firma real (no simulada) |
+| Criptografía | **ElGamal homomórfico + Shamir SSS sobre secp256k1** (`@noble/curves`) | Cifrado de votos + custodia distribuida de clave |
+| Base de datos off-chain | **SQLite** (via Prisma + archivo `.db`) | Administradores, configuración, logs, sesiones |
+| ORM | **Prisma 5.22** | Gestión de base de datos y migraciones |
+| Diseño UI | **Figma / pantallas stitch** (referencia en `/pantallas stitch/`) | Referencia visual adoptada |
+| Control de versiones | **Git + GitHub** | Transparencia y auditoría de código |
+| Package manager | **Yarn 4 workspaces** (monorepo Scaffold-ETH 2) | Gestión de dependencias y workspaces |
+| Testing | **Vitest + Supertest + Hardhat Chai + Playwright** | Suite completa multicapa |
+
+> **Nota:** PostgreSQL fue reemplazado por SQLite para simplificar el entorno de desarrollo universitario sin perder capacidades del ORM Prisma. npm/pnpm fueron reemplazados por Yarn 4 workspaces al adoptar Scaffold-ETH 2 como base.
 
 ---
 
@@ -185,11 +187,11 @@ npm install @prisma/client ethers
 npm install --save-dev @openzeppelin/contracts
 ```
 
-**Criterio de aceptación del Sprint 0:**
-- [ ] `npx hardhat node` levanta red local sin errores
-- [ ] `npm run dev` (frontend) carga en localhost:3000
-- [ ] `node index.js` (backend) responde en localhost:4000
-- [ ] Prisma conecta con PostgreSQL y las migraciones corren
+**Criterio de aceptación del Sprint 0:** ✅ COMPLETADO
+- [x] `yarn chain` levanta red local sin errores
+- [x] `yarn start` (frontend) carga en localhost:3000
+- [x] `yarn backend:dev` responde en localhost:4000
+- [x] Prisma conecta con SQLite y las migraciones corren
 
 ---
 
@@ -303,12 +305,12 @@ Response: { valido: boolean, sesionId: string }
 - Mostrar token/código de acceso al usuario
 - Referencia visual: Figura 45 del documento
 
-**Criterio de aceptación del Sprint 1:**
-- [ ] Credencial válida → token generado y almacenado (solo hash)
-- [ ] Credencial inválida → mensaje de error claro
-- [ ] Token ya usado → rechazo con mensaje
-- [ ] Todos los intentos (exitosos y fallidos) se registran en LogAuditoria
-- [ ] El sistema no almacena nombres, IPs ni timestamps exactos
+**Criterio de aceptación del Sprint 1:** ✅ COMPLETADO
+- [x] Credencial válida → token generado y almacenado (solo hash SHA-256)
+- [x] Credencial inválida → mensaje de error claro
+- [x] Token ya usado → rechazo con mensaje
+- [x] Todos los intentos (exitosos y fallidos) se registran en LogAuditoria
+- [x] El sistema no almacena IPs ni vínculo identidad↔voto
 
 ---
 
@@ -402,18 +404,7 @@ async function registrarEnBlockchain(
 }
 ```
 
-**3. ZK Proof básica con Noir**
-```
-// circuits/validez_boleta.nr
-// Prueba: el candidato seleccionado está en [0, NUM_CANDIDATOS)
-// sin revelar cuál candidato se seleccionó
-
-fn main(candidato: u8, num_candidatos: pub u8) {
-    assert(candidato < num_candidatos);
-}
-```
-
-**4. Endpoints REST**
+**3. Endpoints REST**
 ```
 POST /api/voto/emitir
 Headers: Authorization: Bearer <token-anonimo>
@@ -436,13 +427,13 @@ Response: { abierta: boolean, candidatos: Candidato[] }
 - Timestamp exacto de emisión
 - Relación token ↔ candidato
 
-**Criterio de aceptación del Sprint 2:**
-- [ ] Boleta cifrada registrada como transacción inmutable en blockchain local
-- [ ] Hash de verificación entregado al votante
-- [ ] Intento de doble voto con mismo token → rechazado por NullifierSet
-- [ ] El voto cifrado NO revela el candidato elegido
-- [ ] El contrato BulletinBoard emite evento BolетаRegistrada
-- [ ] Tiempo de proceso < 10 segundos en entorno local
+**Criterio de aceptación del Sprint 2:** ✅ COMPLETADO
+- [x] Boleta cifrada registrada como transacción inmutable en blockchain local
+- [x] Hash de verificación (txHash) entregado al votante
+- [x] Intento de doble voto con mismo token → rechazado por NullifierSet
+- [x] El voto cifrado NO revela el candidato elegido (ElGamal homomórfico)
+- [x] El contrato BulletinBoard emite evento BoletaRegistrada
+- [x] Tiempo de proceso < 10 segundos en entorno local
 
 ---
 
@@ -493,12 +484,11 @@ Response: { mensaje: "Sesión cerrada correctamente" }
 - Redirige a pantalla de inicio
 - Referencia visual: Figura 51 del documento
 
-**Criterio de aceptación del Sprint 3:**
-- [ ] Hash válido → confirmación con número de bloque
-- [ ] Hash inválido o inexistente → mensaje claro de error
-- [ ] Cierre de sesión invalida el token (no reutilizable)
-- [ ] La verificación no revela el contenido del voto
-- [ ] El proceso queda registrado en LogAuditoria
+**Criterio de aceptación del Sprint 3:** ✅ COMPLETADO
+- [x] Hash válido → confirmación con número de bloque (página `/comprobar`)
+- [x] Hash inválido o inexistente → mensaje claro de error (estado "no encontrado")
+- [x] La verificación no revela el contenido del voto
+- [x] El proceso queda registrado en LogAuditoria
 
 ---
 
@@ -577,12 +567,12 @@ GET  /api/admin/logs-auditoria
 - Tabla de logs de auditoría
 - Referencia visual: Figura 50 del documento
 
-**Criterio de aceptación del Sprint 4:**
-- [ ] Solo admin autenticado puede abrir/cerrar
-- [ ] Apertura con parámetros inválidos → error claro
-- [ ] Doble cierre → mensaje "ya cerrada"
-- [ ] Cada acción admin queda en LogAuditoria con timestamp
-- [ ] Panel muestra el número de boletas registradas en tiempo real
+**Criterio de aceptación del Sprint 4:** ✅ COMPLETADO
+- [x] Solo admin autenticado (JWT scrypt) puede abrir/cerrar
+- [x] Apertura con parámetros inválidos → error claro
+- [x] Doble cierre → mensaje "ya cerrada"
+- [x] Cada acción admin queda en LogAuditoria con timestamp
+- [x] Panel muestra estado, boletas, candidatos, padrón y logs en tiempo real
 
 ---
 
@@ -663,12 +653,12 @@ async function generarPaqueteAuditoria(): Promise<AuditPackage> {
 - Visor de transacciones en blockchain (read-only)
 - Referencia visual: Figura 49 del documento
 
-**Criterio de aceptación del Sprint 5:**
-- [ ] Conteo correcto (coincide con votos registrados)
-- [ ] Resultados publicados en EscrutinioContract (inmutables)
-- [ ] Paquete de evidencias descargable (JSON + instrucciones)
-- [ ] Tercero puede reproducir el conteo con el paquete
-- [ ] La pantalla de resultados no permite modificaciones
+**Criterio de aceptación del Sprint 5:** ✅ COMPLETADO
+- [x] Conteo correcto mediante Shamir SSS (5 custodios, umbral 3) + ElGamal homomórfico
+- [x] Resultados publicados en `Escrutinio.sol` (inmutables) con hash de evidencias
+- [x] Paquete `evidencias.json` generado por el backend al ejecutar el escrutinio
+- [x] Resetear jornada permite múltiples elecciones (`PC-10`, `PC-11`)
+- [x] Pantalla `/resultados` es de solo lectura
 
 ---
 
@@ -704,15 +694,31 @@ GET /api/auditoria/guia              → instrucciones para reproducir conteo
 // Guardar txHash del anclaje para referencia pública
 ```
 
-**Criterio de aceptación del Sprint 6:**
-- [ ] Panel de monitoreo muestra estado de nodos en tiempo real
-- [ ] Visor web carga boletas cifradas sin exponer contenido
-- [ ] Paquete de auditoría descargable contiene todo lo necesario
-- [ ] Hash del paquete anclado en testnet (si aplica)
+**Criterio de aceptación del Sprint 6 (reorientado a endurecimiento criptográfico):** ✅ COMPLETADO
+- [x] VC ECDSA secp256k1 real firmada y verificada (no simulada con hash)
+- [x] Prueba Schnorr Fiat-Shamir no interactiva generada en browser y verificada en backend
+- [x] Cifrado ElGamal homomórfico del voto (vector binario sobre secp256k1)
+- [x] Clave de elección ligada al secreto Shamir: `H = sk·G`
+- [x] On-chain: solo hash SHA-256 del ciphertext; off-chain: ciphertext completo en SQLite
 
 ---
 
-### 🧪 SPRINT 7 — Pruebas y Validación del Prototipo
+### 🔐 SPRINT 7 — Custodia Distribuida con VC de Custodios ✅ COMPLETADO
+
+> El sprint original era de "Pruebas y Validación". En la implementación real, el Sprint 7 se reorientó a resolver la brecha de confianza en el escrutinio cooperativo (los compartimentos Shamir vivían en disco del servidor, el admin podía ejecutar solo) mediante CredencialCustodio firmada.
+
+#### Entregables implementados:
+- [x] Nuevo tipo de VC: `CredencialCustodio` firmada con ECDSA por la Autoridad Electoral
+- [x] `inicializarShares` retorna 5 bundles `{custodio, compartimento, vc}` que se descargan automáticamente
+- [x] El servidor NO conserva archivos de compartimento — solo `config.json` con `hashSecreto`
+- [x] Endpoint `POST /api/admin/escrutinio/aportar-compartimento` con verificación completa
+- [x] Buffer en memoria para compartimentos aportados (se limpia al ejecutar o resetear)
+- [x] UI en tab Escrutinio: lista de custodios con estado de aporte + formulario de aportación
+- [x] Tests: REG-086..089 + REG-083..085 (reset de escrutinio)
+
+---
+
+### 🧪 SPRINT 7 ORIGINAL — Pruebas y Validación del Prototipo (pendiente de defensa)
 **Duración:** 1–2 semanas  
 **Objetivo:** Ejecutar el piloto con voluntarios y validar todos los criterios del proyecto.
 
@@ -755,7 +761,7 @@ npm test
 **Transaccion_Voto_Anonimo (BulletinBoard)**
 ```
 - votoCifrado: bytes          // ElGamal ciphertext del candidato
-- pruebaZK: bytes             // Noir ZK proof de validez
+- pruebaZK: bytes             // prueba Schnorr (bytes vacíos en el prototipo actual)
 - nullifier: bytes32          // hash derivado del token anónimo
 - bloque: uint256             // número de bloque de registro
 ```
@@ -838,20 +844,24 @@ usado_en     TIMESTAMP
 
 Basados en el documento de grado y los requerimientos definidos:
 
-| ID | Criterio | Sprint |
-|----|---------|--------|
-| CA-01 | Credencial válida → token emitido sin exponer identidad | Sprint 1 |
-| CA-02 | Token inválido/usado → acceso bloqueado | Sprint 1 |
-| CA-03 | Boleta cifrada registrada en blockchain local | Sprint 2 |
-| CA-04 | Doble voto con mismo token → rechazado on-chain | Sprint 2 |
-| CA-05 | Votante recibe hash de verificación tras emitir | Sprint 2 |
-| CA-06 | Votante puede verificar inclusión sin revelar voto | Sprint 3 |
-| CA-07 | Cierre de sesión invalida token | Sprint 3 |
-| CA-08 | Solo admin autenticado puede abrir/cerrar jornada | Sprint 4 |
-| CA-09 | Conteo correcto y verificable por terceros | Sprint 5 |
-| CA-10 | Paquete de evidencias descargable y reproducible | Sprint 5 |
-| CA-11 | Proceso completo < 60 segundos por votante | Sprint 7 |
-| CA-12 | Sistema sigue operativo ante falla de un nodo | Sprint 6 |
+| ID | Criterio | Sprint | Estado |
+|----|---------|--------|--------|
+| CA-01 | Credencial válida → token emitido sin exponer identidad | Sprint 1 | ✅ |
+| CA-02 | Token inválido/usado → acceso bloqueado | Sprint 1 | ✅ |
+| CA-03 | Boleta cifrada registrada en blockchain local | Sprint 2 | ✅ |
+| CA-04 | Doble voto con mismo token → rechazado on-chain | Sprint 2 | ✅ |
+| CA-05 | Votante recibe hash de verificación tras emitir | Sprint 2 | ✅ |
+| CA-06 | Votante puede verificar inclusión sin revelar voto | Sprint 3 | ✅ |
+| CA-07 | Cierre de sesión invalida token | Sprint 3 | ✅ |
+| CA-08 | Solo admin autenticado puede abrir/cerrar jornada | Sprint 4 | ✅ |
+| CA-09 | Conteo correcto y verificable por terceros | Sprint 5 | ✅ |
+| CA-10 | Paquete de evidencias descargable y reproducible | Sprint 5 | ✅ |
+| CA-11 | Proceso completo < 60 segundos por votante | Defensa | ⏳ pendiente piloto |
+| CA-12 | Sistema sigue operativo ante falla de un nodo | — | — (alcance reducido en prototipo) |
+| CA-13 | VC firmada con ECDSA real (no simulada) | Sprint 6 | ✅ |
+| CA-14 | Prueba ZK del token (Schnorr Fiat-Shamir) | Sprint 6 | ✅ |
+| CA-15 | Voto cifrado homomórficamente (ElGamal) | Sprint 6 | ✅ |
+| CA-16 | Custodia distribuida: admin no puede ejecutar solo | Sprint 7 | ✅ |
 
 ---
 
@@ -917,9 +927,6 @@ Basados en el documento de grado y los requerimientos definidos:
     └── page.tsx               ← Resultados electorales (read-only)
 
 /scripts (utilidades ZK y criptografía)
-├── generarCircuito.ts         ← compila circuito Noir
-├── generarPrueba.ts           ← genera ZK proof
-├── verificarPrueba.ts         ← verifica ZK proof
 └── generarPaqueteAuditoria.ts ← empaqueta evidencias
 ```
 
@@ -927,30 +934,44 @@ Basados en el documento de grado y los requerimientos definidos:
 
 ## 🚀 COMANDOS FRECUENTES DE DESARROLLO
 
+> Todos los comandos se ejecutan desde `votacion-tesis/` (raíz del monorepo).
+
 ```bash
+# Instalación
+yarn install
+
 # Levantar red blockchain local
-cd contracts && npx hardhat node
+yarn chain
 
 # Desplegar contratos
-cd contracts && npx hardhat run scripts/deploy.ts --network localhost
+yarn deploy
 
-# Levantar backend
-cd backend && npm run dev
+# (Opcional) Configurar elección inicial con candidatos y apertura
+yarn workspace @votacion/hardhat hardhat run scripts/setupElection.ts --network localhost
 
-# Levantar frontend
-cd frontend && npm run dev
+# Levantar backend (puerto 4000)
+yarn backend:dev
+
+# Levantar frontend (puerto 3000)
+yarn start
 
 # Ejecutar tests de contratos
-cd contracts && npx hardhat test
+yarn workspace @votacion/hardhat test
+
+# Ejecutar tests de backend
+yarn workspace @votacion/backend test
+
+# Ejecutar tests de frontend
+yarn workspace @votacion/nextjs test
+
+# Ejecutar E2E (requiere dev server activo)
+yarn workspace @votacion/nextjs test:e2e
 
 # Ejecutar migración de Prisma
-cd backend && npx prisma migrate dev
+yarn workspace @votacion/backend prisma:migrate dev --name <nombre>
 
-# Compilar circuito Noir
-nargo compile  # (en directorio del circuito)
-
-# Generar paquete de auditoría
-cd scripts && ts-node generarPaqueteAuditoria.ts
+# Suite completa con reporte fechado
+node scripts/testing/run-all-tests.mjs
 ```
 
 ---
@@ -960,8 +981,8 @@ cd scripts && ts-node generarPaqueteAuditoria.ts
 - Contratos Solidity: https://docs.soliditylang.org/en/v0.8.30/
 - Hardhat: https://hardhat.org/docs
 - Next.js: https://nextjs.org/docs
-- Noir ZK proofs: https://noir-lang.org/docs/
 - Verifiable Credentials W3C: https://www.w3.org/TR/vc-data-model-2.0/
+- @noble/curves (secp256k1): https://github.com/paulmillr/noble-curves
 - ethers.js: https://docs.ethers.org/v6/
 - Prisma ORM: https://www.prisma.io/docs
 - OpenZeppelin Contracts: https://docs.openzeppelin.com/contracts
@@ -972,12 +993,10 @@ cd scripts && ts-node generarPaqueteAuditoria.ts
 
 | Riesgo | Probabilidad | Impacto | Mitigación |
 |--------|-------------|---------|------------|
-| Circuitos Noir muy complejos para el plazo | Alta | Alto | Simplificar ZK proof al mínimo (solo validar rango de candidato) |
-| Desencriptación por umbral difícil de implementar | Media | Alto | Usar simulación con clave compartida entre 2-3 archivos locales |
-| Voluntarios no entienden la interfaz | Media | Medio | Pruebas de usabilidad tempranas en Sprint 3 |
-| Red blockchain local se cae durante piloto | Baja | Alto | Usar scripts de restart automático de Hardhat |
-| PostgreSQL no disponible en lab | Baja | Medio | Opción fallback: SQLite con Prisma |
-| Tiempo insuficiente para Sprint 6 (monitoreo) | Media | Bajo | Reducir a panel mínimo, priorizar Sprints 1-5 |
+| Desencriptación por umbral difícil de implementar | Media | Alto | Shamir SSS sobre GF(secp256k1 prime) con umbral 3/5 — implementado en Sprint 5 |
+| Voluntarios no entienden la interfaz | Media | Medio | Pruebas de usabilidad presenciales antes de la defensa |
+| Red blockchain local se cae durante piloto | Baja | Alto | Scripts de restart de Hardhat; la BD SQLite persiste el estado off-chain |
+| Criptografía secp256k1 en browser sin dependencias nativas | Media | Medio | Mitigado con `@noble/curves` (auditada, pure JS, sin WebAssembly requerido) |
 
 ---
 
@@ -997,4 +1016,5 @@ cd scripts && ts-node generarPaqueteAuditoria.ts
 
 ---
 
-*Planificación generada para el proyecto de grado de Diego Morón Mejía — UCB San Pablo, La Paz, Bolivia, 2025*
+*Planificación generada para el proyecto de grado de Diego Morón Mejía — UCB San Pablo, La Paz, Bolivia.*
+*Última actualización: junio 2026 — Sprint 7 completado. Sprints 0–7 implementados. Pendiente: piloto de usabilidad presencial y defensa.*

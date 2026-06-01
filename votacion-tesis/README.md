@@ -1,225 +1,320 @@
-# 🗳️ Votación Descentralizada Verificable (Tesis)
+# Votación Descentralizada Verificable (Tesis)
 
-> **Proyecto de Grado — UCB San Pablo (La Paz, Bolivia)**  
-> **Autor:** Diego Morón Mejía  
+> **Proyecto de Grado — UCB San Pablo (La Paz, Bolivia)**
+> **Autor:** Diego Morón Mejía
 > **Carrera:** Ingeniería de Sistemas — Taller de Grado 2
+> **Branding:** VotoSeguro
 
 ---
 
-## ✨ ¿Qué es este proyecto?
+## ¿Qué es este proyecto?
 
-Este repositorio contiene un prototipo de votación electrónica descentralizada con:
+Prototipo de votación electrónica descentralizada con:
 
-- verificación de elegibilidad,
-- emisión de voto anónimo,
-- registro inmutable en blockchain local,
-- exploración pública de boletas cifradas.
-
-El objetivo académico es evolucionar desde esta base hacia:
-
-- ZK real en Noir,
-- cifrado ElGamal real,
-- VC firmadas,
-- escrutinio cooperativo y auditoría universal.
+- Verificación de elegibilidad mediante **Credenciales Verificables W3C** firmadas con ECDSA secp256k1.
+- Prueba de conocimiento cero **Schnorr** del token anónimo (Fiat-Shamir no interactivo).
+- **Cifrado ElGamal homomórfico** del voto (vector binario sobre secp256k1).
+- Registro inmutable en blockchain local (Hardhat EVM).
+- **Shamir Secret Sharing** (5 de 3) para custodia distribuida de la clave de elección.
+- **CredencialCustodio** firmada por ECDSA para que cada delegado lleve su compartimento.
+- Exploración pública de boletas cifradas y verificación individual por txHash.
+- Panel administrativo completo con auditoría.
 
 ---
 
-## 🧱 Estado actual (checkpoint)
+## Estado actual — Sprint 7 completado
 
-### ✅ Implementado
+### Sprints completados
 
-- **Sprint 0 (setup):** monorepo funcionando, dependencias instaladas, Prisma + SQLite operativo.
-- **Sprint 1 (identidad/elegibilidad):**
-  - `POST /api/auth/verificar-elegibilidad`
-  - `POST /api/auth/validar-token`
-  - sesión anónima con hash de token en DB
-- **Sprint 2 (emisión):**
-  - `POST /api/voto/emitir`
-  - `GET /api/voto/estado-eleccion`
-  - `GET /api/voto/boletas`
-  - contratos desplegados y boletas registradas on-chain
+| Sprint | Entregable | Estado |
+|---|---|---|
+| 0 — Setup | Monorepo Yarn 4, Prisma + SQLite, cadena local | ✅ |
+| 1 — Identidad | `verificar-elegibilidad`, `validar-token`, sesión anónima | ✅ |
+| 2 — Emisión | `emitir`, `estado-eleccion`, `boletas` + contratos on-chain | ✅ |
+| 3 — Verificación | `comprobante` + página `/comprobar` | ✅ |
+| 4 — Panel admin | Login JWT, candidatos, padrón, abrir/cerrar jornada, auditoría | ✅ |
+| 5 — Escrutinio | Shamir Secret Sharing, publicación de resultados on-chain | ✅ |
+| 6 — Cripto real | VC ECDSA, prueba Schnorr, cifrado ElGamal homomórfico | ✅ |
+| 7 — Custodia distribuida | CredencialCustodio, bundles por custodio, buffer en memoria | ✅ |
 
-- **Sprint 3 (verificación):**
-  - `GET /api/voto/comprobante?txHash=...`
-  - Página `/comprobar`: verificación on-chain por txHash
-  - Parseo de evento `BoletaRegistrada` desde `ethers.TransactionReceipt`
+### Suite de pruebas al cierre (commit `e3f7537`)
 
-### ⚠️ Pendiente (siguientes sprints)
-
-- Panel administrativo completo (Sprint 4)
-- Escrutinio cooperativo y resultados (Sprint 5)
-- Monitoreo/auditoría avanzada (Sprint 6)
-- Piloto y validación final (Sprint 7)
+| Tipo | Herramienta | Resultado |
+|---|---|---|
+| Unitarias + integración backend | Vitest + Supertest | ✅ 122/122 |
+| Contratos Solidity | Hardhat + Chai | ✅ 12/12 |
+| Frontend componentes | Vitest + Testing Library | ✅ 27/27 |
+| E2E Playwright | Playwright (Chromium) | ✅ 9/9 |
+| Regresión formal | Matriz REG-001..REG-089 | ✅ 90/90 |
 
 ---
 
-## � Arquitectura del monorepo
+## Arquitectura del monorepo
 
-```txt
+```
 votacion-tesis/
 ├─ packages/
-│  ├─ hardhat/   # Contratos y despliegue
-│  ├─ backend/   # API Express + Prisma
-│  ├─ nextjs/    # Frontend
-│  └─ circuits/  # Noir (base de circuitos)
-└─ README.md
+│  ├─ hardhat/    # @votacion/hardhat   — Solidity 0.8.x + Hardhat
+│  ├─ nextjs/     # @votacion/nextjs    — Next.js 15 + React 19 + Tailwind 4
+│  ├─ backend/    # @votacion/backend   — Express 4 + Prisma 5 + SQLite
+│  └─ circuits/   # @votacion/circuits  — (reservado para extensiones futuras)
+├─ docs/
+│  └─ testing/    # plan, matriz, protocolo usabilidad, resultados fechados
+└─ scripts/
+   └─ testing/    # run-all-tests.mjs → genera RESULTADO_<fecha>.md
 ```
 
 ---
 
-## 🧩 Contratos actuales
+## Contratos Solidity (`packages/hardhat/contracts/`)
 
-- `AdminParams.sol`
-- `NullifierSet.sol`
-- `BulletinBoard.sol`
-- `Escrutinio.sol`
+| Contrato | Responsabilidad |
+|---|---|
+| `AdminParams.sol` | Candidatos y clave pública de elección; estados `finalized`/`open` |
+| `NullifierSet.sol` | Nullifiers elegibles + consumidos; anti-doble-voto |
+| `BulletinBoard.sol` | Boletas `(votoCifrado, pruebaZK, nullifier)` on-chain; estados Setup/Open/Closed |
+| `Escrutinio.sol` | Habilitar conteo, publicar resultados con hash de evidencias, resetear jornada |
 
-Script principal de despliegue:
-
-- `packages/hardhat/deploy/00_deploy_votacion.ts`
-
-Script de configuración de elección (candidatos + apertura):
-
-- `packages/hardhat/scripts/setupElection.ts`
+Script de despliegue: `packages/hardhat/deploy/00_deploy_votacion.ts`
+Configuración inicial: `packages/hardhat/scripts/setupElection.ts`
 
 ---
 
-## �️ Mini manual de usuario (dev/local)
+## Modelo de datos (Prisma + SQLite)
 
-## 1) Requisitos
+| Modelo | Campos clave |
+|---|---|
+| `Administrador` | email, nombre, passwordHash (scrypt) |
+| `ConfiguracionEleccion` | nombre, estado (PENDIENTE/ABIERTA/CERRADA/ESCRUTINIO) |
+| `LogAuditoria` | accion, actor, detalle, timestamp |
+| `SesionVotante` | tokenHash (SHA-256), tokenPoint (secp256k1), usado |
+| `VotanteElegible` | numeroPadron, nombre, ci |
+| `CredencialEmitida` | credencialHash, numeroPadron |
+| `Candidato` | nombre, descripcion, indice |
+| `VotoContabilizado` | candidatoIndice, votoCifradoElgamal (JSON ElGamal) |
+
+```bash
+yarn workspace @votacion/backend prisma:generate
+yarn workspace @votacion/backend prisma:migrate dev --name <nombre>
+yarn workspace @votacion/backend prisma:studio
+```
+
+---
+
+## Endpoints del backend
+
+### Públicos — Auth
+```
+POST /api/auth/verificar-elegibilidad   # acepta {vc} o {numeroPadron, nombre, ci}
+POST /api/auth/validar-token
+```
+
+### Públicos — Voto
+```
+POST /api/voto/emitir
+GET  /api/voto/estado-eleccion
+GET  /api/voto/boletas
+GET  /api/voto/comprobante?txHash=...
+GET  /api/voto/resultados
+```
+
+### Admin (requieren JWT `requireAdmin`)
+```
+POST   /api/admin/login
+GET    /api/admin/estado
+POST   /api/admin/jornada/abrir
+POST   /api/admin/jornada/cerrar
+GET    /api/admin/candidatos
+POST   /api/admin/candidatos
+DELETE /api/admin/candidatos/:id
+GET    /api/admin/padron
+POST   /api/admin/padron               # retorna {votante, vc}
+POST   /api/admin/padron/csv
+GET    /api/admin/logs
+GET    /api/admin/escrutinio/estado
+POST   /api/admin/escrutinio/inicializar
+POST   /api/admin/escrutinio/aportar-compartimento
+POST   /api/admin/escrutinio/ejecutar
+POST   /api/admin/escrutinio/resetear
+```
+
+### Infra
+```
+GET  /health
+```
+
+---
+
+## Páginas del frontend
+
+| Ruta | Descripción |
+|---|---|
+| `/` | Landing con branding VotoSeguro |
+| `/verificar` | Autenticación con VC ECDSA (modo legado compatible) |
+| `/votar` | Selección de candidato + generación Schnorr proof en browser |
+| `/explorer` | Boletas registradas on-chain |
+| `/comprobar` | Verificación individual por txHash |
+| `/admin` | Panel administrativo (4 tabs: Estado, Candidatos, Padrón, Escrutinio) |
+
+---
+
+## Flujo criptográfico completo (Sprint 6 + 7)
+
+```
+SETUP (admin)
+  ├── Crea candidatos en /admin → tab Candidatos
+  ├── Registra votantes → Backend firma VC ECDSA → admin descarga VC.json
+  ├── Inicializa Shamir → 5 custodios → bundles {custodio, compartimento, vc}
+  │   └── Servidor NO conserva compartimentos; solo config.json con hashSecreto
+  └── Abre jornada → BulletinBoard.open()
+
+VOTACIÓN
+  Votante va a /verificar → pega VC.json → Backend verifica ECDSA → emite token
+  └── tokenPoint = tokenScalar·G guardado en SesionVotante
+  Votante va a /votar → selecciona candidato
+  └── Browser genera Schnorr: R=r·G, s=r+c·tokenScalar
+  Backend:
+  ├── Verifica Schnorr: s·G == R + c·tokenPoint ✓
+  ├── Cifra voto ElGamal: vector binario con H = clavePublicaEleccion
+  ├── Registra boleta on-chain (hash del ciphertext)
+  └── Marca token como usado (un solo uso)
+
+ESCRUTINIO (admin, tras cerrar jornada)
+  Cada custodio aporta su bundle → Backend verifica VC + compartimento
+  Con 3 de 5 compartimentos:
+  ├── Reconstruye sk = Lagrange(shares) mod PRIME
+  ├── Descifra: count·G = ΣC2 - sk·ΣC1 → fuerza bruta → count
+  └── Publica resultados en Escrutinio.sol + hash de evidencias
+
+VERIFICACIÓN PÚBLICA
+  /resultados → ganador, votos por candidato, hash de evidencias on-chain
+```
+
+---
+
+## Mini manual de usuario (dev/local)
+
+### Requisitos
 
 - Node.js 20+
 - Yarn 4+
 - Git
 
-Opcional (para ZK en próximos pasos):
-
-- `nargo`
-- `bb` (Barretenberg)
-
-## 2) Instalación
-
-Desde la raíz `votacion-tesis`:
+### Instalación
 
 ```bash
+# Desde votacion-tesis/
 yarn install
+yarn workspace @votacion/backend prisma:generate
+yarn workspace @votacion/backend prisma:migrate dev --name init
 ```
 
-## 3) Levantar entorno completo
-
-En terminales separadas (orden recomendado):
+### Levantar entorno completo (4 terminales)
 
 ```bash
-# 1. Blockchain local
+# Terminal 1 — Blockchain local
 yarn chain
 
-# 2. Despliegue de contratos
+# Terminal 2 — Despliegue de contratos
 yarn deploy
 
-# 3. Configurar elección inicial (candidatos + abrir jornada)
-cd packages/hardhat
-npx hardhat run scripts/setupElection.ts --network localhost
+# Terminal 3 — Backend (puerto 4000)
+yarn backend:dev
 
-# 4. Backend
-cd ../../packages/backend
-yarn dev
-
-# 5. Frontend
-cd ../nextjs
-yarn dev
+# Terminal 4 — Frontend (puerto 3000)
+yarn start
 ```
 
 URLs:
-
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:4000`
 - Hardhat RPC: `http://127.0.0.1:8545`
 
-## 4) Flujo funcional actual
-
-1. Ir a `http://localhost:3000/verificar`
-2. Ingresar credenciales de prueba (ejemplo):
-   - `numeroPadron`: `LP123456`
-   - `nombre`: `Juan Perez`
-   - `ci`: `12345678L`
-3. El sistema genera token y redirige a `/votar`
-4. Seleccionar candidato y emitir voto
-5. Ver boleta en `/explorer`
-
----
-
-## 🔌 Endpoints backend
-
-### Auth
-
-- `POST /api/auth/verificar-elegibilidad`
-- `POST /api/auth/validar-token`
-
-### Voto
-
-- `POST /api/voto/emitir`
-- `GET /api/voto/estado-eleccion`
-- `GET /api/voto/boletas`
-- `GET /api/voto/comprobante?txHash=...`
-
-### Infra
-
-- `GET /health`
-
----
-
-## 🗄️ Base de datos (Prisma + SQLite)
-
-Comandos útiles:
+### (Opcional) Configurar elección inicial
 
 ```bash
-yarn prisma:generate
-yarn prisma:migrate --name init
-yarn prisma:studio
+yarn workspace @votacion/hardhat hardhat run scripts/setupElection.ts --network localhost
 ```
 
-Modelos principales:
+### Variables de entorno requeridas
 
-- `Administrador`
-- `ConfiguracionEleccion`
-- `LogAuditoria`
-- `SesionVotante`
-- `CredencialEmitida`
-
----
-
-## 🎨 UI / UX
-
-La UI se va alineando a los mockups de `pantallas stitch` (estilo `VotoSeguro`):
-
-- paleta azul `#197fe6`,
-- tarjetas `rounded-xl`,
-- progreso por pasos,
-- modo claro/oscuro.
+```env
+# packages/backend/.env
+JWT_ADMIN_SECRET=<secreto largo aleatorio>
+VC_AUTHORITY_PRIVATE_KEY=<32 bytes hex — clave ECDSA para firmar VCs>
+```
 
 ---
 
-## 🔐 Notas de seguridad (objetivo)
+## Tests
 
-No almacenar:
+```bash
+# Backend (unitarias + integración)
+yarn workspace @votacion/backend test
 
-- IP del votante,
-- vínculo identidad ↔ voto,
-- datos personales en blockchain.
+# Contratos
+yarn workspace @votacion/hardhat test
 
-Sí garantizar:
+# Frontend componentes
+yarn workspace @votacion/nextjs test
 
-- elegibilidad,
-- anti doble voto,
-- verificabilidad on-chain,
-- evidencia auditable.
+# E2E Playwright (requiere dev server activo)
+yarn workspace @votacion/nextjs test:e2e
+
+# Cobertura
+yarn workspace @votacion/backend test:coverage
+
+# Suite completa + reporte fechado
+node scripts/testing/run-all-tests.mjs
+```
+
+El script genera `docs/testing/resultados/RESULTADO_<YYYY-MM-DD>.md`.
 
 ---
 
-## 📝 Registro de trabajo (checkpoint actual)
+## Branding visual
 
-Este checkpoint deja el sistema en estado **ejecutable y demostrable** para Sprint 0/1/2.  
-Siguiente hito recomendado: pulido UI con mockups + endurecimiento criptográfico real (Noir/ElGamal/VC firmadas).
+| Atributo | Valor |
+|---|---|
+| Nombre del producto | VotoSeguro |
+| Color primario | `#197fe6` |
+| Tipografía | Public Sans |
+| Iconos | Material Symbols Outlined |
+| Layout | `max-w-[800px]`, cards `rounded-xl shadow-sm` |
+| Progreso | Stepper "Paso X de Y" |
+| Tema | Dual claro/oscuro (`next-themes`) |
+
+---
+
+## Notas de seguridad
+
+**No se almacena nunca:**
+- IP del votante
+- Vínculo identidad ↔ voto
+- Datos personales en blockchain
+- Token en claro (solo `tokenHash` = SHA-256)
+
+**Se garantiza:**
+- Elegibilidad mediante VC ECDSA firmada
+- Anti-doble-voto por nullifier on-chain
+- Secreto del voto por cifrado ElGamal
+- Verificabilidad individual por txHash
+- Escrutinio cooperativo con umbral (3 de 5 custodios)
+- Evidencia auditable hash-anclada on-chain
+
+---
+
+## Módulos criptográficos
+
+| Módulo | Archivo | Algoritmo |
+|---|---|---|
+| VC Electoral | `backend/src/lib/vcAuthority.ts` | ECDSA secp256k1, W3C VC 1.1 |
+| VC Custodio | `backend/src/lib/vcAuthority.ts` | ECDSA secp256k1, tipo `CredencialCustodio` |
+| Prueba Schnorr | `backend/src/lib/schnorr.ts` + `nextjs/lib/schnorr.ts` | Fiat-Shamir no interactivo |
+| Cifrado ElGamal | `backend/src/lib/elgamal.ts` | ElGamal aditivo homomórfico secp256k1 |
+| Shamir Secret Sharing | `backend/src/services/escrutinioService.ts` | GF(secp256k1 prime), n=5, umbral=3 |
+
+Librería criptográfica: `@noble/curves/secp256k1` (auditada, sin dependencias nativas).
 
 ---
 

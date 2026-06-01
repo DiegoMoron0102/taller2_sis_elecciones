@@ -26,7 +26,7 @@ Construir un prototipo funcional, demostrable y reproducible que combine:
 
 - Verificación de elegibilidad mediante Credenciales Verificables W3C firmadas (ECDSA, no mocks).
 - Voto anónimo cifrado con ElGamal real sobre BN254 (homomórfico, no hash simulado).
-- Pruebas de conocimiento cero reales en Noir (commitment / nullifier / Merkle), inspiradas en Semaphore.
+- Prueba de conocimiento cero **Schnorr** (Fiat-Shamir no interactivo) del token anónimo.
 - Registro inmutable on-chain con anti doble voto vía nullifier set.
 - Escrutinio cooperativo simulado con Shamir Secret Sharing entre archivos locales.
 - Paquete de evidencias reproducible por un tercero (capítulo de pruebas).
@@ -46,7 +46,7 @@ votacion-tesis/
 │  ├─ hardhat/    # @votacion/hardhat   — Solidity 0.8.x + Hardhat
 │  ├─ nextjs/     # @votacion/nextjs    — Next.js 15 + React 19 + TS + Tailwind 4
 │  ├─ backend/    # @votacion/backend   — Express + Prisma + SQLite
-│  └─ circuits/   # @votacion/circuits  — Noir + NoirJS + Barretenberg
+│  └─ circuits/   # @votacion/circuits  — (reservado para extensiones futuras)
 ├─ docs/
 │  └─ testing/    # plan, matriz regresión, protocolo usabilidad, resultados
 └─ scripts/
@@ -60,7 +60,7 @@ votacion-tesis/
 | `@votacion/hardhat` | Solidity 0.8.x, Hardhat 2.28, ethers v6, Chai | Contratos y despliegue |
 | `@votacion/nextjs` | Next.js 15.2 (App Router), React 19, Tailwind 4, daisyUI 5, wagmi 2, viem 2, RainbowKit 2 | Frontend votante y explorador |
 | `@votacion/backend` | Express 4.21, Prisma 5.22, SQLite, Zod, ethers v6, `@noble/curves` | API REST, sesiones, auditoría, integración blockchain |
-| `@votacion/circuits` | Noir, `nargo`, Barretenberg `bb` | Circuitos ZK |
+| `@votacion/circuits` | (sin dependencias activas) | Reservado para extensiones futuras |
 
 ### 3.3 Contratos (en `packages/hardhat/contracts/`)
 
@@ -79,21 +79,31 @@ src/
 ├─ index.ts                    # Express app + middleware (helmet, cors, json)
 ├─ routes/
 │  ├─ authRoutes.ts             # /api/auth/*
-│  └─ votoRoutes.ts             # /api/voto/*
+│  ├─ votoRoutes.ts             # /api/voto/*
+│  └─ adminRoutes.ts            # /api/admin/* (protegidas con requireAdmin)
 ├─ controllers/
 │  ├─ authController.ts
-│  └─ votoController.ts
+│  ├─ votoController.ts
+│  └─ adminController.ts
 ├─ services/
 │  ├─ votanteService.ts         # verificarFormatoCredencial, emitirTokenAnonimo, validarToken
 │  ├─ votoService.ts            # emitirVoto, estadoEleccion, verificarComprobante
-│  └─ blockchainService.ts      # interfaz a contratos (ethers v6)
-├─ lib/prisma.ts                # singleton de PrismaClient
+│  ├─ blockchainService.ts      # interfaz a contratos (ethers v6)
+│  ├─ adminService.ts           # login JWT, candidatos, padrón, jornada, logs
+│  └─ escrutinioService.ts      # Shamir SSS, inicializarShares, aportarCompartimento, ejecutarEscrutinio
+├─ lib/
+│  ├─ prisma.ts                 # singleton de PrismaClient
+│  ├─ vcAuthority.ts            # emitirVC, verificarVC, emitirVCCustodio, verificarVCCustodio
+│  ├─ elgamal.ts                # cifrarVoto, sumarCifrados, descifrarSuma (secp256k1)
+│  └─ schnorr.ts                # verificarSchnorr (Fiat-Shamir, verificador backend)
+├─ middleware/
+│  └─ adminAuth.ts              # requireAdmin — verifica Bearer JWT
 ├─ integration/
 │  └─ api.integration.test.ts   # Supertest sobre la app real
 └─ types/
 ```
 
-Modelos Prisma: `Administrador`, `ConfiguracionEleccion`, `LogAuditoria`, `SesionVotante`, `CredencialEmitida`.
+Modelos Prisma: `Administrador`, `ConfiguracionEleccion`, `LogAuditoria`, `SesionVotante` (+`tokenPoint`), `CredencialEmitida`, `VotanteElegible`, `Candidato`, `VotoContabilizado` (+`votoCifradoElgamal`).
 
 **Regla crítica de privacidad:** ningún modelo guarda IP, vínculo identidad↔voto ni datos personales en blockchain.
 
@@ -102,16 +112,19 @@ Modelos Prisma: `Administrador`, `ConfiguracionEleccion`, `LogAuditoria`, `Sesio
 Páginas:
 
 - `/` — landing con branding VotoSeguro (3 tarjetas de valor + CTAs).
-- `/verificar` — autenticación con SSI/VC.
-- `/votar` — selección de candidato y emisión.
+- `/verificar` — autenticación con VC ECDSA (textarea JSON); modo legado compatible.
+- `/votar` — selección de candidato, generación Schnorr proof en browser (Web Crypto API).
 - `/explorer` — boletas registradas on-chain.
 - `/comprobar` — verificación de comprobante por txHash.
+- `/admin` — panel administrativo (4 tabs: Estado, Candidatos, Padrón, Escrutinio).
 - `/blockexplorer` — explorador genérico (de Scaffold-ETH 2, intacto).
 - `/debug` — debug de contratos (de Scaffold-ETH 2, intacto).
 
 Componente shell: `components/voting/VotingShell.tsx` (header, footer, `ProgressStepper`).
 
-Proxies API en `app/api/`: `auth/verificar-elegibilidad`, `voto/emitir`, `voto/estado-eleccion`, `voto/boletas`, `voto/comprobante` → reenvían a `http://localhost:4000`.
+Proxies API en `app/api/`: auth, voto, admin (todos los endpoints admin incluidos) → reenvían a `http://localhost:4000`.
+
+Librería Schnorr en browser: `lib/schnorr.ts` — `generarSchnorr(token, mensaje)` usando `@noble/curves`.
 
 ---
 
@@ -190,14 +203,6 @@ yarn workspace @votacion/nextjs check-types
 yarn workspace @votacion/hardhat check-types
 ```
 
-### 5.5 Circuitos (cuando entren al alcance)
-
-```bash
-yarn circuits:compile           # nargo compile
-yarn workspace @votacion/circuits vk         # write_vk con --oracle_hash keccak
-yarn workspace @votacion/circuits verifier   # genera Verifier.sol en hardhat/contracts
-```
-
 ---
 
 ## 6. Convenciones de código
@@ -261,13 +266,13 @@ El proyecto tiene un capítulo de pruebas **calificado**. Las cuatro categorías
    - Actualiza `docs/testing/MATRIZ_REGRESION.md` con la fila de fecha/commit.
    - El reporte fechado queda en `docs/testing/resultados/`.
 
-### Estado actual de la suite
+### Estado actual de la suite (cierre Sprint 7)
 
-- Backend: **33/33** (`votanteService 100%`, `votoService 91.56%`).
-- Contratos: **10/10** (PC-01..PC-09 + PC-09b).
-- Frontend componentes: **26/26**.
-- E2E Playwright: **9/9** escritos (PE-01..PE-09).
-- Regresión: **29/29**.
+- Backend: **122/122** (unitarias + integración, todas las capas).
+- Contratos: **12/12** (PC-01..PC-11 + PC-10 resetearJornada).
+- Frontend componentes: **27/27**.
+- E2E Playwright: **9/9** (PE-01..PE-09).
+- Regresión: **90/90** (REG-001..REG-089).
 
 ---
 
@@ -279,10 +284,10 @@ El proyecto tiene un capítulo de pruebas **calificado**. Las cuatro categorías
 | 1 — Identidad | ✅ | `verificar-elegibilidad`, `validar-token`, sesión anónima |
 | 2 — Emisión | ✅ | `emitir`, `estado-eleccion`, `boletas` + contratos en cadena |
 | 3 — Verificación | ✅ | `comprobante` + página `/comprobar` |
-| 4 — Panel admin | ⏳ | abrir/cerrar jornada, habilitar escrutinio |
-| 5 — Escrutinio cooperativo | ⏳ | Shamir + publicación de resultados |
-| 6 — Endurecimiento cripto | ⏳ | Noir real + ElGamal real + VC firmadas |
-| 7 — Piloto y defensa | ⏳ | usabilidad presencial + paquete de evidencias |
+| 4 — Panel admin | ✅ | Login JWT scrypt, candidatos, padrón, abrir/cerrar jornada, auditoría |
+| 5 — Escrutinio cooperativo | ✅ | Shamir Secret Sharing (5/3) + publicación on-chain de resultados |
+| 6 — Endurecimiento cripto | ✅ | VC ECDSA + prueba Schnorr + cifrado ElGamal homomórfico |
+| 7 — Custodia distribuida | ✅ | CredencialCustodio + bundles por custodio + buffer en memoria |
 
 ---
 
@@ -387,4 +392,4 @@ Scopes válidos: `backend`, `frontend`, `contracts`, `circuits`, `testing`, `doc
 
 ---
 
-**Última actualización:** mayo 2026, checkpoint Sprint 3 cerrado.
+**Última actualización:** junio 2026, Sprint 7 cerrado — todos los sprints completados.
