@@ -6,5 +6,7 @@ const router = Router();
 router.post("/emitir", VotoController.emitir);
 router.get("/estado-eleccion", VotoController.estadoEleccion);
 router.get("/boletas", VotoController.boletas);
+router.get("/comprobante", VotoController.comprobante);
+router.get("/resultados", VotoController.resultados);
 
 export default router;

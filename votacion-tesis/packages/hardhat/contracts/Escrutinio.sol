@@ -18,9 +18,11 @@ contract Escrutinio is Ownable {
 
     Resultados private _resultados;
     bool public conteoHabilitado;
+    uint256 public numeroJornada; // contador de jornadas; incrementa en cada reset
 
     event ConteoHabilitado(uint256 timestamp);
     event ResultadosPublicados(uint256 totalVotos, bytes32 hashPaqueteEvidencias, uint256 timestamp);
+    event JornadaReiniciada(uint256 numeroJornada, uint256 timestamp);
 
     error ConteoYaHabilitado();
     error ConteoNoHabilitado();
@@ -66,5 +68,15 @@ contract Escrutinio is Ownable {
 
     function estaPublicado() external view returns (bool) {
         return _resultados.publicado;
+    }
+
+    /// @notice Reinicia el estado del escrutinio para una nueva jornada electoral.
+    /// @dev Solo el administrador puede llamar esta función. Los resultados anteriores
+    ///      quedan registrados en el historial de eventos de la cadena.
+    function resetearJornada() external onlyOwner {
+        delete _resultados;
+        conteoHabilitado = false;
+        numeroJornada += 1;
+        emit JornadaReiniciada(numeroJornada, block.timestamp);
     }
 }

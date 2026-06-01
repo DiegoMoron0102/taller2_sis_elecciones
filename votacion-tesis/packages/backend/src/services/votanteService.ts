@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "../lib/prisma";
+import { verificarVC } from "../lib/vcAuthority";
+import { calcularTokenPoint } from "../lib/schnorr";
 import { CredencialInput, EmisionTokenResult, ResultadoVerificacionCredencial } from "../types/auth";
 
 export class VotanteService {
@@ -8,9 +10,9 @@ export class VotanteService {
       return { valida: false, motivo: "Todos los campos son obligatorios" };
     }
 
-    const padronRegex = /^[A-Z]{2}\d{6}$/;
+    const padronRegex = /^[A-Z]{2}\d{6,8}$/;
     if (!padronRegex.test(input.numeroPadron)) {
-      return { valida: false, motivo: "Número de padrón inválido. Formato esperado: LP123456" };
+      return { valida: false, motivo: "Número de padrón inválido. Formato esperado: 2 letras + 6 a 8 dígitos (ej: LP123456)" };
     }
 
     const ciRegex = /^[0-9]{7,8}[A-Z]?$/i;
@@ -26,35 +28,57 @@ export class VotanteService {
   }
 
   static async emitirTokenAnonimo(input: CredencialInput): Promise<EmisionTokenResult> {
+    // Sprint 6: si se adjunta VC, verificar firma ECDSA
+    if (input.vc) {
+      const vcValida = verificarVC(input.vc);
+      if (!vcValida) throw new Error("Firma de la Credencial Verificable inválida");
+
+      // Derivar campos del sujeto de la VC
+      input.numeroPadron = input.vc.credentialSubject.numeroPadron;
+      input.nombre = input.vc.credentialSubject.nombre;
+      // ci no se almacena en la VC por privacidad; si no vino en el body, asignar valor de placeholder
+      if (!input.ci) input.ci = "0000000";
+    }
+
     const verificacion = this.verificarFormatoCredencial(input);
     if (!verificacion.valida) {
       throw new Error(verificacion.motivo ?? "Credencial inválida");
     }
 
+    const elegible = await prisma.votanteElegible.findUnique({
+      where: { numeroPadron: input.numeroPadron },
+    });
+    if (!elegible) {
+      throw new Error("Número de padrón no encontrado en el registro electoral");
+    }
+
+    const credencialExistente = await prisma.credencialEmitida.findUnique({
+      where: { numeroPadron: input.numeroPadron },
+    });
+    if (credencialExistente) {
+      const sesionAnterior = await prisma.sesionVotante.findUnique({
+        where: { tokenHash: credencialExistente.credencialHash },
+      });
+      if (sesionAnterior?.usado) {
+        throw new Error("Este número de padrón ya emitió su voto");
+      }
+      if (sesionAnterior) {
+        await prisma.sesionVotante.delete({ where: { tokenHash: credencialExistente.credencialHash } });
+      }
+      await prisma.credencialEmitida.delete({ where: { numeroPadron: input.numeroPadron } });
+    }
+
     const token = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const tokenPoint = calcularTokenPoint(token);
 
     const sesion = await prisma.sesionVotante.create({
-      data: { tokenHash, usado: false },
+      data: { tokenHash, tokenPoint, usado: false },
       select: { id: true },
     });
 
-    const credencialSerializada = JSON.stringify({
-      numeroPadron: input.numeroPadron,
-      nombre: input.nombre,
-      ci: input.ci,
-    });
-    const credencialHash = crypto.createHash("sha256").update(credencialSerializada).digest("hex");
-
-    await prisma.credencialEmitida.upsert({
-      where: { numeroPadron: input.numeroPadron },
-      create: {
-        numeroPadron: input.numeroPadron,
-        credencialHash,
-      },
-      update: {
-        credencialHash,
-      },
+    await prisma.credencialEmitida.create({
+      data: { numeroPadron: input.numeroPadron, credencialHash: tokenHash },
     });
 
     await prisma.logAuditoria.create({
@@ -65,12 +89,7 @@ export class VotanteService {
       },
     });
 
-    return {
-      token,
-      tokenHash,
-      sessionId: sesion.id,
-      expiresIn: 3600,
-    };
+    return { token, tokenHash, sessionId: sesion.id, expiresIn: 3600 };
   }
 
   static async validarToken(token: string): Promise<{ valido: boolean; sessionId?: string; tokenHash?: string; motivo?: string }> {
@@ -81,13 +100,8 @@ export class VotanteService {
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
     const sesion = await prisma.sesionVotante.findUnique({ where: { tokenHash } });
 
-    if (!sesion) {
-      return { valido: false, motivo: "Token no registrado" };
-    }
-
-    if (sesion.usado) {
-      return { valido: false, sessionId: sesion.id, tokenHash, motivo: "Token ya utilizado" };
-    }
+    if (!sesion) return { valido: false, motivo: "Token no registrado" };
+    if (sesion.usado) return { valido: false, sessionId: sesion.id, tokenHash, motivo: "Token ya utilizado" };
 
     return { valido: true, sessionId: sesion.id, tokenHash };
   }

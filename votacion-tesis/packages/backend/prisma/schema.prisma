@@ -52,13 +52,38 @@ model LogAuditoria {
 /// Sesión del votante. Solo guardamos el HASH del token, nunca el token en claro.
 /// El token en sí lo conserva el votante.
 model SesionVotante {
-  id         String    @id @default(cuid())
-  tokenHash  String    @unique
-  usado      Boolean   @default(false)
-  creadoEn   DateTime  @default(now())
-  usadoEn    DateTime?
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  tokenPoint  String?   // punto secp256k1 comprimido hex; base para prueba Schnorr
+  usado       Boolean   @default(false)
+  creadoEn    DateTime  @default(now())
+  usadoEn     DateTime?
 
   @@index([usado])
+}
+
+/// Votante elegible del padrón.
+/// Cargado por el administrador antes de la elección.
+model VotanteElegible {
+  id           String   @id @default(cuid())
+  numeroPadron String   @unique // ej: LP123456
+  nombre       String?
+  ci           String?
+  registradoEn DateTime @default(now())
+
+  @@index([numeroPadron])
+}
+
+/// Candidato en la elección.
+model Candidato {
+  id           String   @id @default(cuid())
+  nombre       String
+  descripcion  String?
+  fotoUrl      String?  // URL o ruta pública a la foto del candidato
+  indice       Int      @unique // posición en la boleta (0, 1, 2...)
+  creadoEn     DateTime @default(now())
+
+  @@index([indice])
 }
 
 /// Credencial Verificable emitida al votante.
@@ -70,4 +95,16 @@ model CredencialEmitida {
   emitidaEn      DateTime @default(now())
 
   @@index([emitidaEn])
+}
+
+/// Registro de voto contabilizado para el escrutinio.
+/// Solo guarda el índice del candidato, nunca datos que vinculen al votante.
+/// votoCifradoElgamal: JSON de ParCifrado[] (cifrado homomórfico); nulo en modo legado.
+model VotoContabilizado {
+  id                  String   @id @default(cuid())
+  candidatoIndice     Int
+  votoCifradoElgamal  String?
+  emitidoEn           DateTime @default(now())
+
+  @@index([candidatoIndice])
 }
