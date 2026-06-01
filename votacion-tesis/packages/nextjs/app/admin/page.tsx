@@ -26,6 +26,7 @@ interface Candidato {
   id: string;
   nombre: string;
   descripcion: string | null;
+  fotoUrl: string | null;
   indice: number;
 }
 
@@ -198,6 +199,125 @@ function BotonAccion({ etiqueta, icono, colorClass, disabled, motivo, onConfirma
   );
 }
 
+// ─── Fila de candidato con gestión de foto ────────────────────────────────────
+
+function FilaCandidato({
+  candidato, token, eleccionAbierta, onEliminar, onFotoActualizada,
+}: {
+  candidato: Candidato;
+  token: string;
+  eleccionAbierta: boolean;
+  onEliminar: () => void;
+  onFotoActualizada: () => Promise<void>;
+}) {
+  const [subiendo, setSubiendo] = useState(false);
+  const [errorFoto, setErrorFoto] = useState("");
+  const [preview, setPreview] = useState<string | null>(candidato.fotoUrl);
+
+  const subirFoto = async (file: File) => {
+    setErrorFoto(""); setSubiendo(true);
+    try {
+      const form = new FormData();
+      form.append("foto", file);
+      form.append("indice", String(candidato.indice));
+      const res = await fetch(`/api/admin/candidatos/${candidato.id}/foto`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error al subir");
+      setPreview(`${data.fotoUrl}?t=${Date.now()}`);
+      await onFotoActualizada();
+    } catch (err) {
+      setErrorFoto(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setSubiendo(false);
+    }
+  };
+
+  const eliminarFoto = async () => {
+    setErrorFoto(""); setSubiendo(true);
+    try {
+      const res = await fetch(`/api/admin/candidatos/${candidato.id}/foto`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Error al eliminar foto");
+      setPreview(null);
+      await onFotoActualizada();
+    } catch (err) {
+      setErrorFoto(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setSubiendo(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4 px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      {/* Foto / placeholder */}
+      <div className="relative flex-shrink-0">
+        <div className="h-14 w-14 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+          {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt={candidato.nombre} className="h-full w-full object-cover" />
+          ) : (
+            <span className="material-symbols-outlined text-slate-400 text-3xl">account_circle</span>
+          )}
+        </div>
+        {subiendo && (
+          <div className="absolute inset-0 rounded-lg bg-white/70 dark:bg-slate-900/70 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[#197fe6] animate-spin text-xl">progress_activity</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-slate-400 w-5">#{candidato.indice}</span>
+          <p className="font-medium text-slate-900 dark:text-white text-sm truncate">{candidato.nombre}</p>
+        </div>
+        {candidato.descripcion && <p className="text-xs text-slate-500 ml-7">{candidato.descripcion}</p>}
+        {errorFoto && <p className="text-xs text-red-500 ml-7 mt-0.5">{errorFoto}</p>}
+      </div>
+
+      {/* Acciones foto */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <label className={`cursor-pointer flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors
+          ${subiendo ? "opacity-50 pointer-events-none" : "bg-[#197fe6]/10 text-[#197fe6] hover:bg-[#197fe6]/20"}`}>
+          <span className="material-symbols-outlined text-sm">upload</span>
+          {preview ? "Cambiar" : "Subir foto"}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            disabled={subiendo}
+            onChange={e => { const f = e.target.files?.[0]; if (f) subirFoto(f); e.target.value = ""; }}
+          />
+        </label>
+
+        {preview && (
+          <button
+            onClick={eliminarFoto}
+            disabled={subiendo}
+            className="text-slate-400 hover:text-red-500 disabled:opacity-50 transition-colors"
+            title="Quitar foto"
+          >
+            <span className="material-symbols-outlined text-base">hide_image</span>
+          </button>
+        )}
+
+        {!eleccionAbierta && (
+          <button onClick={onEliminar} className="text-red-400 hover:text-red-600 transition-colors" title="Eliminar candidato">
+            <span className="material-symbols-outlined text-base">delete</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Panel Candidatos ─────────────────────────────────────────────────────────
 
 function PanelCandidatos({ token, eleccionAbierta }: { token: string; eleccionAbierta: boolean }) {
@@ -298,25 +418,16 @@ function PanelCandidatos({ token, eleccionAbierta }: { token: string; eleccionAb
       {candidatos.length === 0 ? (
         <p className="text-sm text-slate-400 text-center py-4">Sin candidatos registrados</p>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {candidatos.map(c => (
-            <div key={c.id} className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-400 w-6 text-center">#{c.indice}</span>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white text-sm">{c.nombre}</p>
-                  {c.descripcion && <p className="text-xs text-slate-500">{c.descripcion}</p>}
-                </div>
-              </div>
-              {!eleccionAbierta && (
-                <button
-                  onClick={() => eliminar(c.id, c.nombre)}
-                  className="text-red-400 hover:text-red-600 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-base">delete</span>
-                </button>
-              )}
-            </div>
+            <FilaCandidato
+              key={c.id}
+              candidato={c}
+              token={token}
+              eleccionAbierta={eleccionAbierta}
+              onEliminar={() => eliminar(c.id, c.nombre)}
+              onFotoActualizada={cargar}
+            />
           ))}
         </div>
       )}
@@ -536,13 +647,22 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
 const SHARES_N = 5;
 const SHARES_UMBRAL = 3;
 
+interface InfoCustodio { indice: number; nombre: string; partido: string }
+
 interface EstadoEscrutinio {
   inicializado: boolean;
   conteoHabilitado: boolean;
   resultadosPublicados: boolean;
   totalBoletas: number;
   votosContabilizados: number;
-  shamir: { n: number; umbral: number; fechaGeneracion: string } | null;
+  shamir: {
+    n: number;
+    umbral: number;
+    fechaGeneracion: string;
+    custodios: InfoCustodio[];
+    indicesAportados: number[];
+    listoParaEjecutar: boolean;
+  } | null;
 }
 
 interface ResultadoEscrutinio {
@@ -551,12 +671,22 @@ interface ResultadoEscrutinio {
   txHash: string;
   blockNumber: number;
   hashEvidencias: string;
+  custodiosParticipantes?: InfoCustodio[];
+}
+
+function descargarBundle(custodio: InfoCustodio, compartimento: unknown, vc: unknown) {
+  const blob = new Blob([JSON.stringify({ custodio, compartimento, vc }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `bundle_custodio_${custodio.indice}_${custodio.partido.replace(/\s+/g, "_")}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function PanelEscrutinio({ token }: { token: string }) {
   const [estado, setEstado] = useState<EstadoEscrutinio | null>(null);
   const [resultado, setResultado] = useState<ResultadoEscrutinio | null>(null);
-  const [sharesSeleccionadas, setSharesSeleccionadas] = useState<number[]>([]);
   const [cargando, setCargando] = useState(true);
   const [ejecutando, setEjecutando] = useState(false);
   const [inicializando, setInicializando] = useState(false);
@@ -564,7 +694,20 @@ function PanelEscrutinio({ token }: { token: string }) {
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
 
+  // Formulario de inicialización con custodios
+  const [custodiosForm, setCustodiosForm] = useState<Array<{ nombre: string; partido: string }>>(
+    Array.from({ length: SHARES_N }, (_, i) => ({ nombre: "", partido: `Partido ${String.fromCharCode(65 + i)}` })),
+  );
+
+  // Formulario para aportar compartimento
+  const [aportandoIndice, setAportandoIndice] = useState<number | null>(null);
+  const [vcAporte, setVcAporte] = useState("");
+  const [compartimentoAporte, setCompartimentoAporte] = useState("");
+  const [aportando, setAportando] = useState(false);
+  const [modoManual, setModoManual] = useState(false);
+
   const headers = { Authorization: `Bearer ${token}` };
+  const jsonHeaders = { ...headers, "Content-Type": "application/json" };
 
   const cargarEstado = useCallback(async () => {
     try {
@@ -579,12 +722,22 @@ function PanelEscrutinio({ token }: { token: string }) {
   useEffect(() => { cargarEstado(); }, [cargarEstado]);
 
   const inicializar = async () => {
+    const custodiosValidos = custodiosForm.every(c => c.nombre.trim() && c.partido.trim());
+    if (!custodiosValidos) { setError("Complete el nombre y partido de todos los custodios"); return; }
     setError(""); setExito(""); setInicializando(true);
     try {
-      const res = await fetch("/api/admin/escrutinio/inicializar", { method: "POST", headers });
+      const res = await fetch("/api/admin/escrutinio/inicializar", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ custodios: custodiosForm.map(c => ({ nombre: c.nombre.trim(), partido: c.partido.trim() })) }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje ?? "Error");
-      setExito(`${data.mensaje}. Umbral: ${data.umbral} de ${data.n} compartimentos.`);
+      // Descarga automática de cada bundle
+      data.bundles.forEach((b: { custodio: InfoCustodio; compartimento: unknown; vc: unknown }) => {
+        descargarBundle(b.custodio, b.compartimento, b.vc);
+      });
+      setExito(`${data.n} bundles generados y descargados. Entrégalos a cada custodio. El servidor NO conserva los compartimentos.`);
       await cargarEstado();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido");
@@ -593,24 +746,77 @@ function PanelEscrutinio({ token }: { token: string }) {
     }
   };
 
-  const toggleShare = (indice: number) => {
-    setSharesSeleccionadas(prev =>
-      prev.includes(indice) ? prev.filter(i => i !== indice) : [...prev, indice],
-    );
+  const aportar = async (indice: number) => {
+    setError(""); setAportando(true);
+    try {
+      let vc: unknown, compartimento: unknown;
+      try { vc = JSON.parse(vcAporte); } catch { throw new Error("JSON de la credencial del custodio inválido"); }
+      try { compartimento = JSON.parse(compartimentoAporte); } catch { throw new Error("JSON del compartimento inválido"); }
+      const res = await fetch("/api/admin/escrutinio/aportar-compartimento", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ vc, compartimento }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error");
+      setExito(data.mensaje);
+      setAportandoIndice(null);
+      setVcAporte(""); setCompartimentoAporte("");
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setAportando(false);
+    }
+  };
+
+  const handleBundleFile = async (file: File, indice: number) => {
+    setError(""); setAportando(true);
+    try {
+      let bundle: { vc?: unknown; compartimento?: unknown };
+      try { bundle = JSON.parse(await file.text()); } catch { throw new Error("El archivo no es un JSON válido"); }
+      if (!bundle.vc || !bundle.compartimento) throw new Error("El archivo no contiene los campos 'vc' y 'compartimento'");
+      const res = await fetch("/api/admin/escrutinio/aportar-compartimento", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ vc: bundle.vc, compartimento: bundle.compartimento }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error al aportar");
+      setExito(data.mensaje);
+      setAportandoIndice(null);
+      setModoManual(false);
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setAportando(false);
+    }
+  };
+
+  const aportarDirecto = async (indice: number) => {
+    setError(""); setAportando(true);
+    try {
+      const res = await fetch("/api/admin/escrutinio/aportar-directo", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ indice }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensaje ?? "Error");
+      setExito(data.mensaje);
+      await cargarEstado();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setAportando(false);
+    }
   };
 
   const ejecutar = async () => {
-    if (!estado || sharesSeleccionadas.length < (estado.shamir?.umbral ?? 3)) {
-      setError(`Seleccione al menos ${estado?.shamir?.umbral ?? 3} compartimentos`);
-      return;
-    }
     setError(""); setExito(""); setEjecutando(true);
     try {
-      const res = await fetch("/api/admin/escrutinio/ejecutar", {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ indicesShares: sharesSeleccionadas }),
-      });
+      const res = await fetch("/api/admin/escrutinio/ejecutar", { method: "POST", headers: jsonHeaders });
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje ?? "Error");
       setResultado(data);
@@ -624,15 +830,14 @@ function PanelEscrutinio({ token }: { token: string }) {
   };
 
   const resetear = async () => {
-    if (!confirm("¿Está seguro de reiniciar el escrutinio para una nueva jornada? Esta acción borra los compartimentos Shamir actuales y resetea los flags del contrato.")) return;
+    if (!confirm("¿Reiniciar el escrutinio para una nueva jornada? Se borran los compartimentos y se resetean los flags del contrato.")) return;
     setError(""); setExito(""); setResetando(true);
     try {
       const res = await fetch("/api/admin/escrutinio/resetear", { method: "POST", headers });
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje ?? "Error");
       setResultado(null);
-      setSharesSeleccionadas([]);
-      setExito(`Nueva jornada #${data.numeroJornada} iniciada. El escrutinio fue reiniciado.`);
+      setExito(`Nueva jornada #${data.numeroJornada} iniciada.`);
       await cargarEstado();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido");
@@ -649,12 +854,14 @@ function PanelEscrutinio({ token }: { token: string }) {
     );
   }
 
-  const n = estado?.shamir?.n ?? 5;
-  const umbral = estado?.shamir?.umbral ?? 3;
+  const shamir = estado?.shamir;
+  const n = shamir?.n ?? SHARES_N;
+  const umbral = shamir?.umbral ?? SHARES_UMBRAL;
+  const indicesAportados = shamir?.indicesAportados ?? [];
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Estado del escrutinio */}
+      {/* Métricas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Boletas</p>
@@ -667,7 +874,7 @@ function PanelEscrutinio({ token }: { token: string }) {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Compartimentos</p>
           <p className={`text-lg font-bold ${estado?.inicializado ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
-            {estado?.inicializado ? `${n} generados` : "Pendiente"}
+            {estado?.inicializado ? `${indicesAportados.length}/${umbral} aportados` : "Pendiente"}
           </p>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
@@ -708,19 +915,23 @@ function PanelEscrutinio({ token }: { token: string }) {
               <span className="font-bold text-[#197fe6]">{resultado.totalVotos} votos</span>
             </div>
           </div>
+          {resultado.custodiosParticipantes && resultado.custodiosParticipantes.length > 0 && (
+            <div className="text-xs text-slate-500">
+              <span className="font-semibold">Custodios que participaron: </span>
+              {resultado.custodiosParticipantes.map(c => `${c.nombre} (${c.partido})`).join(" · ")}
+            </div>
+          )}
           <div className="text-xs text-slate-400 font-mono break-all">
             <span className="font-semibold text-slate-500">txHash: </span>{resultado.txHash}
           </div>
-          <a
-            href="/resultados"
-            className="text-sm text-[#197fe6] hover:underline flex items-center gap-1 self-start"
-          >
+          <a href="/resultados" className="text-sm text-[#197fe6] hover:underline flex items-center gap-1 self-start">
             <span className="material-symbols-outlined text-base">open_in_new</span>
             Ver página pública de resultados
           </a>
         </div>
       )}
 
+      {/* Reset para nueva jornada */}
       {estado?.resultadosPublicados && (
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-amber-300 dark:border-amber-700 p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center gap-2">
@@ -728,13 +939,10 @@ function PanelEscrutinio({ token }: { token: string }) {
             <h3 className="font-semibold text-slate-900 dark:text-white">Nueva jornada electoral</h3>
           </div>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Los resultados de esta jornada han sido publicados on-chain permanentemente. Para iniciar una nueva jornada, reinicie el escrutinio: se borrarán los compartimentos Shamir actuales y se restablecerán los flags del contrato.
+            Los resultados están publicados on-chain de forma permanente. Para iniciar una nueva jornada reinicie el escrutinio.
           </p>
-          <button
-            onClick={resetear}
-            disabled={resetando}
-            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
-          >
+          <button onClick={resetear} disabled={resetando}
+            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start">
             {resetando
               ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Reiniciando...</>
               : <><span className="material-symbols-outlined text-base">restart_alt</span>Reiniciar para nueva jornada</>}
@@ -742,11 +950,12 @@ function PanelEscrutinio({ token }: { token: string }) {
         </div>
       )}
 
+      {/* Flujo Shamir con custodios */}
       {!estado?.resultadosPublicados && (
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col gap-5">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[#197fe6]">key</span>
-            <h3 className="font-semibold text-slate-900 dark:text-white">Shamir Secret Sharing</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white">Shamir Secret Sharing — Custodia Distribuida</h3>
           </div>
 
           {!estado?.conteoHabilitado && (
@@ -756,60 +965,179 @@ function PanelEscrutinio({ token }: { token: string }) {
             </div>
           )}
 
+          {/* Paso 1: Inicializar con custodios */}
           {estado?.conteoHabilitado && !estado.inicializado && (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Genere los <strong>{SHARES_N} compartimentos</strong> Shamir. Se necesitarán <strong>{SHARES_UMBRAL}</strong> de ellos para reconstruir el secreto y ejecutar el conteo cooperativo.
+                Asigne un nombre y partido a cada custodio. Se generará un bundle (VC firmada + compartimento) por cada uno para entrega física. El servidor <strong>no conservará</strong> los compartimentos.
               </p>
-              <button
-                onClick={inicializar}
-                disabled={inicializando}
-                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
-              >
+              <div className="flex flex-col gap-2">
+                {custodiosForm.map((c, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <span className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                    <input
+                      className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/40"
+                      placeholder="Nombre del custodio"
+                      value={c.nombre}
+                      onChange={e => setCustodiosForm(prev => prev.map((x, j) => j === i ? { ...x, nombre: e.target.value } : x))}
+                    />
+                    <input
+                      className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/40"
+                      placeholder="Partido político"
+                      value={c.partido}
+                      onChange={e => setCustodiosForm(prev => prev.map((x, j) => j === i ? { ...x, partido: e.target.value } : x))}
+                    />
+                  </div>
+                ))}
+              </div>
+              <button onClick={inicializar} disabled={inicializando}
+                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start">
                 {inicializando
-                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Generando...</>
-                  : <><span className="material-symbols-outlined text-base">vpn_key</span>Generar compartimentos Shamir</>}
+                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Generando y descargando bundles...</>
+                  : <><span className="material-symbols-outlined text-base">vpn_key</span>Generar compartimentos y descargar bundles</>}
               </button>
             </div>
           )}
 
+          {/* Paso 2: Custodios aportan sus compartimentos */}
           {estado?.conteoHabilitado && estado.inicializado && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
+              <div>
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Seleccione al menos <strong>{umbral}</strong> de los <strong>{n}</strong> compartimentos para ejecutar el escrutinio:
+                  Se necesitan <strong>{umbral}</strong> de <strong>{n}</strong> compartimentos.
                 </p>
-                <p className="text-xs text-slate-400">Generados el {new Date(estado.shamir!.fechaGeneracion).toLocaleString("es-BO")}</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Aportados: {indicesAportados.length}/{umbral} mínimo requerido
+                  {shamir?.listoParaEjecutar && <span className="text-emerald-500 ml-1">✓ umbral alcanzado</span>}
+                </p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: n }, (_, i) => i + 1).map(indice => (
-                  <button
-                    key={indice}
-                    onClick={() => toggleShare(indice)}
-                    className={`w-12 h-12 rounded-xl font-bold text-sm transition-all border-2 ${
-                      sharesSeleccionadas.includes(indice)
-                        ? "bg-purple-600 border-purple-600 text-white shadow-md"
-                        : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-purple-400"
-                    }`}
-                  >
-                    {indice}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-slate-500">
-                {sharesSeleccionadas.length} de {umbral} requeridos seleccionados
-                {sharesSeleccionadas.length >= umbral
-                  ? <span className="text-emerald-500 ml-1">✓ listo</span>
-                  : <span className="text-amber-500 ml-1">— faltan {umbral - sharesSeleccionadas.length}</span>}
-              </p>
-              <button
-                onClick={ejecutar}
-                disabled={ejecutando || sharesSeleccionadas.length < umbral}
-                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start"
-              >
+
+              {/* Modo legacy: compartimentos en disco sin custodios con VC */}
+              {(shamir?.custodios ?? []).length === 0 ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 px-3 py-2.5 text-xs text-amber-700 dark:text-amber-400">
+                    <span className="material-symbols-outlined text-base shrink-0">info</span>
+                    <span>
+                      Compartimentos generados en formato anterior (sin custodia VC).
+                      Los archivos están en el disco del servidor — cárguelos directamente.
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: n }, (_, i) => i + 1).map(idx => {
+                      const yaAportado = indicesAportados.includes(idx);
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => !yaAportado && aportarDirecto(idx)}
+                          disabled={aportando || yaAportado}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors
+                            ${yaAportado
+                              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 cursor-default"
+                              : "bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white"
+                            }`}
+                        >
+                          {yaAportado
+                            ? <><span className="material-symbols-outlined text-base">check_circle</span>Compartimento {idx}</>
+                            : <><span className="material-symbols-outlined text-base">upload_file</span>Cargar #{idx}</>
+                          }
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* Modo normal: custodios con VC */
+                <div className="flex flex-col gap-2">
+                  {(shamir?.custodios ?? []).map(custodio => {
+                    const yaAportado = indicesAportados.includes(custodio.indice);
+                    const esteAbierto = aportandoIndice === custodio.indice;
+                    return (
+                      <div key={custodio.indice} className={`rounded-xl border p-3 transition-all ${yaAportado ? "border-emerald-400/50 bg-emerald-50 dark:bg-emerald-900/10" : "border-slate-200 dark:border-slate-700"}`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${yaAportado ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"}`}>
+                              {yaAportado ? "✓" : custodio.indice}
+                            </span>
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900 dark:text-white">{custodio.nombre}</p>
+                              <p className="text-xs text-[#197fe6] font-medium">{custodio.partido}</p>
+                            </div>
+                          </div>
+                          {!yaAportado && (
+                            <button onClick={() => { setAportandoIndice(esteAbierto ? null : custodio.indice); setVcAporte(""); setCompartimentoAporte(""); setError(""); }}
+                              className="text-xs px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-colors">
+                              {esteAbierto ? "Cancelar" : "Aportar bundle"}
+                            </button>
+                          )}
+                        </div>
+                        {esteAbierto && (
+                          <div className="mt-3 flex flex-col gap-3">
+                            {/* Carga por archivo */}
+                            <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-colors group
+                              ${aportando ? "opacity-50 pointer-events-none" : "border-purple-300 dark:border-purple-700 hover:border-purple-500 bg-purple-50/50 dark:bg-purple-900/10"}`}>
+                              <input
+                                type="file"
+                                accept=".json,application/json"
+                                className="hidden"
+                                disabled={aportando}
+                                onChange={e => { const f = e.target.files?.[0]; if (f) handleBundleFile(f, custodio.indice); e.target.value = ""; }}
+                              />
+                              {aportando
+                                ? <span className="material-symbols-outlined text-purple-400 text-2xl animate-spin">progress_activity</span>
+                                : <span className="material-symbols-outlined text-purple-400 group-hover:text-purple-600 text-2xl">upload_file</span>}
+                              <div>
+                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                  {aportando ? "Verificando credencial…" : `Seleccionar bundle-custodio-${custodio.indice}.json`}
+                                </p>
+                                <p className="text-xs text-slate-400">Archivo descargado al inicializar los compartimentos</p>
+                              </div>
+                            </label>
+
+                            {/* Fallback: pegar JSON manualmente */}
+                            <button
+                              onClick={() => setModoManual(v => !v)}
+                              className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 self-start underline underline-offset-2 transition-colors">
+                              {modoManual ? "Ocultar entrada manual" : "¿No tienes el archivo? Pegar JSON"}
+                            </button>
+
+                            {modoManual && (
+                              <div className="flex flex-col gap-2">
+                                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">VC del custodio (JSON)</label>
+                                <textarea
+                                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-purple-400/40 h-28 resize-none"
+                                  placeholder='Pega aquí el objeto "vc" del bundle...'
+                                  value={vcAporte}
+                                  onChange={e => setVcAporte(e.target.value)}
+                                />
+                                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Compartimento (JSON)</label>
+                                <textarea
+                                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-purple-400/40 h-20 resize-none"
+                                  placeholder='Pega aquí el objeto "compartimento" del bundle...'
+                                  value={compartimentoAporte}
+                                  onChange={e => setCompartimentoAporte(e.target.value)}
+                                />
+                                <button onClick={() => aportar(custodio.indice)} disabled={aportando || !vcAporte || !compartimentoAporte}
+                                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors self-start">
+                                  {aportando
+                                    ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Verificando VC...</>
+                                    : <><span className="material-symbols-outlined text-base">verified_user</span>Verificar y registrar</>}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Ejecutar cuando hay suficientes */}
+              <button onClick={ejecutar} disabled={ejecutando || !shamir?.listoParaEjecutar}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors self-start">
                 {ejecutando
-                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Ejecutando...</>
-                  : <><span className="material-symbols-outlined text-base">analytics</span>Ejecutar escrutinio</>}
+                  ? <><span className="material-symbols-outlined text-base animate-spin">progress_activity</span>Ejecutando escrutinio...</>
+                  : <><span className="material-symbols-outlined text-base">analytics</span>Ejecutar escrutinio ({indicesAportados.length}/{umbral} compartimentos)</>}
               </button>
             </div>
           )}

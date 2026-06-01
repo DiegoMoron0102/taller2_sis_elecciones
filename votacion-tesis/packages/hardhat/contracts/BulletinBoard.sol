@@ -16,7 +16,11 @@ interface IZKVerifier {
 /// @title BulletinBoard
 /// @notice Tablero público de boletas cifradas. Cada boleta incluye voto cifrado (ElGamal),
 ///         prueba ZK de validez y nullifier para prevenir doble voto.
-/// @dev La verificación ZK se delega a un contrato Verifier externo (generado desde Noir).
+/// @dev La verificación ZK (NIZKPoK Schnorr-Fiat-Shamir sobre secp256k1) se realiza
+///      off-chain en el backend antes del registro. El campo pruebaZK almacena el
+///      compromiso hash de la prueba (schnorr-nizkpok:R:s:nullifier) como evidencia
+///      auditable. La interfaz IZKVerifier está reservada para integración futura
+///      con un verificador on-chain (e.g., Noir/Barretenberg).
 contract BulletinBoard is Ownable {
     struct Boleta {
         bytes votoCifrado;

@@ -133,6 +133,27 @@ export class AdminController {
     }
   }
 
+  static async actualizarFotoCandidato(req: Request, res: Response) {
+    const schema = z.object({ fotoUrl: z.string().url().nullable() });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "URL inválida", detalle: parsed.error.flatten() });
+      return;
+    }
+    try {
+      const candidato = await AdminService.actualizarFotoCandidato(
+        String(req.params.id),
+        parsed.data.fotoUrl,
+      );
+      res.status(200).json({ mensaje: "Foto actualizada", candidato });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo actualizar la foto",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
   static async obtenerVotantesElegibles(req: Request, res: Response) {
     try {
       const votantes = await AdminService.obtenerVotantesElegibles();
@@ -198,15 +219,31 @@ export class AdminController {
     }
   }
 
-  static async inicializarEscrutinio(_req: Request, res: Response) {
+  static async inicializarEscrutinio(req: Request, res: Response) {
+    const schema = z.object({
+      custodios: z.array(z.object({
+        nombre: z.string().min(1),
+        partido: z.string().min(1),
+      })).length(EscrutinioService.SHARES_N).optional(),
+    });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Datos inválidos", detalle: parsed.error.flatten() });
+      return;
+    }
     try {
-      const resultado = EscrutinioService.inicializarShares();
+      const resultado = EscrutinioService.inicializarShares(parsed.data?.custodios);
       res.status(200).json({
         mensaje: "Compartimentos Shamir generados exitosamente",
         n: resultado.config.n,
         umbral: resultado.config.umbral,
         fechaGeneracion: resultado.config.fechaGeneracion,
-        indicesDisponibles: resultado.compartimentos.map(c => c.indice),
+        custodios: resultado.config.custodios,
+        bundles: resultado.bundles.map(b => ({
+          custodio: b.custodio,
+          compartimento: b.compartimento,
+          vc: b.vc,
+        })),
       });
     } catch (error) {
       res.status(400).json({
@@ -216,9 +253,30 @@ export class AdminController {
     }
   }
 
-  static async ejecutarEscrutinio(req: Request, res: Response) {
+  static async aportarCompartimento(req: Request, res: Response) {
     const schema = z.object({
-      indicesShares: z.array(z.number().int().min(1).max(EscrutinioService.SHARES_N)).min(EscrutinioService.SHARES_UMBRAL),
+      vc: z.object({
+        "@context": z.array(z.string()),
+        type: z.array(z.string()),
+        issuer: z.string(),
+        issuanceDate: z.string(),
+        credentialSubject: z.object({
+          nombre: z.string(),
+          partido: z.string(),
+          indiceCompartimento: z.number().int().min(1),
+        }),
+        proof: z.object({
+          type: z.string(),
+          created: z.string(),
+          verificationMethod: z.string(),
+          proofValue: z.string(),
+        }),
+      }),
+      compartimento: z.object({
+        indice: z.number().int().min(1),
+        valor: z.string(),
+        fechaGeneracion: z.string(),
+      }),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
@@ -226,10 +284,46 @@ export class AdminController {
       return;
     }
     try {
-      const resultado = await EscrutinioService.ejecutarEscrutinio(
-        parsed.data.indicesShares,
-        req.admin!.adminId,
+      const resultado = EscrutinioService.aportarCompartimento(
+        parsed.data.vc as any,
+        parsed.data.compartimento,
       );
+      res.status(200).json({
+        mensaje: `Compartimento ${resultado.indice} aportado por ${resultado.custodio.nombre} (${resultado.custodio.partido})`,
+        ...resultado,
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo registrar el compartimento",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async aportarCompartimentoDirecto(req: Request, res: Response) {
+    const schema = z.object({ indice: z.number().int().min(1).max(10) });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Índice inválido" });
+      return;
+    }
+    try {
+      const resultado = EscrutinioService.aportarCompartimentoDirecto(parsed.data.indice);
+      res.status(200).json({
+        mensaje: `Compartimento ${resultado.indice} cargado desde disco`,
+        ...resultado,
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: "No se pudo cargar el compartimento",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async ejecutarEscrutinio(req: Request, res: Response) {
+    try {
+      const resultado = await EscrutinioService.ejecutarEscrutinio(req.admin!.adminId);
       res.status(200).json({ mensaje: "Escrutinio ejecutado exitosamente", ...resultado });
     } catch (error) {
       res.status(400).json({

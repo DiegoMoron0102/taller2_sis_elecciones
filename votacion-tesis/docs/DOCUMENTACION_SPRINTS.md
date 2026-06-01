@@ -552,4 +552,103 @@ VC_AUTHORITY_PRIVATE_KEY=<32 bytes hex>   # clave privada ECDSA para firmar VCs
 
 ---
 
-*Última actualización: 2026-05-10, Sprint 6 completado.*
+---
+
+## Sprint 7 — Custodia Distribuida con VC de Custodios
+
+### Objetivo
+Cerrar la brecha de confianza en el escrutinio cooperativo: en el Sprint 5 el administrador podía seleccionar unilateralmente todos los compartimentos Shamir (que vivían en disco del servidor). El Sprint 7 implementa custodia real mediante Credenciales Verificables emitidas a cada custodio, representando la firma digital de cada partido político.
+
+### Problema resuelto
+El sistema anterior guardaba los 5 archivos `compartimento-N.json` en el servidor. El administrador podía ejecutar el escrutinio solo sin intervención de los delegados partidarios. Esto contradecía el modelo de Shamir en elecciones reales.
+
+### Solución implementada
+
+#### Nuevo tipo de VC: `CredencialCustodio`
+```typescript
+interface CredencialCustodio {
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
+  type: ["VerifiableCredential", "CredencialCustodio"],
+  issuer: "did:votoseguro:authority",
+  issuanceDate: string,
+  credentialSubject: {
+    nombre: string,      // nombre del delegado
+    partido: string,     // partido político representado
+    indiceCompartimento: number  // qué compartimento Shamir le corresponde
+  },
+  proof: { type: "EcdsaSecp256k1Signature2019", proofValue: string }
+}
+```
+Firmada con `VC_AUTHORITY_PRIVATE_KEY` mediante ECDSA secp256k1, igual que la `CredencialElectoral` del votante.
+
+#### Flujo de inicialización con custodia distribuida
+1. El admin asigna nombre y partido a cada uno de los 5 custodios en el panel.
+2. El backend genera los 5 compartimentos Shamir + una `CredencialCustodio` por cada uno.
+3. Retorna 5 **bundles** `{ custodio, compartimento, vc }` que se descargan automáticamente como archivos JSON.
+4. El servidor **no conserva** los archivos de compartimento en disco — solo guarda `config.json` con el hash de verificación y la lista de custodios asignados.
+5. Cada delegado recibe físicamente su bundle y lo guarda de forma segura.
+
+#### Flujo de escrutinio con VC de custodio
+Cuando llega la fase de escrutinio, cada custodio se acerca al sistema con su bundle:
+1. El operador pega el JSON de la VC del custodio y el JSON del compartimento en el panel de admin.
+2. El backend verifica:
+   - Firma ECDSA de la VC es válida (emitida por la Autoridad Electoral)
+   - El tipo de VC es `CredencialCustodio`
+   - El `indiceCompartimento` en la VC coincide con el índice del compartimento aportado
+   - El nombre y partido coinciden con el custodio registrado para ese índice
+   - El compartimento no fue aportado previamente (anti-repetición)
+3. El compartimento aportado se almacena en un **buffer en memoria** (no en disco).
+4. El UI muestra quién ya aportó y cuántos faltan para alcanzar el umbral (3 de 5).
+5. Solo cuando se alcanzan los 3 compartimentos el botón "Ejecutar escrutinio" se habilita.
+
+#### Buffer en memoria
+Los compartimentos aportados viven en un `Map<number, {x, y}>` en memoria del proceso backend. Se limpia al ejecutar el escrutinio o al resetear la jornada. Limitación documentada: un reinicio del proceso backend durante el escrutinio requiere que los custodios vuelvan a aportar.
+
+### Archivos nuevos/modificados
+
+| Archivo | Cambio |
+|---|---|
+| `backend/src/lib/vcAuthority.ts` | `emitirVCCustodio()`, `verificarVCCustodio()` |
+| `backend/src/services/escrutinioService.ts` | `inicializarShares()` acepta custodios → retorna bundles; `aportarCompartimento(vc, compartimento)`; buffer en memoria `sharesAportadas`; `ejecutarEscrutinio()` sin parámetro `indicesShares` |
+| `backend/src/controllers/adminController.ts` | `inicializarEscrutinio` con body de custodios; `aportarCompartimento` handler; `ejecutarEscrutinio` sin body |
+| `backend/src/routes/adminRoutes.ts` | `POST /api/admin/escrutinio/aportar-compartimento` |
+| `nextjs/app/api/admin/escrutinio/aportar-compartimento/route.ts` | Proxy Next.js |
+| `nextjs/app/admin/page.tsx` | `PanelEscrutinio` rediseñado: formulario de custodios en inicialización; descarga automática de bundles; lista de custodios con estado de aporte; textareas para pegar VC y compartimento |
+
+### Nuevo endpoint
+
+```
+POST /api/admin/escrutinio/aportar-compartimento
+Authorization: Bearer <JWT admin>
+Body: { vc: CredencialCustodio, compartimento: { indice, valor, fechaGeneracion } }
+Response 200: { indice, custodio, totalAportados, umbral, listoParaEjecutar }
+Response 400: mensaje de error (VC inválida / índice no coincide / ya aportado)
+```
+
+### Invariante de seguridad del escrutinio
+
+El administrador no puede ejecutar el escrutinio sin la participación de al menos `UMBRAL` custodios porque:
+1. Los compartimentos **no están en el servidor** (el admin no tiene los archivos).
+2. Cada compartimento requiere una VC firmada por la Autoridad Electoral con el `indiceCompartimento` específico — la VC no puede ser falsificada sin la clave privada de la Autoridad.
+3. La VC identifica el nombre y partido del custodio — el sistema verifica que coincida con el registrado al inicializar.
+
+### Estado de tests tras Sprint 7
+
+| Suite | Resultado |
+|---|---|
+| Backend unit + integración | 116/116 |
+| Contratos Hardhat | 12/12 |
+| Frontend componentes | 27/27 |
+
+### Casos de regresión nuevos (REG-086..089)
+
+| ID | Descripción |
+|---|---|
+| REG-086 | `emitirVCCustodio` genera VC con firma ECDSA válida y tipo `CredencialCustodio` |
+| REG-087 | `verificarVCCustodio` rechaza VC con proof alterado |
+| REG-088 | `aportarCompartimento` rechaza VC con índice que no coincide con el compartimento |
+| REG-089 | `aportarCompartimento` rechaza compartimento ya aportado (anti-repetición) |
+
+---
+
+*Última actualización: 2026-05-10, Sprint 7 completado.*

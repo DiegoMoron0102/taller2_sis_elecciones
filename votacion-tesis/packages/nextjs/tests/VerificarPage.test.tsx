@@ -89,7 +89,7 @@ describe("VerificarPage (PF-01)", () => {
     fireEvent.submit(screen.getByRole("button", { name: /Autenticar/i }).closest("form")!);
 
     await waitFor(() => {
-      expect(screen.getByText(/Verificando credencial.../i)).toBeInTheDocument();
+      expect(screen.getByText(/Verificando credencial/i)).toBeInTheDocument();
     });
 
     resolvePromise({ ok: false, json: async () => ({}) });

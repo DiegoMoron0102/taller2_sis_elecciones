@@ -3,8 +3,14 @@
 import { useEffect, useState } from "react";
 import VotingShell from "~~/components/voting/VotingShell";
 
+type Boleta = {
+  nullifier: string;
+  bloque: number;
+  votoCifrado: string;
+};
+
 export default function ExplorerPage() {
-  const [boletas, setBoletas] = useState<any[]>([]);
+  const [boletas, setBoletas] = useState<Boleta[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -23,7 +29,7 @@ export default function ExplorerPage() {
           la prueba asociada y el bloque en que fue incluido.
         </p>
         <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-sm w-fit">
-          <span className="material-symbols-outlined text-base">inventory_2</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-base">inventory_2</span>
           Total de boletas: {boletas.length}
         </span>
       </div>

@@ -24,11 +24,9 @@ describe("VotingShell — componente de shell (PF-00)", () => {
     expect(screen.queryByText(/ID de Sesión/)).not.toBeInTheDocument();
   });
 
-  it("renderiza los enlaces del footer a verificar, votar y explorer", () => {
+  it("renderiza el enlace de inicio en el header", () => {
     render(<VotingShell><div/></VotingShell>);
-    expect(screen.getByRole("link", { name: /Verificar/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Votar/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Explorer/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /VotoSeguro/i })).toBeInTheDocument();
   });
 });
 

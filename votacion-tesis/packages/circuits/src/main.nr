@@ -1,3 +1,16 @@
+// ─── ESTADO: PROTOTIPO — NO INTEGRADO AL FLUJO PRODUCTIVO ──────────────────
+// Este circuito implementa una prueba de nullifier con Poseidon/BN254 (Noir).
+// En la versión actual del sistema (Sprint 6+) la prueba ZK de conocimiento
+// del token se realiza con el protocolo Schnorr-Fiat-Shamir sobre secp256k1
+// en packages/backend/src/lib/schnorr.ts.
+//
+// Este circuito está diseñado para la siguiente fase (Sprint 8+):
+// verificación completamente on-chain del nullifier mediante un contrato
+// Verifier generado por Barretenberg a partir de este circuito.
+//
+// Referencia: Schnorr, C.P. (1991). Journal of Cryptology, 4(3), 161-174.
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Circuito ZK del sistema de votación descentralizada
 // ------------------------------------------------------------
 // Fase actual (Sprint 2): validación básica de nullifier

@@ -3,6 +3,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import VotarPage from "~~/app/votar/page";
 
+vi.mock("~~/lib/schnorr", () => ({
+  generarSchnorr: vi.fn().mockResolvedValue({ R: "0xRtest", s: "0xstest" }),
+  MENSAJE_SCHNORR_PREFIX: "voto",
+}));
+
 const ESTADO_ABIERTO = {
   abierta: true,
   candidatos: ["Ana Mamani - Partido A", "Carlos Quispe - Partido B", "Luis Flores - Partido C"],
@@ -66,6 +71,11 @@ describe("VotarPage (PF-02)", () => {
     }));
 
     render(<VotarPage />);
+
+    // Esperar candidatos y seleccionar uno para habilitar el botón
+    await waitFor(() => screen.getByText(/Ana Mamani/i));
+    const candidatoBtn = screen.getByText("Ana Mamani").closest("button") as HTMLElement;
+    fireEvent.click(candidatoBtn);
 
     await waitFor(() => {
       const btn = screen.getByRole("button", { name: /Emitir voto/i });

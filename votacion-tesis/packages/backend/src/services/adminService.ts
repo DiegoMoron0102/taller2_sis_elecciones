@@ -179,6 +179,13 @@ export async function eliminarCandidato(candidatoId: string) {
   });
 }
 
+export async function actualizarFotoCandidato(candidatoId: string, fotoUrl: string | null) {
+  return prisma.candidato.update({
+    where: { id: candidatoId },
+    data: { fotoUrl },
+  });
+}
+
 export async function obtenerVotantesElegibles() {
   return prisma.votanteElegible.findMany({
     orderBy: { registradoEn: "desc" },

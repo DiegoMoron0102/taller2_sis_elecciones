@@ -102,6 +102,10 @@ Asegurar que los cambios no rompan funcionalidades previamente validadas del sis
 | REG-078 | Backend integración | POST /api/auth/verificar-elegibilidad acepta formato legado | {numeroPadron, nombre, ci} sin VC | 200 con token | ✅ PS6-02 |
 | REG-079 | Backend integración | POST /api/voto/emitir acepta schnorrProof en body | schnorrProof presente | 200 emite voto | ✅ PS6-03 |
 | REG-080 | Backend integración | POST /api/admin/padron retorna VC en respuesta | VC_AUTHORITY_PRIVATE_KEY configurada | vc.type contiene CredencialElectoral | ✅ PA-11 |
+| REG-086 | Unitaria backend | emitirVCCustodio genera VC con tipo y firma ECDSA | clave configurada, custodio válido | type=CredencialCustodio, proofValue 128 hex | ✅ REG-086 |
+| REG-087 | Unitaria backend | verificarVCCustodio acepta VC válida y rechaza alterada | proof/nombre/índice modificado | true / false según integridad | ✅ REG-087 |
+| REG-088 | Unitaria backend | verificarVCCustodio rechaza si nombre o índice alterado | credentialSubject modificado | false | ✅ REG-088 |
+| REG-089 | Unitaria backend | emitirVCCustodio es determinista con misma issuanceDate | misma fecha y datos | proofValue idéntico en ambas llamadas | ✅ REG-089 |
 
 ---
 
@@ -116,3 +120,4 @@ Asegurar que los cambios no rompan funcionalidades previamente validadas del sis
 | 2026-05-10 | Sprint 6 Cripto real | **113/113** | **10/10** | 26/26 | — | vcAuthority+elgamal+schnorr nuevos | **80/80** |
 | 2026-05-10 | Sprint 6 E2E+Frontend fix | **113/113** | **10/10** | **27/27** | — | modo VC default en /verificar | **81/81** |
 | 2026-05-10 | resetearJornada multi-elección | **116/116** | **12/12** | **27/27** | — | resetearEscrutinio + PC-10/PC-11 nuevos | **86/86** |
+| 2026-05-10 | Sprint 7 custodia distribuida | **122/122** | **12/12** | **27/27** | — | CredencialCustodio + aportarCompartimento | **90/90** |

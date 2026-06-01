@@ -353,23 +353,25 @@ describe("API admin — escrutinio cooperativo", () => {
     expect(res.status).toBe(401);
   });
 
-  it("PE-03: POST /api/admin/escrutinio/inicializar retorna 200 cuando no está inicializado", async () => {
+  it("PE-03: POST /api/admin/escrutinio/inicializar retorna 200 con bundles y custodios", async () => {
+    const mockBundle = {
+      custodio: { indice: 1, nombre: "Delegado A", partido: "Partido A" },
+      compartimento: { indice: 1, valor: "a".repeat(64), fechaGeneracion: "2026-01-01" },
+      vc: { type: ["VerifiableCredential", "CredencialCustodio"], credentialSubject: { indiceCompartimento: 1 } },
+    };
     vi.spyOn(EscrutinioService, "inicializarShares").mockReturnValue({
-      compartimentos: [1, 2, 3, 4, 5].map(i => ({
-        indice: i,
-        valor: "a".repeat(64),
-        fechaGeneracion: "2026-01-01",
-      })),
-      config: { hashSecreto: "a".repeat(64), n: 5, umbral: 3, fechaGeneracion: "2026-01-01" },
+      bundles: [1, 2, 3, 4, 5].map(i => ({ ...mockBundle, custodio: { ...mockBundle.custodio, indice: i } })),
+      config: { hashSecreto: "a".repeat(64), n: 5, umbral: 3, fechaGeneracion: "2026-01-01", custodios: [] },
     });
 
     const res = await request(app)
       .post("/api/admin/escrutinio/inicializar")
-      .set("Authorization", `Bearer ${tokenValido()}`);
+      .set("Authorization", `Bearer ${tokenValido()}`)
+      .send({ custodios: [1,2,3,4,5].map(i => ({ nombre: `Delegado ${i}`, partido: `Partido ${i}` })) });
 
     expect(res.status).toBe(200);
     expect(res.body.mensaje).toContain("generados exitosamente");
-    expect(res.body.indicesDisponibles).toHaveLength(5);
+    expect(res.body.bundles).toHaveLength(5);
   });
 
   it("PE-04: POST /api/admin/escrutinio/inicializar retorna 400 si ya inicializado", async () => {
@@ -379,30 +381,33 @@ describe("API admin — escrutinio cooperativo", () => {
 
     const res = await request(app)
       .post("/api/admin/escrutinio/inicializar")
-      .set("Authorization", `Bearer ${tokenValido()}`);
+      .set("Authorization", `Bearer ${tokenValido()}`)
+      .send({ custodios: [1,2,3,4,5].map(i => ({ nombre: `D${i}`, partido: `P${i}` })) });
 
     expect(res.status).toBe(400);
     expect(res.body.mensaje).toContain("ya fueron inicializados");
   });
 
-  it("PE-05: POST /api/admin/escrutinio/ejecutar retorna 400 si faltan shares", async () => {
+  it("PE-05: POST /api/admin/escrutinio/ejecutar retorna 400 si el servicio falla", async () => {
+    vi.spyOn(EscrutinioService, "ejecutarEscrutinio").mockRejectedValue(
+      new Error("aportados: 0"),
+    );
+
     const res = await request(app)
       .post("/api/admin/escrutinio/ejecutar")
-      .set("Authorization", `Bearer ${tokenValido()}`)
-      .send({ indicesShares: [1, 2] }); // umbral es 3
+      .set("Authorization", `Bearer ${tokenValido()}`);
 
     expect(res.status).toBe(400);
   });
 
-  it("PE-06: POST /api/admin/escrutinio/ejecutar retorna 400 si escrutinio falla", async () => {
+  it("PE-06: POST /api/admin/escrutinio/ejecutar retorna 400 si conteo no habilitado", async () => {
     vi.spyOn(EscrutinioService, "ejecutarEscrutinio").mockRejectedValue(
       new Error("El conteo no está habilitado"),
     );
 
     const res = await request(app)
       .post("/api/admin/escrutinio/ejecutar")
-      .set("Authorization", `Bearer ${tokenValido()}`)
-      .send({ indicesShares: [1, 2, 3] });
+      .set("Authorization", `Bearer ${tokenValido()}`);
 
     expect(res.status).toBe(400);
     expect(res.body.mensaje).toContain("no está habilitado");
@@ -541,5 +546,27 @@ describe("API Sprint 6 — emitir voto con prueba Schnorr real", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.mensaje).toBe("Voto emitido exitosamente");
+  });
+
+  it("PS6-04: POST /api/voto/emitir retorna 400 cuando falta schnorrProof", async () => {
+    const token = "f".repeat(64);
+
+    const res = await request(app)
+      .post("/api/voto/emitir")
+      .send({ candidatoId: 0, token });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Datos de voto inválidos");
+  });
+
+  it("PS6-05: POST /api/voto/emitir retorna 400 cuando schnorrProof tiene campos malformados", async () => {
+    const token = "f".repeat(64);
+
+    const res = await request(app)
+      .post("/api/voto/emitir")
+      .send({ candidatoId: 0, token, schnorrProof: { R: "corto", s: "corto" } });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Datos de voto inválidos");
   });
 });

@@ -121,10 +121,13 @@ describe("escrutinioService.inicializarShares", () => {
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "shamir-test-"));
     process.env.SHAMIR_SHARES_DIR = tmpDir;
+    // Sprint 7: inicializarShares llama a emitirVCCustodio que necesita la clave
+    process.env.VC_AUTHORITY_PRIVATE_KEY = "2abb48ab141aecd53d37b967901a9b1645c3d8e5a6700ed3eef8f5855edbab7c";
   });
 
   afterEach(() => {
     delete process.env.SHAMIR_SHARES_DIR;
+    delete process.env.VC_AUTHORITY_PRIVATE_KEY;
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
@@ -133,24 +136,36 @@ describe("escrutinioService.inicializarShares", () => {
     expect(() => inicializarShares()).toThrow("ya fueron inicializados");
   });
 
-  it("crea config y N compartimentos en el directorio", () => {
-    const resultado = inicializarShares();
+  it("crea config.json y N bundles (Sprint 7: no guarda compartimentos en disco)", () => {
+    const resultado = inicializarShares([
+      { nombre: "Delegado A", partido: "Partido A" },
+      { nombre: "Delegado B", partido: "Partido B" },
+      { nombre: "Delegado C", partido: "Partido C" },
+      { nombre: "Delegado D", partido: "Partido D" },
+      { nombre: "Delegado E", partido: "Partido E" },
+    ]);
 
-    expect(resultado.compartimentos).toHaveLength(SHARES_N);
+    expect(resultado.bundles).toHaveLength(SHARES_N);
     expect(resultado.config.n).toBe(SHARES_N);
     expect(resultado.config.umbral).toBe(SHARES_UMBRAL);
     expect(resultado.config.hashSecreto).toMatch(/^[0-9a-f]{64}$/);
+    expect(resultado.config.custodios).toHaveLength(SHARES_N);
+    expect(resultado.bundles[0].vc.type).toContain("CredencialCustodio");
 
+    // config.json existe, pero los archivos de compartimento NO (custodia distribuida)
     expect(fs.existsSync(path.join(tmpDir, "config.json"))).toBe(true);
     for (let i = 1; i <= SHARES_N; i++) {
-      expect(fs.existsSync(path.join(tmpDir, `compartimento-${i}.json`))).toBe(true);
+      expect(fs.existsSync(path.join(tmpDir, `compartimento-${i}.json`))).toBe(false);
     }
   });
 
-  it("el secreto reconstruido coincide con el original (round-trip con archivos)", () => {
-    const { compartimentos, config } = inicializarShares();
+  it("round-trip: secreto reconstruido desde bundles coincide con hash del config", () => {
+    const { bundles, config } = inicializarShares();
 
-    const sharesLeidas = compartimentos.slice(0, SHARES_UMBRAL).map(c => ({ x: c.indice, y: c.valor }));
+    const sharesLeidas = bundles.slice(0, SHARES_UMBRAL).map(b => ({
+      x: b.compartimento.indice,
+      y: b.compartimento.valor,
+    }));
     const secretoReconstruido = reconstruirSecreto(sharesLeidas);
     const hexSecreto = secretoReconstruido.toString(16).padStart(62, "0");
     const secretoBytes = Buffer.from(hexSecreto, "hex");
@@ -224,27 +239,28 @@ describe("escrutinioService.ejecutarEscrutinio", () => {
     (BlockchainService.conteoHabilitado as any).mockResolvedValue(false);
     (BlockchainService.resultadosPublicados as any).mockResolvedValue(false);
 
-    await expect(ejecutarEscrutinio([1, 2, 3], "admin-1")).rejects.toThrow("no está habilitado");
+    await expect(ejecutarEscrutinio("admin-1")).rejects.toThrow("no está habilitado");
   });
 
   it("lanza error si los resultados ya fueron publicados", async () => {
     (BlockchainService.conteoHabilitado as any).mockResolvedValue(true);
     (BlockchainService.resultadosPublicados as any).mockResolvedValue(true);
 
-    await expect(ejecutarEscrutinio([1, 2, 3], "admin-1")).rejects.toThrow("ya fueron publicados");
+    await expect(ejecutarEscrutinio("admin-1")).rejects.toThrow("ya fueron publicados");
   });
 
-  it("lanza error si se proveen menos shares que el umbral", async () => {
+  it("lanza error si el buffer de shares aportadas está por debajo del umbral", async () => {
     const tmpDir2 = fs.mkdtempSync(path.join(os.tmpdir(), "shamir-test-"));
     process.env.SHAMIR_SHARES_DIR = tmpDir2;
     try {
-      const config = { hashSecreto: "abc", n: SHARES_N, umbral: SHARES_UMBRAL, fechaGeneracion: "2026-01-01" };
+      const config = { hashSecreto: "abc", n: SHARES_N, umbral: SHARES_UMBRAL, fechaGeneracion: "2026-01-01", custodios: [] };
       fs.writeFileSync(path.join(tmpDir2, "config.json"), JSON.stringify(config));
 
       (BlockchainService.conteoHabilitado as any).mockResolvedValue(true);
       (BlockchainService.resultadosPublicados as any).mockResolvedValue(false);
 
-      await expect(ejecutarEscrutinio([1, 2], "admin-1")).rejects.toThrow("al menos 3 compartimentos");
+      // Buffer vacío → menos del umbral
+      await expect(ejecutarEscrutinio("admin-1")).rejects.toThrow("al menos 3 compartimentos");
     } finally {
       delete process.env.SHAMIR_SHARES_DIR;
       fs.rmSync(tmpDir2, { recursive: true, force: true });

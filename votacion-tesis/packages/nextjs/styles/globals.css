@@ -98,6 +98,7 @@
   h4 {
     margin-bottom: 0.5rem;
     line-height: 1;
+    text-wrap: balance;
   }
 }
 
@@ -141,4 +142,68 @@
   direction: ltr;
   font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Easing curves ─────────────────────────────────────── */
+:root {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* ─── Entry animation ──────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stagger-1 { animation: fadeUp 0.4s var(--ease-out-strong) 0ms   both; }
+  .stagger-2 { animation: fadeUp 0.4s var(--ease-out-strong) 70ms  both; }
+  .stagger-3 { animation: fadeUp 0.4s var(--ease-out-strong) 140ms both; }
+  .stagger-4 { animation: fadeUp 0.4s var(--ease-out-strong) 210ms both; }
+  .stagger-5 { animation: fadeUp 0.4s var(--ease-out-strong) 280ms both; }
+}
+
+/* ─── Skeleton shimmer ──────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton { animation: shimmer 1.4s ease-in-out infinite; }
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #263549 50%, #1e293b 75%);
+  background-size: 200% 100%;
+}
+
+/* ─── Bar progress animation ────────────────────────────── */
+@keyframes growBar {
+  from { width: 0%; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar-animate { animation: growBar 0.8s var(--ease-out-strong) both; }
+}
+
+/* ─── Tactile press on buttons ──────────────────────────── */
+.btn-votoseguro {
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-votoseguro {
+    transition: transform 150ms var(--ease-out-strong),
+                filter     150ms var(--ease-out-strong),
+                background-color 150ms var(--ease-out-strong);
+  }
+  .btn-votoseguro:active { transform: scale(0.97); }
 }

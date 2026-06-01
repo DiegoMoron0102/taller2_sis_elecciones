@@ -7,6 +7,8 @@ import { generarPruebaSchnorr, calcularTokenPoint, MENSAJE_SCHNORR_PREFIX } from
 
 const tokenValido = "t".repeat(64);
 const tokenHashValido = "hash-token-ok";
+// Token hex válido para pruebas que invocan funciones criptográficas Schnorr
+const tokenHex = "a1b2c3d4e5f67890".repeat(4);
 
 function mockTokenOk() {
   vi.spyOn(VotanteService, "validarToken").mockResolvedValue({
@@ -35,6 +37,17 @@ function mockCandidatosDB(cantidad: number) {
 function mockPrismaOk() {
   vi.spyOn(prisma.logAuditoria, "create").mockResolvedValue({} as any);
   vi.spyOn(prisma.votoContabilizado, "create").mockResolvedValue({} as any);
+}
+
+function mockSesionVotante(token: string) {
+  vi.spyOn(prisma.sesionVotante, "findUnique").mockResolvedValue({
+    id: "s1",
+    tokenHash: tokenHashValido,
+    tokenPoint: calcularTokenPoint(token),
+    usado: false,
+    creadoEn: new Date(),
+    usadoEn: null,
+  } as any);
 }
 
 describe("VotoService — funciones puras", () => {
@@ -72,37 +85,44 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
 
   it("PU-07: rechaza si elección está cerrada", async () => {
     mockTokenOk();
+    mockSesionVotante(tokenHex);
     mockEleccionAbierta(false);
+    const schnorrProof = generarPruebaSchnorr(tokenHex, `${MENSAJE_SCHNORR_PREFIX}:0`);
 
-    await expect(VotoService.emitirVoto({ candidatoId: 0, token: tokenValido })).rejects.toThrow(
+    await expect(VotoService.emitirVoto({ candidatoId: 0, token: tokenHex, schnorrProof })).rejects.toThrow(
       "La elección está cerrada",
     );
   });
 
   it("PU-08: rechaza si candidato está fuera de rango", async () => {
     mockTokenOk();
+    mockSesionVotante(tokenHex);
     mockEleccionAbierta(true);
     mockCandidatosDB(2);
+    const schnorrProof = generarPruebaSchnorr(tokenHex, `${MENSAJE_SCHNORR_PREFIX}:5`);
 
-    await expect(VotoService.emitirVoto({ candidatoId: 5, token: tokenValido })).rejects.toThrow(
+    await expect(VotoService.emitirVoto({ candidatoId: 5, token: tokenHex, schnorrProof })).rejects.toThrow(
       "Candidato fuera de rango",
     );
   });
 
   it("PU-09: rechaza si el nullifier ya fue usado (doble voto)", async () => {
     mockTokenOk();
+    mockSesionVotante(tokenHex);
     mockEleccionAbierta(true);
     mockCandidatosDB(2);
     vi.spyOn(BlockchainService, "esNullifierElegible").mockResolvedValue(true);
     vi.spyOn(BlockchainService, "fueNullifierUsado").mockResolvedValue(true);
+    const schnorrProof = generarPruebaSchnorr(tokenHex, `${MENSAJE_SCHNORR_PREFIX}:0`);
 
-    await expect(VotoService.emitirVoto({ candidatoId: 0, token: tokenValido })).rejects.toThrow(
+    await expect(VotoService.emitirVoto({ candidatoId: 0, token: tokenHex, schnorrProof })).rejects.toThrow(
       "doble voto",
     );
   });
 
   it("PU-10: emite voto correctamente cuando todo es válido", async () => {
     mockTokenOk();
+    mockSesionVotante(tokenHex);
     mockEleccionAbierta(true);
     mockCandidatosDB(3);
     vi.spyOn(BlockchainService, "esNullifierElegible").mockResolvedValue(false);
@@ -113,8 +133,9 @@ describe("VotoService.emitirVoto — reglas de negocio", () => {
       blockNumber: 42,
     });
     vi.spyOn(VotanteService, "marcarTokenUsado").mockResolvedValue(undefined);
+    const schnorrProof = generarPruebaSchnorr(tokenHex, `${MENSAJE_SCHNORR_PREFIX}:1`);
 
-    const res = await VotoService.emitirVoto({ candidatoId: 1, token: tokenValido });
+    const res = await VotoService.emitirVoto({ candidatoId: 1, token: tokenHex, schnorrProof });
 
     expect(res.mensaje).toBe("Voto emitido exitosamente");
     expect(res.transaccion.hash).toBe("0xabc123deadbeef");

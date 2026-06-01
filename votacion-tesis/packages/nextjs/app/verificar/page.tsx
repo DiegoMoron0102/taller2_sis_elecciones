@@ -10,10 +10,7 @@ export default function VerificarPage() {
   const router = useRouter();
   const [modo, setModo] = useState<Modo>("vc");
 
-  // Modo VC (Sprint 6)
   const [vcJson, setVcJson] = useState("");
-
-  // Modo legado (compatibilidad)
   const [numeroPadron, setNumeroPadron] = useState("");
   const [nombre, setNombre] = useState("");
   const [ci, setCi] = useState("");
@@ -66,26 +63,41 @@ export default function VerificarPage() {
     <VotingShell sessionId="PRE-AUTH">
       <ProgressStepper totalSteps={4} currentStep={2} faseActual="Autenticación de Identidad Digital" />
 
-      <div className="flex flex-col gap-2 px-1">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight">Autenticación con SSI/VC</h1>
-        <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg">
+      <div className="stagger-1 flex flex-col gap-2 px-1">
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none mb-0">
+          Autenticación con SSI/VC
+        </h1>
+        <p className="mt-2 mb-0 text-slate-600 dark:text-slate-400 text-base leading-relaxed">
           Presente su Credencial Verificable firmada por la Autoridad Electoral para acreditar elegibilidad.
-          El sistema únicamente verifica la firma; no registra su identidad junto con el voto.
+          El sistema únicamente verifica la firma — no registra su identidad junto con el voto.
         </p>
       </div>
 
-      <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+      {/* Tab switcher */}
+      <div className="stagger-2 relative flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5">
+        {/* Pill deslizante */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1.5 h-[calc(100%-12px)] rounded-lg bg-[#197fe6] shadow-sm"
+          style={{
+            width: "calc(50% - 4px)",
+            left: modo === "vc" ? "6px" : "calc(50% + 2px)",
+            transition: "left 220ms cubic-bezier(0.23, 1, 0.32, 1)",
+          }}
+        />
         <button
           type="button"
           onClick={() => setModo("vc")}
-          className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${modo === "vc" ? "bg-[#197fe6] text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+          className="relative flex-1 py-2 rounded-lg text-sm font-bold z-10"
+          style={{ transition: "color 220ms cubic-bezier(0.23, 1, 0.32, 1)", color: modo === "vc" ? "white" : undefined }}
         >
-          Credencial Verificable (VC)
+          Credencial Verificable
         </button>
         <button
           type="button"
           onClick={() => setModo("legacy")}
-          className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${modo === "legacy" ? "bg-[#197fe6] text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+          className="relative flex-1 py-2 rounded-lg text-sm font-bold z-10"
+          style={{ transition: "color 220ms cubic-bezier(0.23, 1, 0.32, 1)", color: modo === "legacy" ? "white" : undefined }}
         >
           Campos individuales
         </button>
@@ -93,90 +105,90 @@ export default function VerificarPage() {
 
       <form
         onSubmit={onSubmit}
-        className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg grid gap-5"
+        className="stagger-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col gap-5"
       >
         {modo === "vc" ? (
           <>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#197fe6]/10 text-[#197fe6]">
-                <span className="material-symbols-outlined">verified_user</span>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#197fe6]/10 text-[#197fe6]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">verified_user</span>
               </div>
               <div>
-                <p className="font-bold">Credencial Verificable con firma ECDSA</p>
-                <p className="text-xs text-slate-500">Emitida por la Autoridad Electoral al registrarse en el padrón</p>
+                <p className="font-bold mb-0">Credencial Verificable con firma ECDSA</p>
+                <p className="mt-0 mb-0 text-xs text-slate-500">Emitida por la Autoridad Electoral al registrarse en el padrón</p>
               </div>
             </div>
-            <label className="block">
-              <span className="text-sm font-semibold">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 JSON de su Credencial Verificable
               </span>
               <textarea
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40 h-48 resize-none"
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40 focus:border-[#197fe6]/50 h-48 resize-none"
+                style={{ transition: "border-color 150ms, box-shadow 150ms" }}
                 placeholder='{"@context": [...], "type": [...], "credentialSubject": {...}, "proof": {...}}'
                 value={vcJson}
                 onChange={e => setVcJson(e.target.value)}
                 required={modo === "vc"}
+                autoComplete="off"
+                spellCheck={false}
               />
             </label>
           </>
         ) : (
           <>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Modo de compatibilidad: ingrese sus datos directamente sin firma criptográfica.
-            </p>
-            <label className="block">
-              <span className="text-sm font-semibold">Número de Padrón</span>
-              <input
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40"
-                placeholder="LP123456"
-                value={numeroPadron}
-                onChange={e => setNumeroPadron(e.target.value.toUpperCase())}
-                required={modo === "legacy"}
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-semibold">Nombre completo</span>
-              <input
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40"
-                placeholder="Juan Pérez"
-                value={nombre}
-                onChange={e => setNombre(e.target.value)}
-                required={modo === "legacy"}
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-semibold">Carnet de Identidad</span>
-              <input
-                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40"
-                placeholder="12345678L"
-                value={ci}
-                onChange={e => setCi(e.target.value.toUpperCase())}
-                required={modo === "legacy"}
-              />
-            </label>
+            <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 px-3 py-2.5">
+              <span aria-hidden="true" className="material-symbols-outlined text-amber-600 text-[18px]">info</span>
+              <p className="text-xs text-amber-700 dark:text-amber-400 mb-0">
+                Modo de compatibilidad: sin firma criptográfica.
+              </p>
+            </div>
+            {[
+              { label: "Número de Padrón", placeholder: "LP123456", value: numeroPadron, onChange: (v: string) => setNumeroPadron(v.toUpperCase()), autoComplete: "off" },
+              { label: "Nombre completo", placeholder: "Juan Pérez", value: nombre, onChange: (v: string) => setNombre(v), autoComplete: "name" },
+              { label: "Carnet de Identidad", placeholder: "12345678L", value: ci, onChange: (v: string) => setCi(v.toUpperCase()), autoComplete: "off" },
+            ].map(field => (
+              <label key={field.label} className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{field.label}</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#197fe6]/40 focus:border-[#197fe6]/50"
+                  style={{ transition: "border-color 150ms, box-shadow 150ms" }}
+                  placeholder={field.placeholder}
+                  value={field.value}
+                  onChange={e => field.onChange(e.target.value)}
+                  required={modo === "legacy"}
+                  autoComplete={field.autoComplete}
+                />
+              </label>
+            ))}
           </>
         )}
 
-        {error && (
-          <div className="flex items-start gap-2 text-sm text-red-500">
-            <span className="material-symbols-outlined text-base">error</span>
-            <span>{error}</span>
-          </div>
-        )}
+        <div aria-live="polite" aria-atomic="true">
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2.5 text-sm text-red-600 dark:text-red-400">
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] shrink-0">error</span>
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 rounded-xl bg-[#197fe6] text-white font-bold shadow-lg shadow-[#197fe6]/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+          className="btn-votoseguro w-full h-12 rounded-xl bg-[#197fe6] text-white font-bold shadow-lg shadow-[#197fe6]/20 hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="material-symbols-outlined">fingerprint</span>
-          {loading ? "Verificando credencial..." : "Autenticar credencial digital"}
+          {loading
+            ? <><span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Verificando credencial…</>
+            : <><span aria-hidden="true" className="material-symbols-outlined text-[18px]">fingerprint</span> Autenticar credencial digital</>
+          }
         </button>
       </form>
 
-      <div className="flex justify-center items-center gap-2 py-2 opacity-60">
-        <span className="material-symbols-outlined text-sm">lock</span>
-        <p className="text-[10px] uppercase tracking-widest font-bold">Token anónimo de un solo uso · Firma ECDSA secp256k1</p>
+      <div className="flex justify-center items-center gap-2 py-1 opacity-50">
+        <span aria-hidden="true" className="material-symbols-outlined text-[14px]">lock</span>
+        <p className="m-0 text-[10px] uppercase tracking-widest font-bold">
+          Token anónimo de un solo uso · Firma ECDSA secp256k1
+        </p>
       </div>
     </VotingShell>
   );

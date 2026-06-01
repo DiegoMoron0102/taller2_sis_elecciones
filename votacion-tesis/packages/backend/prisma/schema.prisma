@@ -79,6 +79,7 @@ model Candidato {
   id           String   @id @default(cuid())
   nombre       String
   descripcion  String?
+  fotoUrl      String?  // URL o ruta pública a la foto del candidato
   indice       Int      @unique // posición en la boleta (0, 1, 2...)
   creadoEn     DateTime @default(now())
 

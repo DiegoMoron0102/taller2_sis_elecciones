@@ -10,7 +10,7 @@ import { cifrarVotoElgamal, type ParCifrado } from "../lib/elgamal";
 export interface EmitirVotoInput {
   candidatoId: number;
   token: string;
-  schnorrProof?: PruebaSchnorr; // Sprint 6: prueba de conocimiento del token
+  schnorrProof: PruebaSchnorr;
 }
 
 interface ConfigElgamal {
@@ -45,20 +45,18 @@ export class VotoService {
       throw new Error(tokenValidado.motivo ?? "Token no válido");
     }
 
-    // Sprint 6: verificar prueba Schnorr si se proporcionó
-    if (input.schnorrProof) {
-      const sesion = await prisma.sesionVotante.findUnique({
-        where: { tokenHash: tokenValidado.tokenHash },
-        select: { tokenPoint: true },
-      });
-      if (!sesion?.tokenPoint) {
-        throw new Error("TokenPoint no disponible para verificación Schnorr");
-      }
-      const mensaje = `${MENSAJE_SCHNORR_PREFIX}:${input.candidatoId}`;
-      const pruebaValida = verificarSchnorr(sesion.tokenPoint, input.schnorrProof, mensaje);
-      if (!pruebaValida) {
-        throw new Error("Prueba Schnorr inválida: no se pudo verificar el conocimiento del token");
-      }
+    // Verificación NIZKPoK Schnorr-Fiat-Shamir: obligatoria para toda emisión
+    const sesion = await prisma.sesionVotante.findUnique({
+      where: { tokenHash: tokenValidado.tokenHash },
+      select: { tokenPoint: true },
+    });
+    if (!sesion?.tokenPoint) {
+      throw new Error("TokenPoint no registrado para este token");
+    }
+    const mensaje = `${MENSAJE_SCHNORR_PREFIX}:${input.candidatoId}`;
+    const pruebaValida = verificarSchnorr(sesion.tokenPoint, input.schnorrProof, mensaje);
+    if (!pruebaValida) {
+      throw new Error("Prueba Schnorr inválida: el votante no acreditó conocimiento del token");
     }
 
     const abierta = await BlockchainService.eleccionAbierta();
@@ -95,7 +93,13 @@ export class VotoService {
       votoCifrado = `0x${crypto.createHash("sha256").update(`${input.candidatoId}:${Date.now()}:${crypto.randomBytes(8).toString("hex")}`).digest("hex")}`;
     }
 
-    const pruebaZK = `0x${crypto.createHash("sha256").update(`${votoCifrado}:${nullifier}:schnorr-verified`).digest("hex")}`;
+    // Serialización canónica de la prueba NIZKPoK: schnorr-nizkpok:<R>:<s>
+    // R y s son los componentes de la prueba Schnorr verificada por el backend.
+    // Este compromiso se almacena on-chain como evidencia auditable de la prueba.
+    const pruebaZK = `0x${crypto
+      .createHash("sha256")
+      .update(`schnorr-nizkpok:${input.schnorrProof.R}:${input.schnorrProof.s}:${nullifier}`)
+      .digest("hex")}`;
 
     const tx = await BlockchainService.registrarBoleta(votoCifrado, pruebaZK, nullifier);
     await VotanteService.marcarTokenUsado(tokenValidado.tokenHash);

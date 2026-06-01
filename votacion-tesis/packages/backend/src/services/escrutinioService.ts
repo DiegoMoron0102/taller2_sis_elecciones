@@ -138,6 +138,7 @@ export async function resetearEscrutinio(adminId: string): Promise<{ txHash: str
   if (fs.existsSync(dir)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+  limpiarSharesAportadas();
 
   const { txHash, numeroJornada } = await BlockchainService.resetearJornada();
 
@@ -153,7 +154,15 @@ export async function resetearEscrutinio(adminId: string): Promise<{ txHash: str
   return { txHash, numeroJornada };
 }
 
-export function inicializarShares(): { compartimentos: Compartimento[]; config: ConfigShaman } {
+export interface BundleCustodio {
+  custodio: InfoCustodio;
+  compartimento: Compartimento;
+  vc: CredencialCustodio;
+}
+
+export function inicializarShares(
+  custodiosInput?: Array<{ nombre: string; partido: string }>,
+): { bundles: BundleCustodio[]; config: ConfigShaman } {
   if (sharesExisten()) throw new Error("Los compartimentos ya fueron inicializados");
 
   const dir = asegurarDirectorio();
@@ -170,13 +179,6 @@ export function inicializarShares(): { compartimentos: Compartimento[]; config: 
     fechaGeneracion,
   }));
 
-  compartimentos.forEach(c => {
-    fs.writeFileSync(
-      path.join(dir, `compartimento-${c.indice}.json`),
-      JSON.stringify(c, null, 2),
-    );
-  });
-
   // Sprint 6: calcular clave pública ElGamal H = (secreto mod ORDER_secp256k1) · G
   const ORDER_N = secp256k1.CURVE.n;
   const skElgamal = ((secretoBig % ORDER_N) + ORDER_N) % ORDER_N;
@@ -184,20 +186,105 @@ export function inicializarShares(): { compartimentos: Compartimento[]; config: 
     ? secp256k1.ProjectivePoint.BASE.multiply(skElgamal).toHex(true)
     : undefined;
 
+  // Sprint 7: generar custodios y VCs
+  const custodios: InfoCustodio[] = compartimentos.map((c, i) => ({
+    indice: c.indice,
+    nombre: custodiosInput?.[i]?.nombre ?? `Custodio ${c.indice}`,
+    partido: custodiosInput?.[i]?.partido ?? `Partido ${c.indice}`,
+  }));
+
+  const bundles: BundleCustodio[] = compartimentos.map((comp, i) => ({
+    custodio: custodios[i],
+    compartimento: comp,
+    vc: emitirVCCustodio(custodios[i].nombre, custodios[i].partido, comp.indice, fechaGeneracion),
+  }));
+
+  // Solo guardar config.json — los compartimentos NO se almacenan en disco (custodia distribuida)
   const config: ConfigShaman = {
     hashSecreto,
     n: SHARES_N,
     umbral: SHARES_UMBRAL,
     fechaGeneracion,
     clavePublicaEleccion,
+    custodios,
   };
   fs.writeFileSync(path.join(dir, "config.json"), JSON.stringify(config, null, 2));
 
-  return { compartimentos, config };
+  limpiarSharesAportadas();
+  return { bundles, config };
+}
+
+export interface ResultadoAporte {
+  indice: number;
+  custodio: InfoCustodio;
+  totalAportados: number;
+  umbral: number;
+  listoParaEjecutar: boolean;
+}
+
+export function aportarCompartimento(
+  vc: CredencialCustodio,
+  compartimento: Compartimento,
+): ResultadoAporte {
+  if (!sharesExisten()) throw new Error("El escrutinio no ha sido inicializado");
+  if (!verificarVCCustodio(vc)) throw new Error("Credencial del custodio inválida o no firmada por la Autoridad Electoral");
+
+  const config = leerConfig();
+  const indiceDesdVC = vc.credentialSubject.indiceCompartimento;
+
+  if (indiceDesdVC !== compartimento.indice) {
+    throw new Error(`El compartimento aportado (índice ${compartimento.indice}) no coincide con el autorizado en la credencial (índice ${indiceDesdVC})`);
+  }
+
+  const custodioEsperado = config.custodios?.find(c => c.indice === indiceDesdVC);
+  if (!custodioEsperado) throw new Error(`Índice ${indiceDesdVC} no pertenece a esta jornada`);
+
+  if (vc.credentialSubject.nombre !== custodioEsperado.nombre || vc.credentialSubject.partido !== custodioEsperado.partido) {
+    throw new Error("La credencial no corresponde al custodio registrado para este índice");
+  }
+
+  if (sharesAportadas.has(indiceDesdVC)) {
+    throw new Error(`El compartimento ${indiceDesdVC} ya fue aportado`);
+  }
+
+  sharesAportadas.set(indiceDesdVC, { x: compartimento.indice, y: compartimento.valor });
+
+  const totalAportados = sharesAportadas.size;
+  return {
+    indice: indiceDesdVC,
+    custodio: custodioEsperado,
+    totalAportados,
+    umbral: config.umbral,
+    listoParaEjecutar: totalAportados >= config.umbral,
+  };
+}
+
+// Modo legacy: lee compartimentos del disco sin verificar VC (para shares generados antes de Sprint 7)
+export function aportarCompartimentoDirecto(indice: number): ResultadoAporte {
+  if (!sharesExisten()) throw new Error("El escrutinio no ha sido inicializado");
+  const config = leerConfig();
+  const compartimento = leerCompartimento(indice);
+
+  if (sharesAportadas.has(indice)) {
+    throw new Error(`El compartimento ${indice} ya fue aportado`);
+  }
+
+  sharesAportadas.set(indice, { x: compartimento.indice, y: compartimento.valor });
+
+  const totalAportados = sharesAportadas.size;
+  const custodio: InfoCustodio = config.custodios?.find(c => c.indice === indice)
+    ?? { indice, nombre: `Custodio ${indice}`, partido: `Partido ${indice}` };
+
+  return {
+    indice,
+    custodio,
+    totalAportados,
+    umbral: config.umbral,
+    listoParaEjecutar: totalAportados >= config.umbral,
+  };
 }
 
 export async function ejecutarEscrutinio(
-  indicesShares: number[],
   adminId: string,
 ): Promise<{
   totalesPorCandidato: number[];
@@ -205,6 +292,7 @@ export async function ejecutarEscrutinio(
   txHash: string;
   blockNumber: number;
   hashEvidencias: string;
+  custodiosParticipantes: InfoCustodio[];
 }> {
   const conteoHabilitado = await BlockchainService.conteoHabilitado();
   if (!conteoHabilitado) throw new Error("El conteo no está habilitado: habilite el escrutinio primero");
@@ -214,16 +302,13 @@ export async function ejecutarEscrutinio(
 
   const config = leerConfig();
 
-  if (indicesShares.length < config.umbral) {
+  if (sharesAportadas.size < config.umbral) {
     throw new Error(
-      `Se necesitan al menos ${config.umbral} compartimentos (se proporcionaron ${indicesShares.length})`,
+      `Se necesitan al menos ${config.umbral} compartimentos (aportados: ${sharesAportadas.size})`,
     );
   }
 
-  const sharesLeidas = indicesShares.map(i => {
-    const c = leerCompartimento(i);
-    return { x: c.indice, y: c.valor };
-  });
+  const sharesLeidas = Array.from(sharesAportadas.values());
 
   const secretoReconstruido = reconstruirSecreto(sharesLeidas);
   const hexSecreto = secretoReconstruido.toString(16).padStart(62, "0");
@@ -285,9 +370,12 @@ export async function ejecutarEscrutinio(
   const totalVotos = totalesPorCandidato.reduce((a, b) => a + b, 0);
   const totalOnChain = await BlockchainService.totalBoletas();
 
+  const indicesUsados = Array.from(sharesAportadas.keys()).sort((a, b) => a - b);
+  const custodiosParticipantes = (config.custodios ?? []).filter(c => indicesUsados.includes(c.indice));
+
   const evidencias = {
     sistema: "VotoSeguro — Sistema de Votación Electrónica Descentralizada Verificable",
-    version: "Sprint 6",
+    version: "Sprint 7",
     metodoEscrutinio,
     timestamp: new Date().toISOString(),
     candidatos: candidatos.map((c, i) => ({
@@ -299,7 +387,8 @@ export async function ejecutarEscrutinio(
     totalVotos,
     totalBoletasOnChain: totalOnChain,
     shamir: {
-      sharesUsadas: indicesShares,
+      indicesUsados,
+      custodiosParticipantes,
       hashSecreto: config.hashSecreto,
       n: config.n,
       umbral: config.umbral,
@@ -332,7 +421,9 @@ export async function ejecutarEscrutinio(
     data: { estado: "FINALIZADA" },
   });
 
-  return { totalesPorCandidato, totalVotos, txHash, blockNumber, hashEvidencias };
+  limpiarSharesAportadas();
+
+  return { totalesPorCandidato, totalVotos, txHash, blockNumber, hashEvidencias, custodiosParticipantes };
 }
 
 export async function obtenerResultadosPublicos() {
@@ -368,6 +459,7 @@ export async function obtenerEstadoEscrutinio() {
   ]);
 
   const config = inicializado ? leerConfig() : null;
+  const indicesAportados = obtenerSharesAportadas();
 
   return {
     inicializado,
@@ -376,7 +468,14 @@ export async function obtenerEstadoEscrutinio() {
     totalBoletas,
     votosContabilizados,
     shamir: config
-      ? { n: config.n, umbral: config.umbral, fechaGeneracion: config.fechaGeneracion }
+      ? {
+          n: config.n,
+          umbral: config.umbral,
+          fechaGeneracion: config.fechaGeneracion,
+          custodios: config.custodios ?? [],
+          indicesAportados,
+          listoParaEjecutar: indicesAportados.length >= config.umbral,
+        }
       : null,
   };
 }
