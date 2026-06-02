@@ -200,6 +200,32 @@ VERIFICACIÓN PÚBLICA
 - Yarn 4+
 - Git
 
+**Instalar Yarn 4** (si no está disponible):
+
+```bash
+npm install -g yarn
+yarn set version stable
+```
+
+### Variables de entorno
+
+Crear el archivo `packages/backend/.env` con el siguiente contenido:
+
+```env
+JWT_ADMIN_SECRET=<secreto largo aleatorio>
+VC_AUTHORITY_PRIVATE_KEY=<32 bytes hex — clave ECDSA para firmar VCs>
+```
+
+Para generar los valores, ejecutar estos comandos y copiar la salida de cada uno:
+
+```bash
+# JWT_ADMIN_SECRET
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+
+# VC_AUTHORITY_PRIVATE_KEY
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
 ### Instalación
 
 ```bash
@@ -209,13 +235,23 @@ yarn workspace @votacion/backend prisma:generate
 yarn workspace @votacion/backend prisma:migrate dev --name init
 ```
 
-### Levantar entorno completo (4 terminales)
+### Crear el primer administrador
+
+Antes de levantar el servidor, crear la cuenta de administrador en la base de datos:
 
 ```bash
-# Terminal 1 — Blockchain local
+yarn workspace @votacion/backend crear-admin admin@votoseguro.local "Admin Principal" contraseña123
+```
+
+Reemplazar el email, nombre y contraseña con los valores deseados. Este comando solo es necesario la primera vez.
+
+### Levantar entorno completo (4 terminales, en orden)
+
+```bash
+# Terminal 1 — Blockchain local (levantar primero)
 yarn chain
 
-# Terminal 2 — Despliegue de contratos
+# Terminal 2 — Despliegue de contratos (esperar a que la Terminal 1 esté lista)
 yarn deploy
 
 # Terminal 3 — Backend (puerto 4000)
@@ -225,23 +261,17 @@ yarn backend:dev
 yarn start
 ```
 
+> **Importante:** los contratos deben estar desplegados (Terminal 2 completada) antes de iniciar el backend. Si el backend arranca sin contratos en la cadena, los endpoints de blockchain fallarán.
+
 URLs:
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:4000`
 - Hardhat RPC: `http://127.0.0.1:8545`
 
-### (Opcional) Configurar elección inicial
+### (Opcional) Configurar elección inicial con candidatos de ejemplo
 
 ```bash
 yarn workspace @votacion/hardhat hardhat run scripts/setupElection.ts --network localhost
-```
-
-### Variables de entorno requeridas
-
-```env
-# packages/backend/.env
-JWT_ADMIN_SECRET=<secreto largo aleatorio>
-VC_AUTHORITY_PRIVATE_KEY=<32 bytes hex — clave ECDSA para firmar VCs>
 ```
 
 ---
