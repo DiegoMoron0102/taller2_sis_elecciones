@@ -134,7 +134,7 @@ export class AdminController {
   }
 
   static async actualizarFotoCandidato(req: Request, res: Response) {
-    const schema = z.object({ fotoUrl: z.string().url().nullable() });
+    const schema = z.object({ fotoUrl: z.string().nullable() });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: "URL inválida", detalle: parsed.error.flatten() });
@@ -343,6 +343,22 @@ export class AdminController {
     } catch (error) {
       res.status(400).json({
         error: "No se pudo reiniciar el escrutinio",
+        mensaje: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+  }
+
+  static async reconfigurarEleccion(req: Request, res: Response) {
+    const adminId = (req as unknown as { admin: { adminId: string } }).admin.adminId;
+    try {
+      const resultado = await AdminService.reconfigurarEleccion(adminId);
+      res.status(200).json({
+        mensaje: "Elección reconfigurada correctamente. Recuerde re-desplegar los contratos para limpiar el estado on-chain.",
+        ...resultado,
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: "No se pudo reconfigurar la elección",
         mensaje: error instanceof Error ? error.message : "Error desconocido",
       });
     }

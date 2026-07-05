@@ -25,6 +25,9 @@ router.get("/padron", requireAdmin, AdminController.obtenerVotantesElegibles);
 router.post("/padron", requireAdmin, AdminController.agregarVotanteElegible);
 router.post("/padron/csv", requireAdmin, AdminController.cargarPadronCSV);
 
+// Reconfiguración completa para nueva elección
+router.post("/reconfigurar", requireAdmin, AdminController.reconfigurarEleccion);
+
 // Escrutinio cooperativo (Shamir)
 router.get("/escrutinio/estado", requireAdmin, AdminController.obtenerEstadoEscrutinio);
 router.post("/escrutinio/inicializar", requireAdmin, AdminController.inicializarEscrutinio);

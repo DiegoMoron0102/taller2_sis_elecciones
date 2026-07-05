@@ -1,0 +1,49 @@
+{
+  "sistema": "VotoSeguro — Sistema de Votación Electrónica Descentralizada Verificable",
+  "version": "Sprint 7",
+  "metodoEscrutinio": "elgamal",
+  "timestamp": "2026-06-18T22:59:06.027Z",
+  "candidatos": [
+    {
+      "indice": 0,
+      "nombre": "Rodrigo Paz",
+      "descripcion": "PDC",
+      "votos": 0
+    },
+    {
+      "indice": 1,
+      "nombre": "Tuto Quiroga",
+      "descripcion": "Libre",
+      "votos": 1
+    }
+  ],
+  "totalVotos": 1,
+  "totalBoletasOnChain": 1,
+  "shamir": {
+    "indicesUsados": [
+      1,
+      2,
+      3
+    ],
+    "custodiosParticipantes": [
+      {
+        "indice": 1,
+        "nombre": "Custodio 1",
+        "partido": "Partido 1"
+      },
+      {
+        "indice": 2,
+        "nombre": "Custodio 2",
+        "partido": "Partido 2"
+      },
+      {
+        "indice": 3,
+        "nombre": "Custodio 3",
+        "partido": "Partido 3"
+      }
+    ],
+    "hashSecreto": "1079df4382a2080108a2c9825db6067402fc08995dda60e20a320ab075b660f8",
+    "n": 5,
+    "umbral": 3
+  }
+}

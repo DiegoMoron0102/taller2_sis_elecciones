@@ -448,6 +448,7 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
   const [vcActual, setVcActual] = useState<{ vc: unknown; padron: string } | null>(null);
+  const [vcsCSV, setVcsCSV] = useState<Array<{ numeroPadron: string; nombre: string | null; vc: unknown }>>([]);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -494,9 +495,23 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
     }
   };
 
+  const descargarTodasVCs = (vcs: Array<{ numeroPadron: string; nombre: string | null; vc: unknown }>) => {
+    vcs.forEach(({ numeroPadron, vc }, i) => {
+      setTimeout(() => {
+        const blob = new Blob([JSON.stringify(vc, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `VC_${numeroPadron}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, i * 300);
+    });
+  };
+
   const cargarCSV = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); setExito(""); setCargando(true);
+    setError(""); setExito(""); setCargando(true); setVcsCSV([]);
     try {
       const res = await fetch("/api/admin/padron/csv", {
         method: "POST",
@@ -506,6 +521,7 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje ?? "Error");
       setExito(`${data.exitosos} votantes cargados${data.errores?.length ? `, ${data.errores.length} errores` : ""}`);
+      if (data.vcs?.length) setVcsCSV(data.vcs);
       setCsvTexto("");
       await cargar();
     } catch (err) {
@@ -615,6 +631,48 @@ function PanelPadron({ token, eleccionAbierta }: { token: string; eleccionAbiert
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {exito && <p className="text-emerald-600 text-sm font-medium">{exito}</p>}
+
+      {vcsCSV.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-xl border border-[#197fe6]/30 bg-[#197fe6]/5 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#197fe6]">folder_zip</span>
+              <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                {vcsCSV.length} Credenciales Verificables generadas
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => descargarTodasVCs(vcsCSV)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#197fe6] text-white text-xs font-bold hover:bg-blue-700 transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">download_for_offline</span>
+              Descargar todas ({vcsCSV.length})
+            </button>
+          </div>
+          <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+            {vcsCSV.map(({ numeroPadron, nombre, vc }) => (
+              <div key={numeroPadron} className="flex items-center justify-between gap-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2">
+                <div>
+                  <span className="font-mono text-xs font-semibold text-slate-900 dark:text-white">{numeroPadron}</span>
+                  {nombre && <span className="text-xs text-slate-500 ml-2">{nombre}</span>}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => descargarVC(vc, numeroPadron)}
+                  className="flex items-center gap-1 text-xs text-[#197fe6] hover:text-blue-700 font-semibold transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">download</span>
+                  VC_{numeroPadron}.json
+                </button>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-400">
+            Entregue cada archivo al votante correspondiente. Las VCs contienen la firma ECDSA de la Autoridad Electoral.
+          </p>
+        </div>
+      )}
 
       {votantes.length > 0 && (
         <div className="overflow-x-auto max-h-48 overflow-y-auto">
@@ -1337,6 +1395,29 @@ function Dashboard({ token, nombre, onLogout }: { token: string; nombre: string;
               </span>
             </p>
           )}
+
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-2">
+            <p className="text-xs text-slate-500 mb-3">
+              <span className="font-semibold text-amber-600">Zona de reconfiguración:</span>{" "}
+              Elimina candidatos, padrón, sesiones y votos de la base de datos para comenzar desde cero.
+              Los datos on-chain (boletas en blockchain) requieren re-desplegar contratos (<code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">yarn deploy</code>).
+            </p>
+            <BotonAccion
+              etiqueta="Reconfigurar elección" icono="restart_alt" colorClass="bg-slate-700 hover:bg-slate-800"
+              disabled={estado?.eleccionAbierta ?? false}
+              motivo={estado?.eleccionAbierta ? "Cierre la jornada antes de reconfigurar" : undefined}
+              onConfirmar={async () => {
+                const res = await fetch("/api/admin/reconfigurar", {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.mensaje ?? "Error al reconfigurar");
+                mostrarExito(data.mensaje ?? "Elección reconfigurada");
+                await cargarEstado();
+              }}
+            />
+          </div>
         </div>
       )}
 

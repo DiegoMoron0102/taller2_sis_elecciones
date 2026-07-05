@@ -231,8 +231,13 @@ export async function agregarVotanteElegible(
 export async function cargarPadronCSV(
   lineas: string[],
   adminId: string,
-): Promise<{ exitosos: number; errores: Array<{ fila: number; error: string }> }> {
+): Promise<{
+  exitosos: number;
+  errores: Array<{ fila: number; error: string }>;
+  vcs: Array<{ numeroPadron: string; nombre: string | null; vc: unknown }>;
+}> {
   const errores: Array<{ fila: number; error: string }> = [];
+  const vcs: Array<{ numeroPadron: string; nombre: string | null; vc: unknown }> = [];
   let exitosos = 0;
 
   for (let i = 0; i < lineas.length; i++) {
@@ -250,8 +255,11 @@ export async function cargarPadronCSV(
         continue;
       }
 
-      await agregarVotanteElegible(numeroPadron, nombre, ci);
+      const resultado = await agregarVotanteElegible(numeroPadron, nombre, ci);
       exitosos++;
+      if (resultado.vc) {
+        vcs.push({ numeroPadron, nombre: resultado.nombre, vc: resultado.vc });
+      }
     } catch (err) {
       errores.push({
         fila: i + 1,
@@ -271,5 +279,41 @@ export async function cargarPadronCSV(
     });
   }
 
-  return { exitosos, errores };
+  return { exitosos, errores, vcs };
+}
+
+export async function reconfigurarEleccion(adminId: string): Promise<{
+  candidatosEliminados: number;
+  votantesEliminados: number;
+  sesionesEliminadas: number;
+  votosEliminados: number;
+}> {
+  const [candidatos, votantes, sesiones, votos] = await prisma.$transaction([
+    prisma.candidato.deleteMany({}),
+    prisma.votanteElegible.deleteMany({}),
+    prisma.sesionVotante.deleteMany({}),
+    prisma.votoContabilizado.deleteMany({}),
+  ]);
+
+  await prisma.credencialEmitida.deleteMany({});
+
+  await prisma.configuracionEleccion.updateMany({
+    data: { estado: "PENDIENTE" },
+  });
+
+  await prisma.logAuditoria.create({
+    data: {
+      accion: "RECONFIGURAR_ELECCION",
+      actor: `admin:${adminId}`,
+      detalle: `Elección reconfigurada: ${candidatos.count} candidatos, ${votantes.count} votantes, ${sesiones.count} sesiones, ${votos.count} votos eliminados`,
+      administradorId: adminId,
+    },
+  });
+
+  return {
+    candidatosEliminados: candidatos.count,
+    votantesEliminados: votantes.count,
+    sesionesEliminadas: sesiones.count,
+    votosEliminados: votos.count,
+  };
 }

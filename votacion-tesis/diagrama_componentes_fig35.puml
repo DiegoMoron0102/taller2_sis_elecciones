@@ -1,0 +1,90 @@
+@startuml DiagramaComponentes_VotoSeguro
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+skinparam component {
+  BackgroundColor #EBF5FB
+  BorderColor #1A5276
+  FontColor #1A5276
+}
+skinparam interface {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+}
+skinparam note {
+  BackgroundColor #FEF9E7
+  BorderColor #F39C12
+}
+
+title Diagrama de Componentes — VotoSeguro
+
+package "Cliente Web (Next.js 15)" {
+  [LandingPage /]
+  [VerificarElegibilidad /verificar]
+  [EmitirVoto /votar]
+  [ComprobarVoto /comprobar]
+  [ExplorarBoletas /explorer]
+  [PanelAdmin /admin]
+  [Resultados /resultados]
+}
+
+package "Backend API (Express 4 + Prisma)" {
+  [AuthController]
+  [VotoController]
+  [AdminController]
+  [VotanteService]
+  [VotoService]
+  [AdminService]
+  [BlockchainService]
+  [SchnorrModule]
+  [ElGamalModule]
+  [VCService]
+  database "SQLite\n(Prisma ORM)" as DB
+}
+
+package "Contratos Inteligentes (Solidity 0.8 / EVM)" {
+  [AdminParams]
+  [NullifierSet]
+  [BulletinBoard]
+  [Escrutinio]
+}
+
+package "Red Blockchain Local (Hardhat)" {
+  [HardhatNode]
+}
+
+[Cliente Web (Next.js 15)] --> [Backend API (Express 4 + Prisma)] : HTTP / REST\n(proxies /api/*)
+
+[AuthController] --> [VotanteService]
+[VotoController] --> [VotoService]
+[AdminController] --> [AdminService]
+[VotoService] --> [SchnorrModule] : genera/verifica\nprueba NIZKPoK
+[VotoService] --> [ElGamalModule] : cifrado homomórfico
+[VotanteService] --> [VCService] : firma ECDSA VC
+[VotoService] --> [BlockchainService]
+[AdminService] --> [BlockchainService]
+[BlockchainService] --> [AdminParams] : setearCandidatos\nabrirJornada
+[BlockchainService] --> [NullifierSet] : registrarNullifier\nverificarElegible
+[BlockchainService] --> [BulletinBoard] : emitirBoleta
+[BlockchainService] --> [Escrutinio] : habilitarConteo\npublicarResultados
+[VotanteService] --> DB
+[VotoService] --> DB
+[AdminService] --> DB
+[HardhatNode] --> [AdminParams]
+[HardhatNode] --> [NullifierSet]
+[HardhatNode] --> [BulletinBoard]
+[HardhatNode] --> [Escrutinio]
+
+note right of [NullifierSet]
+  Previene doble voto
+  on-chain mediante
+  conjunto de nullifiers
+end note
+
+note right of [SchnorrModule]
+  s·G = R + c·tokenPoint
+  (Fiat-Shamir, secp256k1)
+end note
+
+@enduml

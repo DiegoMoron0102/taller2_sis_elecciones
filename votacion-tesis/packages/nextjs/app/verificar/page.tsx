@@ -118,6 +118,34 @@ export default function VerificarPage() {
                 <p className="mt-0 mb-0 text-xs text-slate-500">Emitida por la Autoridad Electoral al registrarse en el padrón</p>
               </div>
             </div>
+
+            {/* Adjuntar archivo .json */}
+            <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-colors
+              ${vcJson ? "border-[#197fe6]/50 bg-[#197fe6]/5" : "border-slate-300 dark:border-slate-700 hover:border-[#197fe6]/40 bg-slate-50 dark:bg-slate-800/50"}`}>
+              <input
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={e => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = ev => setVcJson((ev.target?.result as string) ?? "");
+                  reader.readAsText(f);
+                  e.target.value = "";
+                }}
+              />
+              <span aria-hidden="true" className={`material-symbols-outlined text-2xl ${vcJson ? "text-[#197fe6]" : "text-slate-400"}`}>
+                {vcJson ? "task_alt" : "upload_file"}
+              </span>
+              <div>
+                <p className={`text-sm font-semibold mb-0 ${vcJson ? "text-[#197fe6]" : "text-slate-600 dark:text-slate-300"}`}>
+                  {vcJson ? "Archivo cargado — puede editar abajo si lo necesita" : "Adjuntar archivo VC_PADRON.json"}
+                </p>
+                <p className="mt-0 text-xs text-slate-400">O pegue el contenido manualmente en el campo de abajo</p>
+              </div>
+            </label>
+
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 JSON de su Credencial Verificable

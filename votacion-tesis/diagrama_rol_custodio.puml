@@ -1,0 +1,102 @@
+@startuml RolCustodioVotoSeguro
+title Rol del Custodio en el Escrutinio Cooperativo — VotoSeguro\n(Shamir Secret Sharing, umbral 3 de 5)
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBackgroundColor #EBF5FB
+skinparam activityBorderColor #1A5276
+skinparam activityFontName Arial
+skinparam activityFontSize 11
+skinparam ArrowColor #1A5276
+skinparam ArrowThickness 1.5
+skinparam PartitionBackgroundColor #F4F6F7
+skinparam PartitionBorderColor #2C3E50
+skinparam PartitionFontStyle bold
+skinparam NoteBackgroundColor #FEF9E7
+skinparam NoteBorderColor #F39C12
+skinparam shadowing false
+
+|#E9F7EF| ADMINISTRADOR |
+|#EBF5FB| CUSTODIO (×5) |
+|#FDEDEC| SISTEMA (EscrutinioService) |
+
+start
+
+' ─── PRE-JORNADA ───
+|ADMINISTRADOR|
+:Agrega votantes al padrón\ny configura candidatos;
+:Ejecuta: Inicializar Escrutinio\n→ POST /api/admin/escrutinio/inicializar;
+
+|SISTEMA (EscrutinioService)|
+:Genera clave privada ElGamal aleatoria k;
+:dividirSecreto(k, n=5, umbral=3)\nInterpolación de Lagrange sobre GF(p secp256k1)\nObtiene 5 compartimentos: s₁, s₂, s₃, s₄, s₅;
+:Para cada custodio i:\nemitirVCCustodio(nombre, partido, i, fecha)\nFirma ECDSA → CredencialCustodio_i;
+
+|CUSTODIO (×5)|
+:Cada custodio recibe su bundle:\n• CredencialCustodio_i (JSON firmado)\n• Compartimento sᵢ (bigint sobre GF(p))\nLo guarda de forma segura fuera del sistema;
+
+note right
+  Ningún custodio conoce
+  el valor de los otros
+  compartimentos. La clave k
+  no se almacena en el sistema.
+end note
+
+' ─── JORNADA ───
+|ADMINISTRADOR|
+:Abre jornada electoral\n→ BulletinBoard.sol;
+
+note right
+  Durante la jornada los votantes
+  emiten sus boletas cifradas
+  (ElGamal homomórfico).
+  Los compartimentos están
+  custodiados fuera del sistema.
+end note
+
+:Cierra jornada\n→ cerrarEleccion() on-chain;
+:Habilita conteo\n→ habilitarConteo() → Escrutinio.sol;
+
+' ─── APORTE DE COMPARTIMENTOS ───
+|CUSTODIO (×5)|
+:Custodio presenta al panel:\n• CredencialCustodio_i\n• Compartimento sᵢ;
+:→ POST /api/admin/escrutinio/aportar;
+
+|SISTEMA (EscrutinioService)|
+:verificarVCCustodio(vc)\n¿Firma ECDSA de la autoridad válida?;
+
+if (¿VC válida?) then (sí)
+  :Acumula compartimento sᵢ en buffer de memoria\n(nunca persiste en BD);
+else (no)
+  :Rechaza: "CredencialCustodio inválida";
+  stop
+endif
+
+:¿Compartimentos acumulados ≥ 3?;
+
+if (umbral alcanzado) then (sí)
+  ' ─── RECONSTRUCCIÓN Y DESCIFRADO ───
+  :reconstruirSecreto(shares_recibidos)\nInterpolación de Lagrange → clave privada k;
+  :sumarCifrados(todasLasBoletas)\n→ Par cifrado total (suma homomórfica);
+  :descifrarSuma(sumaCifrada, k)\n→ Totales por candidato (baby-step giant-step);
+  :hashPaqueteEvidencias(totales, boletas, logs)\n→ bytes32 hashEvidencias;
+
+  |ADMINISTRADOR|
+  :publicarResultados(totales[], hashEvidencias)\n→ Escrutinio.sol emite ResultadosPublicados;
+  :Resultados auditables públicamente on-chain;
+
+else (no, seguir aportando)
+  :Espera más custodios\n(mínimo 3 de 5 requeridos);
+  |CUSTODIO (×5)|
+  :Siguiente custodio aporta su compartimento;
+endif
+
+note right
+  Con solo 2 compartimentos es
+  matemáticamente imposible
+  reconstruir k (seguridad
+  perfecta del esquema Shamir).
+end note
+
+stop
+
+@enduml

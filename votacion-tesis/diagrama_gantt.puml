@@ -1,0 +1,127 @@
+@startgantt
+<style>
+ganttDiagram {
+  task {
+    BackGroundColor #D6EAF8
+    LineColor #1A5276
+    FontColor #1A5276
+  }
+  separator {
+    LineColor #1A5276
+    BackGroundColor #1A5276
+    FontColor white
+  }
+  note {
+    BackGroundColor #FEF9E7
+    LineColor #F39C12
+  }
+}
+</style>
+
+title Cronograma de Desarrollo -- VotoSeguro\nTaller de Grado 2 -- UCB La Paz -- Primer Semestre 2026
+
+printscale weekly
+saturday are closed
+sunday are closed
+
+Project starts 2026-02-02
+
+-- Fase 0: Planificacion y Setup --
+
+[Revision bibliografica y marco teorico] lasts 2 weeks
+[Definicion de requisitos y backlog] lasts 1 week
+[Definicion de requisitos y backlog] starts at [Revision bibliografica y marco teorico]'s end
+[S0: Monorepo y Hardhat local] lasts 1 week
+[S0: Monorepo y Hardhat local] starts at [Definicion de requisitos y backlog]'s end
+
+-- Fase 1: Modulo de Identidad (Sprint 1) --
+
+[S1: Modulo de identidad y elegibilidad] lasts 2 weeks
+[S1: Modulo de identidad y elegibilidad] starts at [S0: Monorepo y Hardhat local]'s end
+[S1 - Verificar elegibilidad padron y VC] lasts 1 week
+[S1 - Verificar elegibilidad padron y VC] starts at [S0: Monorepo y Hardhat local]'s end
+[S1 - Emision de token anonimo SHA256] lasts 1 week
+[S1 - Emision de token anonimo SHA256] starts at [S0: Monorepo y Hardhat local]'s end
+[S1 - Sesion anonima tokenHash en BD] lasts 1 week
+[S1 - Sesion anonima tokenHash en BD] starts at [S0: Monorepo y Hardhat local]'s end
+[S1 - Pagina verificar frontend] lasts 1 week
+[S1 - Pagina verificar frontend] starts at [S0: Monorepo y Hardhat local]'s end
+
+-- Fase 2: Emision de Votos (Sprint 2) --
+
+[S2: Emision de votos y contratos on-chain] lasts 2 weeks
+[S2: Emision de votos y contratos on-chain] starts at [S1: Modulo de identidad y elegibilidad]'s end
+[S2 - Contratos Solidity 4 contratos] lasts 2 weeks
+[S2 - Contratos Solidity 4 contratos] starts at [S1: Modulo de identidad y elegibilidad]'s end
+[S2 - Endpoint api voto emitir] lasts 1 week
+[S2 - Endpoint api voto emitir] starts at [S1: Modulo de identidad y elegibilidad]'s end
+[S2 - Pagina votar y registro on-chain] lasts 2 weeks
+[S2 - Pagina votar y registro on-chain] starts at [S1: Modulo de identidad y elegibilidad]'s end
+
+-- Fase 3: Verificacion (Sprint 3) --
+
+[S3: Comprobante y verificacion] lasts 1 week
+[S3: Comprobante y verificacion] starts at [S2: Emision de votos y contratos on-chain]'s end
+[S3 - Endpoint comprobante y explorador] lasts 1 week
+[S3 - Endpoint comprobante y explorador] starts at [S2: Emision de votos y contratos on-chain]'s end
+[S3 - Pagina comprobar y explorer] lasts 1 week
+[S3 - Pagina comprobar y explorer] starts at [S2: Emision de votos y contratos on-chain]'s end
+
+-- Fase 4: Panel Administrador (Sprint 4) --
+
+[S4: Panel de administracion] lasts 2 weeks
+[S4: Panel de administracion] starts at [S3: Comprobante y verificacion]'s end
+[S4 - Login JWT scrypt y control jornada] lasts 1 week
+[S4 - Login JWT scrypt y control jornada] starts at [S3: Comprobante y verificacion]'s end
+[S4 - Gestion candidatos y padron] lasts 1 week
+[S4 - Gestion candidatos y padron] starts at [S3: Comprobante y verificacion]'s end
+[S4 - Auditoria de logs y pagina admin] lasts 2 weeks
+[S4 - Auditoria de logs y pagina admin] starts at [S3: Comprobante y verificacion]'s end
+
+-- Fase 5: Escrutinio Cooperativo (Sprint 5) --
+
+[S5: Shamir Secret Sharing] lasts 2 weeks
+[S5: Shamir Secret Sharing] starts at [S4: Panel de administracion]'s end
+[S5 - Shamir SSS 5 de 3 en escrutinioService] lasts 1 week
+[S5 - Shamir SSS 5 de 3 en escrutinioService] starts at [S4: Panel de administracion]'s end
+[S5 - Publicacion resultados on-chain] lasts 1 week
+[S5 - Publicacion resultados on-chain] starts at [S4: Panel de administracion]'s end
+[S5 - Pagina resultados y panel escrutinio] lasts 2 weeks
+[S5 - Pagina resultados y panel escrutinio] starts at [S4: Panel de administracion]'s end
+
+-- Fase 6: Criptografia Real (Sprint 6) --
+
+[S6: Endurecimiento criptografico] lasts 2 weeks
+[S6: Endurecimiento criptografico] starts at [S5: Shamir Secret Sharing]'s end
+[S6 - VC ECDSA con noble curves] lasts 1 week
+[S6 - VC ECDSA con noble curves] starts at [S5: Shamir Secret Sharing]'s end
+[S6 - Prueba Schnorr-Fiat-Shamir NIZKPoK] lasts 1 week
+[S6 - Prueba Schnorr-Fiat-Shamir NIZKPoK] starts at [S5: Shamir Secret Sharing]'s end
+[S6 - Cifrado ElGamal homomorfico] lasts 1 week
+[S6 - Cifrado ElGamal homomorfico] starts at [S5: Shamir Secret Sharing]'s end
+[S6 - SchnorrBrowser en frontend] lasts 1 week
+[S6 - SchnorrBrowser en frontend] starts at [S5: Shamir Secret Sharing]'s end
+
+-- Fase 7: Custodia y Pruebas (Sprint 7) --
+
+[S7: Custodia distribuida y suite de pruebas] lasts 3 weeks
+[S7: Custodia distribuida y suite de pruebas] starts at [S6: Endurecimiento criptografico]'s end
+[S7 - CredencialCustodio VCCustodio ECDSA] lasts 1 week
+[S7 - CredencialCustodio VCCustodio ECDSA] starts at [S6: Endurecimiento criptografico]'s end
+[S7 - Suite completa 122+12+27+9 tests] lasts 2 weeks
+[S7 - Suite completa 122+12+27+9 tests] starts at [S6: Endurecimiento criptografico]'s end
+[S7 - Matriz regresion y protocolo usabilidad] lasts 2 weeks
+[S7 - Matriz regresion y protocolo usabilidad] starts at [S6: Endurecimiento criptografico]'s end
+[S7 - Reporte de evidencias fechado] lasts 1 week
+[S7 - Reporte de evidencias fechado] starts at [S7 - Suite completa 122+12+27+9 tests]'s end
+
+-- Documentacion y Entrega --
+
+[Redaccion informe T2] lasts 3 weeks
+[Redaccion informe T2] starts at [S5: Shamir Secret Sharing]'s end
+[Correcciones y revision del informe] lasts 2 weeks
+[Correcciones y revision del informe] starts at [S7: Custodia distribuida y suite de pruebas]'s end
+[Preparacion defensa] lasts 1 week
+[Preparacion defensa] starts at [Correcciones y revision del informe]'s end
+
+@endgantt

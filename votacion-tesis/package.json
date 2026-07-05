@@ -29,6 +29,7 @@
     "fork": "yarn workspace @votacion/hardhat fork",
     "verify": "yarn workspace @votacion/hardhat verify",
     "backend:dev": "yarn workspace @votacion/backend dev",
+    "benchmark": "node scripts/benchmarks/run-benchmarks.mjs",
     "circuits:compile": "yarn workspace @votacion/circuits compile",
     "postinstall": "husky",
     "precommit": "lint-staged"

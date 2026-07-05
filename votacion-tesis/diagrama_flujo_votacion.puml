@@ -1,0 +1,132 @@
+@startuml FlujoVotacionVotoSeguro
+title Flujo de Funcionamiento del Proceso de Votación — VotoSeguro
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBackgroundColor #EBF5FB
+skinparam activityBorderColor #1A5276
+skinparam activityFontName Arial
+skinparam activityFontSize 10
+skinparam ArrowColor #1A5276
+skinparam ArrowThickness 1.5
+skinparam NoteBackgroundColor #FEF9E7
+skinparam NoteBorderColor #F39C12
+skinparam shadowing false
+
+|#D6EAF8| Votante |
+|#D5F5E3| Backend / Blockchain |
+|#FADBD8| Módulo Criptográfico |
+
+' ─── FASE 1: VERIFICACIÓN DE ELEGIBILIDAD ───────────────────
+|Votante|
+start
+:Presenta Credencial Verificable W3C\n(JSON firmado con ECDSA secp256k1);
+
+|Módulo Criptográfico|
+:verificarVC(vc)\nVerifica firma ECDSA de la autoridad;
+
+|Backend / Blockchain|
+:Consulta padrón electoral\n(VotanteElegible por numeroPadrón);
+
+if (¿Elegible y VC válida?) then (sí)
+  :Genera token anónimo (randomBytes 32)\ntokenHash = SHA-256(token)\ntokenPoint = tokenScalar · G;
+  |Votante|
+  :Recibe token anónimo\n(un solo uso);
+else (no)
+  #FFB3B3:Error 401\n"No elegible o VC inválida";
+  stop
+endif
+
+note right
+  **FASE 1 — Verificación de Elegibilidad**
+  La identidad queda desvinculada
+  del proceso de votación.
+  Solo el hash del token persiste en BD.
+end note
+
+' ─── FASE 2: EMISIÓN DE VOTO ────────────────────────────────
+|Votante|
+:Selecciona candidato en /votar;
+:Genera PruebaSchnorr en el navegador\n(NIZKPoK Fiat-Shamir, @noble/curves)\ns·G = R + c·tokenPoint;
+
+|Módulo Criptográfico|
+:verificarSchnorr(tokenPoint, prueba, msg)\n¿s·G = R + c·H(R||tokenPoint||msg)?;
+
+if (¿Prueba Schnorr válida?) then (sí)
+  :cifrarVotoElgamal(candidatoIdx)\nCifrado homomórfico secp256k1\nRetorna vector ParCifrado[];
+  |Backend / Blockchain|
+  :Verifica nullifier en NullifierSet.sol\n¿Ya fue usado?;
+  if (¿Doble voto?) then (no)
+    :registrarBoleta(votoCifrado, pruebaZK, nullifier)\nEmite BoletaRegistrada on-chain;
+    |Votante|
+    :Recibe txHash\n(comprobante de inclusión);
+  else (sí)
+    #FFB3B3:Error\n"Doble voto detectado";
+    stop
+  endif
+else (no)
+  #FFB3B3:Error 400\n"Prueba Schnorr inválida";
+  stop
+endif
+
+note right
+  **FASE 2 — Emisión de Voto**
+  El voto viaja cifrado.
+  El nullifier previene
+  doble voto on-chain.
+end note
+
+' ─── FASE 3: VERIFICACIÓN INDIVIDUAL ───────────────────────
+|Votante|
+:Guarda txHash como comprobante;
+:Consulta /comprobar con txHash\n(en cualquier momento posterior);
+
+|Backend / Blockchain|
+:verificarComprobante(txHash)\nConsulta BulletinBoard.sol\nRetorna: bloque, timestamp\n(sin revelar candidato elegido);
+
+note right
+  **FASE 3 — Verificación Individual**
+  El votante puede auditar
+  su propio voto en cualquier
+  momento tras la jornada.
+end note
+
+' ─── FASE 4: CIERRE Y ESCRUTINIO COOPERATIVO ────────────────
+|Backend / Blockchain|
+:Administrador cierra jornada\ncerrarEleccion() → BulletinBoard.sol;
+:Administrador habilita conteo\nhabilitarConteo() → Escrutinio.sol;
+:5 custodios aportan\nCredencialCustodio + compartimento Shamir;
+
+|Módulo Criptográfico|
+:verificarVCCustodio(vc) × 3..5;
+if (¿Umbral ≥ 3 custodios?) then (sí)
+  :reconstruirSecreto(shares)\nInterpolación de Lagrange GF(p)\n→ clave privada ElGamal k;
+  :sumarCifrados(todasLasBoletas)\ndescifrarSuma(suma, k)\n→ totales por candidato;
+else (no)
+  :Esperar más custodios\n(mín. 3 de 5 requeridos);
+  stop
+endif
+
+note right
+  **FASE 4 — Escrutinio Cooperativo**
+  Shamir SSS: umbral 3 de 5.
+  Ningún custodio puede
+  descifrar solo.
+end note
+
+' ─── FASE 5: PUBLICACIÓN DE RESULTADOS ─────────────────────
+|Backend / Blockchain|
+:publicarResultados(totales[], hashEvidencias)\n→ Escrutinio.sol emite ResultadosPublicados;
+
+|Votante|
+:Consulta /resultados on-chain\nVerifica y audita el conteo\ncon paquete de evidencias público;
+
+note right
+  **FASE 5 — Publicación**
+  Cualquier tercero puede
+  auditar usando el hash
+  de evidencias on-chain.
+end note
+
+stop
+
+@enduml

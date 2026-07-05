@@ -1,0 +1,34 @@
+{
+  "hashSecreto": "1079df4382a2080108a2c9825db6067402fc08995dda60e20a320ab075b660f8",
+  "n": 5,
+  "umbral": 3,
+  "fechaGeneracion": "2026-06-18T19:41:41.479Z",
+  "clavePublicaEleccion": "030d78e420cfa84e54e1671f2e4349e8a72c20a0699ab4cb4272551934cdfa19a8",
+  "custodios": [
+    {
+      "indice": 1,
+      "nombre": "Custodio 1",
+      "partido": "Partido 1"
+    },
+    {
+      "indice": 2,
+      "nombre": "Custodio 2",
+      "partido": "Partido 2"
+    },
+    {
+      "indice": 3,
+      "nombre": "Custodio 3",
+      "partido": "Partido 3"
+    },
+    {
+      "indice": 4,
+      "nombre": "Custodio 4",
+      "partido": "Partido 4"
+    },
+    {
+      "indice": 5,
+      "nombre": "Custodio 5",
+      "partido": "Partido 5"
+    }
+  ]
+}

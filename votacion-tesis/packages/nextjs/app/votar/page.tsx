@@ -182,7 +182,7 @@ export default function VotarPage() {
                     key={idx}
                     type="button"
                     onClick={() => setSeleccion(idx)}
-                    className={`${staggerClass} btn-votoseguro group flex flex-col gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border text-left shadow-sm relative overflow-hidden
+                    className={`${staggerClass} btn-votoseguro group flex flex-col gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border text-center shadow-sm relative overflow-hidden
                       ${activo
                         ? "border-[#197fe6] ring-2 ring-[#197fe6]/30 shadow-[#197fe6]/10 shadow-md"
                         : "border-slate-200 dark:border-slate-800 hover:border-[#197fe6]/50 hover:shadow-md"
@@ -202,7 +202,7 @@ export default function VotarPage() {
                     {/* Avatar */}
                     <CandidatoAvatar indice={idx} nombre={nombre ?? c} activo={activo} />
 
-                    <div>
+                    <div className="flex flex-col items-center gap-0.5">
                       <p className="font-bold text-slate-900 dark:text-white mb-0">{nombre ?? c}</p>
                       {partido && (
                         <p className="mt-0.5 mb-0 text-[#197fe6] text-xs font-bold tracking-wide">{partido}</p>

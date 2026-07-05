@@ -1,0 +1,606 @@
+@startuml DiagramaCodigo_VotoSeguro
+title Diagrama de Código — VotoSeguro\n(Nivel C4: Code / Clases por Segmento)
+
+skinparam backgroundColor #FFFFFF
+skinparam classBackgroundColor #EBF5FB
+skinparam classBorderColor #1A5276
+skinparam classHeaderBackgroundColor #1A5276
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontName Arial
+skinparam classFontSize 11
+skinparam packageBackgroundColor #F8F9FA
+skinparam packageBorderColor #2C3E50
+skinparam packageFontStyle bold
+skinparam packageFontSize 13
+skinparam ArrowColor #1A5276
+skinparam ArrowThickness 1.5
+skinparam NoteBackgroundColor #FEF9E7
+skinparam NoteBorderColor #F39C12
+
+' ═══════════════════════════════════════════════════════════
+' SEGMENTO 1 — FRONTEND WEB (Next.js 15 + React 19)
+' ═══════════════════════════════════════════════════════════
+package "Segmento 1 — Frontend Web\n(Next.js 15 + React 19 + Tailwind 4)" #EBF5FB {
+
+  class LandingPage {
+    ruta: /
+    --
+    + renderHero(): JSX
+    + renderFeatureBento(): JSX
+  }
+
+  class VerificarPage {
+    ruta: /verificar
+    modo: "vc" | "legacy"
+    --
+    + onSubmitVC(vcJson: string): void
+    + onSubmitLegado(padron, nombre, ci): void
+    + guardarToken(token: string): void
+    ' Persiste en localStorage: votingToken, votingSessionId
+  }
+
+  class VotarPage {
+    ruta: /votar
+    seleccion: number | null
+    --
+    + generarSchnorr(token, mensaje): PruebaSchnorr
+    + emitir(candidatoId, token, schnorrProof): void
+    + mostrarComprobante(txHash): void
+    ' schnorrProof = { R: string(66), s: string(64) }
+  }
+
+  class ComprobarPage {
+    ruta: /comprobar
+    --
+    + verificar(txHash: string): void
+    + mostrarResultado(boleta): void
+  }
+
+  class ExplorerPage {
+    ruta: /explorer
+    --
+    + cargarBoletas(): Boleta[]
+    + renderTabla(boletas): JSX
+  }
+
+  class ResultadosPage {
+    ruta: /resultados
+    --
+    + cargarResultados(): ResultadosData
+    + renderBarras(candidatos): JSX
+  }
+
+  class AdminPage {
+    ruta: /admin
+    tabActiva: estado|candidatos|padron|escrutinio|logs
+    --
+    + login(email, password): string
+    + abrirJornada(): void
+    + cerrarJornada(): void
+    + habilitarEscrutinio(): void
+    + agregarCandidato(nombre, desc): void
+    + actualizarFotoCandidato(id, url): void
+    + agregarVotante(padron, nombre, ci): void
+    + cargarPadronCSV(contenido): void
+    + inicializarShares(custodios?): BundleResult
+    + aportarCompartimento(vc, compartimento): void
+    + aportarCompartimentoDirecto(indice): void
+    + ejecutarEscrutinio(): void
+    + resetearEscrutinio(): void
+  }
+
+  class VotingShell {
+    header: string
+    footer: string
+    --
+    + render(children): JSX
+  }
+
+  class ProgressStepper {
+    totalSteps: number
+    currentStep: number
+    faseActual: string
+    --
+    + render(): JSX
+  }
+
+  class SchnorrBrowser {
+    archivo: lib/schnorr.ts
+    curva: secp256k1
+    --
+    + generarSchnorr(token, mensaje): PruebaSchnorr
+    + tokenAEscalar(token): bigint
+    + calcularTokenPoint(token): string
+    + computarReto(R, tokenPoint, msg): bigint
+    ' PruebaSchnorr = { R: hex66, s: hex64 }
+    ' ecuacion: s·G = R + c·tokenPoint
+  }
+}
+
+' ═══════════════════════════════════════════════════════════
+' SEGMENTO 2 — BACKEND API (Express 4.21 + Prisma 5.22)
+' ═══════════════════════════════════════════════════════════
+package "Segmento 2 — Backend API\n(Express 4.21 + Prisma 5.22 + ethers v6)" #E9F7EF {
+
+  class AuthController {
+    rutas: /api/auth/*
+    --
+    + verificarElegibilidad(req, res): void
+    + validarToken(req, res): void
+  }
+
+  class VotoController {
+    rutas: /api/voto/*
+    --
+    + emitir(req, res): void
+    + estadoEleccion(req, res): void
+    + boletas(req, res): void
+    + resultados(req, res): void
+    + comprobante(req, res): void
+  }
+
+  class AdminController {
+    rutas: /api/admin/* [requireAdmin]
+    --
+    + login(req, res): void
+    + obtenerEstado(req, res): void
+    + abrirJornada(req, res): void
+    + cerrarJornada(req, res): void
+    + habilitarEscrutinio(req, res): void
+    + obtenerCandidatos(req, res): void
+    + agregarCandidato(req, res): void
+    + eliminarCandidato(req, res): void
+    + actualizarFotoCandidato(req, res): void
+    + obtenerVotantesElegibles(req, res): void
+    + agregarVotanteElegible(req, res): void
+    + cargarPadronCSV(req, res): void
+    + obtenerLogs(req, res): void
+    + inicializarEscrutinio(req, res): void
+    + aportarCompartimento(req, res): void
+    + aportarCompartimentoDirecto(req, res): void
+    + ejecutarEscrutinio(req, res): void
+    + resetearEscrutinio(req, res): void
+    + obtenerEstadoEscrutinio(req, res): void
+  }
+
+  class RequireAdmin {
+    middleware: adminAuth.ts
+    --
+    + verificar(req, res, next): void
+    ' Bearer JWT → req.admin.adminId
+  }
+
+  class VotanteService {
+    --
+    + verificarFormatoCredencial(input): ResultadoVerificacion
+    + emitirTokenAnonimo(input): EmisionTokenResult
+    + validarToken(token): ValidacionResult
+    + marcarTokenUsado(tokenHash): void
+    ' token = randomBytes(32), tokenHash = SHA-256(token)
+    ' tokenPoint = tokenScalar·G (para Schnorr)
+  }
+
+  class VotoService {
+    --
+    + emitirVoto(candidatoId, token, schnorrProof): EmisionResult
+    + generarNullifierDesdeToken(token): string
+    + estadoEleccion(): EstadoEleccion
+    + obtenerBoletas(): Boleta[]
+    + verificarComprobante(txHash): Comprobante
+    ' nullifier = keccak256(token)
+  }
+
+  class AdminService {
+    --
+    + loginAdmin(email, password): LoginResult
+    + obtenerEstadoAdmin(): EstadoAdmin
+    + abrirJornada(adminId): void
+    + cerrarJornada(adminId): void
+    + habilitarEscrutinio(adminId): void
+    + agregarCandidato(nombre, desc): Candidato
+    + eliminarCandidato(id): void
+    + actualizarFotoCandidato(id, url): Candidato
+    + obtenerCandidatos(): Candidato[]
+    + agregarVotanteElegible(padron, nombre?, ci?): VCResult
+    + obtenerVotantesElegibles(): VotanteElegible[]
+    + cargarPadronCSV(lineas, adminId): ResultadoCarga
+    + obtenerLogsAuditoria(limite): Log[]
+    ' Emite VC ECDSA al agregar votante al padrón
+  }
+
+  class EscrutinioService {
+    SHARES_N: 5
+    SHARES_UMBRAL: 3
+    ' GF(p) — secp256k1 prime
+    --
+    + inicializarShares(custodios?): BundlesResult
+    + aportarCompartimento(vc, compartimento): ResultadoAporte
+    + aportarCompartimentoDirecto(indice): ResultadoAporte
+    + ejecutarEscrutinio(adminId): ResultadoEscrutinio
+    + resetearEscrutinio(adminId): ResetResult
+    + dividirSecreto(secreto, n, umbral): Share[]
+    + reconstruirSecreto(shares): bigint
+    + obtenerResultadosPublicos(): Resultados | null
+    + obtenerEstadoEscrutinio(): EstadoEscrutinio
+    ' aportarCompartimento: valida VC custodio (ECDSA)
+    ' bundles: [{custodio, compartimento, vc}] × n
+  }
+
+  class BlockchainService {
+    proveedor: ethers v6 / JsonRpcProvider
+    --
+    + registrarNullifierElegible(nullifier): void
+    + esNullifierElegible(nullifier): boolean
+    + fueNullifierUsado(nullifier): boolean
+    + registrarBoleta(votoCifrado, pruebaZK, nullifier): TxResult
+    + totalBoletas(): number
+    + obtenerBoleta(id): Boleta
+    + abrirEleccion(): void
+    + cerrarEleccion(): void
+    + habilitarConteo(): void
+    + conteoHabilitado(): boolean
+    + resultadosPublicados(): boolean
+    + publicarResultados(totales, hashEvidencias): TxResult
+    + obtenerResultados(): Resultados
+    + verificarComprobante(txHash): Comprobante
+    + resetearJornada(): ResetResult
+  }
+
+  RequireAdmin ..> AdminController : protege rutas
+  AuthController --> VotanteService : delega
+  VotoController --> VotoService : delega
+  VotoController --> EscrutinioService : resultados públicos
+  AdminController --> AdminService : delega
+  AdminController --> EscrutinioService : delega
+}
+
+' ═══════════════════════════════════════════════════════════
+' SEGMENTO 3 — MÓDULO CRIPTOGRÁFICO (@noble/curves/secp256k1)
+' ═══════════════════════════════════════════════════════════
+package "Segmento 3 — Módulo Criptográfico\n(@noble/curves/secp256k1)" #FDEDEC {
+
+  class SchnorrFiatShamir {
+    archivo: lib/schnorr.ts (backend)
+    curva: secp256k1
+    --
+    + verificarSchnorr(tokenPoint, prueba, msg): boolean
+    + calcularTokenPoint(token): string
+    + computarReto(R, tokenPoint, msg): bigint
+    + tokenAEscalar(token): bigint
+    --
+    ecuacion: s*G = R + c*tokenPoint
+    reto: c = H(R || tokenPoint || mensaje)
+    ' NIZKPoK — Schnorr-Fiat-Shamir (1986/1991)
+  }
+
+  class CifradoElGamal {
+    archivo: lib/elgamal.ts
+    curva: secp256k1
+    --
+    + cifrarVotoElgamal(candidatoIdx, numCandidatos, clavePublica): ParCifrado[]
+    + sumarCifrados(cifrados: ParCifrado[][]): ParCifrado[]
+    + descifrarSuma(par: ParCifrado, clavePrivada: bigint): number
+    + clavePublicaDesdePrivada(claveHex): string
+    + secretoShamirAClaveElgamal(secreto: bigint): bigint
+    ' Homomórfico: Σ(enc(vi)) = enc(Σvi)
+    ' Descifrado: M·G → DLOG por baby-step-giant-step
+  }
+
+  class VCAuthority {
+    archivo: lib/vcAuthority.ts
+    estandar: "W3C VC 1.1"
+    firma: "ECDSA secp256k1 (EcdsaSecp256k1Signature2019)"
+    --
+    + emitirVC(padron, nombre): CredencialVerificable
+    + verificarVC(vc): boolean
+    + obtenerClavePublicaVC(): string
+    + emitirVCCustodio(nombre, partido, indice, fecha): CredencialCustodio
+    + verificarVCCustodio(vc: CredencialCustodio): boolean
+    ' Clave privada de autoridad: variable de entorno
+    ' CredencialCustodio incluye indiceCompartimento
+  }
+
+  class HashService {
+    ' Utilidades de hash inline (sin clase propia en código)
+    --
+    + sha256(data): string
+    + generarNullifier(token): string
+    ' nullifier = keccak256(token) — secp256k1 / ethers.id()
+    + tokenHash(token): string
+    ' tokenHash = SHA-256(token) — Node.js crypto
+    + hashPaqueteEvidencias(datos): string
+    ' hashEvidencias = SHA-256(JSON evidencias)
+  }
+
+  note right of SchnorrFiatShamir
+    La prueba se genera en browser
+    (SchnorrBrowser) y se verifica
+    en el backend antes de emitir
+    la boleta on-chain.
+  end note
+
+  note right of VCAuthority
+    Sprint 6: VCs para votantes.
+    Sprint 7: VCs para custodios
+    de escrutinio (CredencialCustodio).
+    Ambas: firma ECDSA secp256k1 real.
+  end note
+}
+
+' ═══════════════════════════════════════════════════════════
+' SEGMENTO 4 — CONTRATOS INTELIGENTES (Solidity 0.8.x / EVM)
+' ═══════════════════════════════════════════════════════════
+package "Segmento 4 — Contratos Inteligentes\n(Solidity 0.8.x — Hardhat 2.28 — EVM local)" #E9F7EF {
+
+  class AdminParams {
+    hereda: Ownable (OpenZeppelin)
+    --
+    nombreEleccion: string
+    candidatos: string[] [privado]
+    clavePublicaEleccion: bytes
+    configuracionFinalizada: bool
+    --
+    + configurarCandidatos(candidatos[]): void
+    + configurarClavePublica(clave): void
+    + finalizarConfiguracion(): void
+    + candidato(indice): string
+    + totalCandidatos(): uint256
+    + candidatos(): string[]
+    --
+    event EleccionNombrada
+    event CandidatosConfigurados
+    event ClavePublicaConfigurada
+    event ConfiguracionFinalizada
+    error ConfiguracionYaFinalizada
+    error CandidatosVacios
+    error ClavePublicaVacia
+  }
+
+  class NullifierSet {
+    hereda: Ownable (OpenZeppelin)
+    --
+    elegible: mapping(bytes32 => bool)
+    usado: mapping(bytes32 => bool)
+    totalElegibles: uint256
+    totalUsados: uint256
+    emisorDeBoletas: address
+    --
+    + setEmisorDeBoletas(emisor): void
+    + registrarNullifiers(nullifiers[]): void
+    + marcarUsado(nullifier): void
+    ' Solo el emisorDeBoletas puede marcar
+    + elegible(nullifier): bool
+    + usado(nullifier): bool
+    + disponibles(): uint256
+    --
+    event NullifiersRegistrados
+    event NullifierUsado
+    event EmisorDeBoletasConfigurado
+    error NullifierNoElegible
+    error NullifierYaUsado
+    error NoAutorizado
+  }
+
+  class BulletinBoard {
+    hereda: Ownable (OpenZeppelin)
+    --
+    _boletas: Boleta[] [privado]
+    eleccionAbierta: bool
+    nullifierSet: INullifierSet
+    verifier: IZKVerifier [reservado futuro]
+    --
+    .. struct Boleta ..
+    votoCifrado: bytes
+    pruebaZK: bytes
+    nullifier: bytes32
+    bloque: uint256
+    timestamp: uint256
+    --
+    + setNullifierSet(addr): void
+    + setVerifier(addr): void
+    + abrirEleccion(): void
+    + cerrarEleccion(): void
+    + registrarBoleta(votoCifrado, pruebaZK, nullifier): void
+    + totalBoletas(): uint256
+    + obtenerBoleta(id): Boleta
+    + obtenerRangoBoletas(desde, hasta): Boleta[]
+    --
+    event EleccionAbierta
+    event EleccionCerrada
+    event BoletaRegistrada(id, nullifier, bloque)
+    error EleccionNoAbierta
+    error NullifierNoElegible
+    error NullifierYaUsado
+    error PruebaZKInvalida
+  }
+
+  class Escrutinio {
+    hereda: Ownable (OpenZeppelin)
+    --
+    conteoHabilitado: bool
+    numeroJornada: uint256
+    _resultados: Resultados [privado]
+    --
+    .. struct Resultados ..
+    totalesPorCandidato: uint256[]
+    totalVotos: uint256
+    hashPaqueteEvidencias: bytes32
+    timestamp: uint256
+    publicado: bool
+    --
+    + habilitarConteo(): void
+    + publicarResultados(totales[], hashEvidencias): void
+    + obtenerResultados(): Resultados
+    + estaPublicado(): bool
+    + resetearJornada(): void
+    --
+    event ConteoHabilitado
+    event ResultadosPublicados(totalVotos, hashEvidencias, ts)
+    event JornadaReiniciada(numeroJornada, timestamp)
+    error ConteoYaHabilitado
+    error ConteoNoHabilitado
+    error ResultadosYaPublicados
+    error DatosInvalidos
+  }
+
+  BulletinBoard --> NullifierSet : verifica elegible\ny marca usado
+  AdminParams --> BulletinBoard : configura candidatos\nantes de abrir
+
+  note bottom of BulletinBoard
+    IZKVerifier reservado para
+    integración futura on-chain
+    (ej. Noir/Barretenberg).
+    La verificación NIZKPoK actual
+    es off-chain (SchnorrFiatShamir).
+  end note
+}
+
+' ═══════════════════════════════════════════════════════════
+' SEGMENTO 5 — ALMACENAMIENTO OFF-CHAIN (Prisma + SQLite)
+' ═══════════════════════════════════════════════════════════
+package "Segmento 5 — Almacenamiento Off-Chain\n(Prisma 5.22 ORM — SQLite prototipo / PostgreSQL prod)" #F8F9FA {
+
+  class Administrador {
+    + id: String <<cuid>>
+    + nombre: String
+    + email: String <<unique>>
+    + passwordHash: String <<scrypt>>
+    + creadoEn: DateTime
+    --
+    logs: LogAuditoria[]
+  }
+
+  class ConfiguracionEleccion {
+    + id: String <<cuid>>
+    + nombre: String
+    + descripcion: String?
+    + fechaInicio: DateTime?
+    + fechaFin: DateTime?
+    + estado: String
+    --
+    estados: PENDIENTE|CONFIGURADA
+           |ABIERTA|CERRADA
+           |ESCRUTADA|FINALIZADA
+  }
+
+  class LogAuditoria {
+    + id: String <<cuid>>
+    + accion: String
+    + actor: String
+    + detalle: String?
+    + creadoEn: DateTime
+    + administradorId: String?
+    --
+    acciones: TOKEN_EMITIDO|VOTO_EMITIDO
+            |ABRIR_JORNADA|CERRAR_JORNADA
+            |HABILITAR_ESCRUTINIO
+            |ESCRUTINIO_EJECUTADO
+            |ESCRUTINIO_REINICIADO
+  }
+
+  class SesionVotante {
+    + id: String <<cuid>>
+    + tokenHash: String <<unique>>
+    + tokenPoint: String?
+    + sessionId: String
+    + usado: Boolean
+    + creadoEn: DateTime
+    + usadoEn: DateTime?
+    --
+    tokenHash = SHA-256(token)
+    tokenPoint = tokenScalar*G (secp256k1)
+    ' PRIVACIDAD: nunca el token en claro
+  }
+
+  class VotanteElegible {
+    + id: String <<cuid>>
+    + numeroPadron: String <<unique>>
+    + nombre: String?
+    + ci: String?
+    + registradoEn: DateTime
+  }
+
+  class Candidato {
+    + id: String <<cuid>>
+    + nombre: String
+    + descripcion: String?
+    + indice: Int <<unique>>
+    + fotoUrl: String?
+    + creadoEn: DateTime
+  }
+
+  class CredencialEmitida {
+    + id: String <<cuid>>
+    + credencialHash: String <<unique>>
+    + numeroPadron: String <<unique>>
+    + emitidaEn: DateTime
+    --
+    ' Solo hash SHA-256 de la VC emitida
+    ' La VC completa se entrega al votante
+  }
+
+  class VotoContabilizado {
+    + id: String <<cuid>>
+    + candidatoIndice: Int
+    + votoCifradoElgamal: String?
+    + emitidoEn: DateTime
+    --
+    ' Sin vínculo a identidad del votante
+    ' votoCifradoElgamal: JSON de ParCifrado[]
+  }
+
+  Administrador "1" --> "0..*" LogAuditoria : genera
+}
+
+' ═══════════════════════════════════════════════════════════
+' RELACIONES ENTRE SEGMENTOS
+' ═══════════════════════════════════════════════════════════
+
+' Frontend → Backend (via proxies /api/* Next.js → Express)
+VerificarPage ..> AuthController : POST /api/auth/verificar-elegibilidad\n(CU-01: elegibilidad + token anónimo)
+VotarPage ..> VotoController : POST /api/voto/emitir\n(CU-02: con schnorrProof)
+ComprobarPage ..> VotoController : GET /api/voto/comprobante\n(CU-03: por txHash)
+ExplorerPage ..> VotoController : GET /api/voto/boletas
+ResultadosPage ..> VotoController : GET /api/voto/resultados\n(CU-09: vía EscrutinioService)
+AdminPage ..> AdminController : /api/admin/*\n(CU-06,07,08)
+VotarPage ..> SchnorrBrowser : genera PruebaSchnorr\nNIZKPoK en browser
+
+' Backend → Criptografía
+VotanteService --> VCAuthority : verificarVC()\nemitirVC()
+VotoService --> SchnorrFiatShamir : verificarSchnorr()\n[OBLIGATORIO antes de emitir]
+VotoService --> CifradoElGamal : cifrarVotoElgamal()
+VotoService --> HashService : generarNullifier()\ntokenHash()
+EscrutinioService --> CifradoElGamal : sumarCifrados()\ndescifrarSuma()
+EscrutinioService --> VCAuthority : emitirVCCustodio()\nverificarVCCustodio()
+EscrutinioService --> HashService : hashPaqueteEvidencias()
+AdminService --> VCAuthority : emitirVC()\nal agregar votante
+
+' Backend → Blockchain (ethers v6)
+VotoService --> BlockchainService : registrarBoleta()
+AdminService --> BlockchainService : abrirEleccion()\ncerrarEleccion()\nregistrarNullifiers()
+EscrutinioService --> BlockchainService : habilitarConteo()\npublicarResultados()
+
+' Blockchain (BlockchainService) → Contratos
+BlockchainService --> AdminParams : configurarCandidatos()\nfinalizarConfiguracion()
+BlockchainService --> NullifierSet : registrarNullifiers()\nmarcarUsado()
+BlockchainService --> BulletinBoard : abrirEleccion()\ncerrarEleccion()\nregistrarBoleta()\ntotalBoletas()
+BlockchainService --> Escrutinio : habilitarConteo()\npublicarResultados()\nresetearJornada()
+
+' Backend → BD (Prisma ORM)
+VotanteService --> SesionVotante : crea sesión\n(solo tokenHash + tokenPoint)
+VotanteService --> CredencialEmitida : registra hash VC
+VotanteService --> VotanteElegible : consulta padrón
+VotoService --> VotoContabilizado : registra voto\n(sin identidad)
+VotoService --> SesionVotante : marca token usado
+AdminService --> Administrador : autentica con scrypt
+AdminService --> Candidato : CRUD candidatos\n(incl. fotoUrl)
+AdminService --> LogAuditoria : audita acciones
+AdminService --> VotanteElegible : gestiona padrón
+EscrutinioService --> VotoContabilizado : lee cifrados ElGamal
+EscrutinioService --> LogAuditoria : audita escrutinio
+EscrutinioService --> ConfiguracionEleccion : marca FINALIZADA
+
+' Schnorr Browser ↔ Schnorr Backend (misma ecuación, distinto entorno)
+SchnorrBrowser ..> SchnorrFiatShamir : misma ecuacion\ns*G = R + c*tokenPoint
+
+@enduml
